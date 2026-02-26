@@ -33,7 +33,13 @@ jobs:
       # Minimal internal link checker (internal links only; avoids flaky externals)
       - name: Link check (internal)
         continue-on-error: true # warn-only until baseline is stable
-        run: npx -y linkinator ./dist --recurse --skip '^(https?:)?//'
+        run: |
+          npx -y http-server ./dist -p 4173 -c-1 &
+          for i in 1 2 3 4 5; do
+            curl -fsS http://localhost:4173/ >/dev/null && break
+            sleep 1
+          done
+          npx -y linkinator http://localhost:4173 --recurse --skip '^(https?:)?//'
 
       # Optional: Lighthouse CI (usually better against preview URLs)
       # - name: Lighthouse CI
