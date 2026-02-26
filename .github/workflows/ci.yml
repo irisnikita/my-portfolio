@@ -30,9 +30,10 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Optional: minimal internal link checker after build
-      # - name: Link check (internal)
-      #   run: npx -y linkinator ./dist --recurse --skip '^(https?:)?//' 
+      # Minimal internal link checker (internal links only; avoids flaky externals)
+      - name: Link check (internal)
+        continue-on-error: true # warn-only until baseline is stable
+        run: npx -y linkinator ./dist --recurse --skip '^(https?:)?//'
 
       # Optional: Lighthouse CI (usually better against preview URLs)
       # - name: Lighthouse CI

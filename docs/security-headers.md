@@ -11,7 +11,7 @@ Tighten later once you know all third-party domains (analytics, form providers, 
 
 ## CSP (starter)
 
-Included in `vercel.json`:
+Included in `vercel.json` (enforced):
 
 ```
 default-src 'self';
@@ -25,7 +25,14 @@ script-src 'self';
 connect-src 'self' https:
 ```
 
-Notes:
+## Report-only option
+
+If you want to trial CSP without breaking the site, switch the header key in `vercel.json` from:
+- `Content-Security-Policy` → `Content-Security-Policy-Report-Only`
+
+(Do **not** ship both at once unless you explicitly want enforce+report behavior.)
+
+## Notes
 - `style-src 'unsafe-inline'` is often needed initially due to inline styles; remove later if you can.
 - If you add analytics (e.g. Plausible, GA), update `script-src`/`connect-src` accordingly.
-- If you embed YouTube, update `frame-src` and potentially `img-src`.
+- If you embed YouTube, add `frame-src` and update other directives as needed.

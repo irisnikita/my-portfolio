@@ -7,6 +7,10 @@
 3) **QA sign-off** on preview URL
 4) Merge PR → Vercel deploys **Production** (from `main`)
 
+## Env vars
+
+- `PUBLIC_CONTACT_EMAIL` (used for mailto links / contact section)
+
 ## QA sign-off checklist (preview)
 
 - Visual pass: layout, typography, responsive (mobile + desktop)
