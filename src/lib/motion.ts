@@ -61,41 +61,75 @@ export function observeReveal(opts: ObserveRevealOpts = {}) {
 
   const els = Array.from(root.querySelectorAll(selector)) as HTMLElement[];
 
-  // counter is per-container + group
-  const counters = new Map<string, number>();
+  const getContainer = (el: HTMLElement) =>
+    (el.closest?.("[data-reveal-container]") as HTMLElement | null) ?? null;
 
   const getContainerKey = (el: HTMLElement) => {
-    const container = el.closest?.("[data-reveal-container]") as HTMLElement | null;
+    const container = getContainer(el);
     return container?.getAttribute("data-reveal-container") ?? "__global";
   };
 
-  const getStaggerMs = (el: HTMLElement) => {
-    const container = el.closest?.("[data-reveal-container]") as HTMLElement | null;
+  const getStaggerMs = (container: HTMLElement | null) => {
     return (
       parseMs(container?.getAttribute("data-reveal-stagger") ?? null) ??
       defaultStaggerMs
     );
   };
 
+  const isGridLayout = (container: HTMLElement | null) =>
+    (container?.getAttribute("data-reveal-layout") ?? "") === "grid";
+
+  const getCols = (container: HTMLElement) => {
+    const css = window.getComputedStyle(container);
+    const tpl = css.gridTemplateColumns;
+    if (!tpl || tpl === "none") return 1;
+    // computed style expands repeat(...) to explicit track sizes
+    return tpl.split(" ").filter(Boolean).length || 1;
+  };
+
+  const getGridDelay = (container: HTMLElement, idx: number) => {
+    const cols = getCols(container);
+    const colStagger = parseMs(container.getAttribute("data-reveal-col-stagger")) ?? 60;
+    const rowStagger = parseMs(container.getAttribute("data-reveal-row-stagger")) ?? 140;
+
+    const row = Math.floor(idx / cols);
+    const col = idx % cols;
+    return row * rowStagger + col * colStagger;
+  };
+
+  // Group elements by container+group so we can do per-grid row/col staggering.
+  const groups = new Map<string, { container: HTMLElement | null; items: HTMLElement[] }>();
+
   for (const el of els) {
     el.classList.add("reveal");
 
-    // per-element explicit delay wins
-    const explicit = parseMs(el.getAttribute("data-reveal-delay"));
-    if (explicit != null) {
-      el.style.setProperty("--reveal-delay", `${explicit}ms`);
-      continue;
-    }
-
+    const container = getContainer(el);
     const containerKey = getContainerKey(el);
     const group = el.getAttribute("data-reveal-group") ?? "__default";
     const key = `${containerKey}::${group}`;
 
-    const idx = counters.get(key) ?? 0;
-    counters.set(key, idx + 1);
+    const g = groups.get(key) ?? { container, items: [] };
+    g.items.push(el);
+    groups.set(key, g);
+  }
 
-    const staggerMs = getStaggerMs(el);
-    el.style.setProperty("--reveal-delay", `${idx * staggerMs}ms`);
+  for (const { container, items } of groups.values()) {
+    const grid = container && isGridLayout(container);
+    const staggerMs = getStaggerMs(container);
+
+    for (let i = 0; i < items.length; i++) {
+      const el = items[i];
+
+      // per-element explicit delay wins
+      const explicit = parseMs(el.getAttribute("data-reveal-delay"));
+      if (explicit != null) {
+        el.style.setProperty("--reveal-delay", `${explicit}ms`);
+        continue;
+      }
+
+      const d = grid && container ? getGridDelay(container, i) : i * staggerMs;
+      el.style.setProperty("--reveal-delay", `${d}ms`);
+    }
   }
 
   const io = new IntersectionObserver(

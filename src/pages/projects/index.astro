@@ -12,9 +12,15 @@ projects.sort((a, b) => (b.data.date?.getTime?.() ?? 0) - (a.data.date?.getTime?
 
 <BaseLayout title="Projects • Cinematic Portfolio" description="Selected work and case studies.">
   <Section title="Projects" eyebrow="Selected Work">
-    <div class="grid">
+    <div
+      class="grid"
+      data-reveal-container="projectsGrid"
+      data-reveal-layout="grid"
+      data-reveal-col-stagger="70"
+      data-reveal-row-stagger="140"
+    >
       {projects.map((p) => (
-        <a class="cardLink" href={`/projects/${p.slug}`}> 
+        <a class="cardLink" href={`/projects/${p.slug}`} data-reveal data-reveal-group="projectCard">
           <Card>
             <div
               class="poster"
