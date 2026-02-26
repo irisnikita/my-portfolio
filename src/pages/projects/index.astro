@@ -1,0 +1,90 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../../components/ui/Section.astro";
+import Card from "../../components/ui/Card.astro";
+import Tag from "../../components/ui/Tag.astro";
+
+const projects = [
+  {
+    slug: "neon-landing",
+    title: "Neon Landing (MVP)",
+    summary: "A performance-first landing with cinematic neon grid and clear CTAs.",
+    tags: ["Astro", "Motion rules"],
+  },
+  {
+    slug: "case-study-template",
+    title: "Case Study Template",
+    summary: "Problem / Approach / Result template with sensible typography and SEO hooks.",
+    tags: ["Content Collections", "MDX"],
+  },
+];
+---
+
+<BaseLayout title="Projects • Cinematic Portfolio" description="Selected work and case studies.">
+  <Section title="Projects" eyebrow="Selected Work">
+    <div class="grid">
+      {projects.map((p) => (
+        <a class="cardLink" href={`/projects/${p.slug}`}> 
+          <Card>
+            <div class="pad">
+              <h3 class="h3">{p.title}</h3>
+              <p class="sum">{p.summary}</p>
+              <div class="tags">
+                {p.tags.map((t, i) => (
+                  <Tag tone={i % 2 === 0 ? "cyan" : "magenta"}>{t}</Tag>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </a>
+      ))}
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .cardLink {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pad {
+    padding: 16px;
+  }
+
+  .h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .sum {
+    margin: 0 0 12px;
+    color: var(--c-muted);
+    line-height: 1.55;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  @media (max-width: 980px) {
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 620px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

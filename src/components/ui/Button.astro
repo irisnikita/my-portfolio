@@ -1,0 +1,118 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"a"> & {
+  href: string;
+  variant?: "primary" | "ghost";
+  magnet?: boolean;
+};
+
+const { variant = "primary", magnet = true, class: className, ...rest } = Astro.props;
+
+const classes = [
+  "btn",
+  variant === "primary" ? "btnPrimary" : "btnGhost",
+  magnet ? "magnet" : "",
+  className ?? "",
+]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<a {...rest} class={classes}>
+  <span class="btnInner">
+    <slot />
+  </span>
+</a>
+
+<script>
+  // Cursor magnet (lightweight): transform-only, respects reduced motion.
+  const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  if (!prefersReduced) {
+    for (const el of document.querySelectorAll('.magnet')) {
+      let raf = 0;
+      const strength = 10;
+
+      const onMove = (ev) => {
+        const rect = el.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = (ev.clientX - cx) / rect.width;
+        const dy = (ev.clientY - cy) / rect.height;
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          el.style.setProperty('--mx', String(dx * strength));
+          el.style.setProperty('--my', String(dy * strength));
+        });
+      };
+      const onLeave = () => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          el.style.setProperty('--mx', '0');
+          el.style.setProperty('--my', '0');
+        });
+      };
+
+      el.addEventListener('pointermove', onMove);
+      el.addEventListener('pointerleave', onLeave);
+    }
+  }
+</script>
+
+<style>
+  .btn {
+    --mx: 0;
+    --my: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    text-decoration: none;
+    color: var(--c-text);
+    line-height: 1;
+
+    transform: translate3d(calc(var(--mx) * 1px), calc(var(--my) * 1px), 0);
+    transition: transform var(--dur-quick) var(--ease-out), box-shadow var(--dur-med) var(--ease-out),
+      background-color var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
+    will-change: transform;
+  }
+
+  .btnInner {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 650;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .btnPrimary {
+    background: radial-gradient(120% 220% at 20% 10%, rgba(50, 245, 255, 0.22), transparent 40%),
+      radial-gradient(120% 220% at 90% 30%, rgba(255, 53, 213, 0.18), transparent 45%),
+      rgba(255, 255, 255, 0.06);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  }
+  .btnPrimary:hover {
+    border-color: rgba(50, 245, 255, 0.35);
+    box-shadow: var(--shadow-glow-cyan);
+    transform: translate3d(calc(var(--mx) * 1px), calc(var(--my) * 1px - 2px), 0);
+  }
+
+  .btnGhost {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .btnGhost:hover {
+    border-color: rgba(255, 53, 213, 0.35);
+    box-shadow: var(--shadow-glow-magenta);
+    transform: translate3d(calc(var(--mx) * 1px), calc(var(--my) * 1px - 2px), 0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn {
+      transform: none;
+    }
+  }
+</style>

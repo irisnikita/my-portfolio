@@ -1,0 +1,168 @@
+---
+import "../styles/global.css";
+
+const {
+  title = "Cinematic Dark Neon Portfolio",
+  description = "Performance-first cinematic dark neon portfolio.",
+} = Astro.props;
+
+const nav = [
+  { href: "/projects", label: "Projects" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+
+const pathname = Astro.url?.pathname ?? "/";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/" aria-label="Home">
+          <span class="mark" aria-hidden="true"></span>
+          <span>Cinematic</span>
+        </a>
+
+        <nav class="nav" aria-label="Primary">
+          {nav.map((item) => (
+            <a
+              href={item.href}
+              class={"navLink" + (pathname.startsWith(item.href) ? " isActive" : "")}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p class="fine">© {new Date().getFullYear()} • Built with Astro</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    transform: translateY(-140%);
+    background: rgba(7, 6, 13, 0.92);
+    border: 1px solid var(--c-border);
+    color: var(--c-text);
+    padding: 10px 12px;
+    border-radius: 10px;
+    transition: transform var(--dur-quick) var(--ease-out);
+    z-index: 50;
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  .wrap {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    backdrop-filter: saturate(120%) blur(10px);
+    background: rgba(7, 6, 13, 0.65);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  @supports not (backdrop-filter: blur(1px)) {
+    .site-header {
+      background: rgba(7, 6, 13, 0.92);
+    }
+  }
+
+  .site-header .wrap {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--c-text);
+    font-weight: 650;
+    letter-spacing: var(--tracking-tight);
+  }
+  .mark {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 30%, #ffffff, rgba(50, 245, 255, 0.85) 35%, rgba(255, 53, 213, 0.6));
+    box-shadow: var(--shadow-glow-cyan);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .navLink {
+    text-decoration: none;
+    color: var(--c-muted);
+    padding: 8px 10px;
+    border-radius: 10px;
+    transition: color var(--dur-quick) var(--ease-out), background-color var(--dur-quick) var(--ease-out);
+  }
+  .navLink:hover {
+    color: var(--c-text);
+    background: rgba(255, 255, 255, 0.04);
+  }
+  .navLink.isActive {
+    color: var(--c-text);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .site-footer {
+    margin-top: 72px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .site-footer .wrap {
+    padding-block: 28px;
+  }
+  .fine {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 14px;
+  }
+
+  @media (max-width: 520px) {
+    .nav {
+      gap: 2px;
+    }
+    .navLink {
+      padding: 8px 8px;
+      font-size: 14px;
+    }
+  }
+</style>

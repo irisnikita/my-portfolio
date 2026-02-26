@@ -1,0 +1,19 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"div"> & { as?: "div" | "section" | "header" | "footer" };
+const { as = "div", class: className, ...rest } = Astro.props;
+const Tag = as;
+---
+
+<Tag {...rest} class={['container', className].filter(Boolean).join(' ')}>
+  <slot />
+</Tag>
+
+<style>
+  .container {
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+</style>

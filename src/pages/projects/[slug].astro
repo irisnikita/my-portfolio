@@ -1,0 +1,113 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/ui/Container.astro";
+import Tag from "../../components/ui/Tag.astro";
+
+export function getStaticPaths() {
+  // MVP: hardcoded slugs. Day 2: generated from Astro Content Collections.
+  return [{ params: { slug: "neon-landing" } }, { params: { slug: "case-study-template" } }];
+}
+
+const { slug } = Astro.params;
+
+// MVP placeholder; Day 2 will be Astro Content Collections.
+const doc = {
+  title: slug ? slug.split("-").map((s) => s[0].toUpperCase() + s.slice(1)).join(" ") : "Project",
+  problem: "What was the problem and why it mattered.",
+  approach: "How it was built (tradeoffs, constraints, performance budget).",
+  result: "Outcome, metrics, and links.",
+};
+---
+
+<BaseLayout title={`${doc.title} • Project`} description={`Case study: ${doc.title}`}>
+  <article class="wrap">
+    <Container>
+      <header class="head">
+        <Tag tone="magenta">Case Study</Tag>
+        <h1 class="h1">{doc.title}</h1>
+        <p class="lede">Problem → Approach → Result (template). Day 2 will be wired to Content Collections.</p>
+      </header>
+
+      <div class="grid">
+        <section class="block">
+          <h2>Problem</h2>
+          <p>{doc.problem}</p>
+        </section>
+        <section class="block">
+          <h2>Approach</h2>
+          <p>{doc.approach}</p>
+        </section>
+        <section class="block">
+          <h2>Result</h2>
+          <p>{doc.result}</p>
+          <div class="links">
+            <a href="#" aria-label="GitHub link (placeholder)">GitHub</a>
+            <a href="#" aria-label="Live link (placeholder)">Live</a>
+          </div>
+        </section>
+      </div>
+    </Container>
+  </article>
+</BaseLayout>
+
+<style>
+  .wrap {
+    padding-block: clamp(40px, 7vw, 80px);
+  }
+  .head {
+    max-width: 70ch;
+  }
+  .h1 {
+    margin: 14px 0 10px;
+    font-size: clamp(30px, 5vw, 46px);
+    letter-spacing: var(--tracking-tight);
+  }
+  .lede {
+    margin: 0;
+    color: var(--c-muted);
+    line-height: 1.65;
+  }
+
+  .grid {
+    margin-top: 26px;
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .block {
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 16px;
+  }
+  .block h2 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    letter-spacing: var(--tracking-tight);
+  }
+  .block p {
+    margin: 0;
+    color: var(--c-muted);
+    line-height: 1.65;
+  }
+
+  .links {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .links a {
+    color: rgba(50, 245, 255, 0.85);
+    text-decoration: none;
+  }
+  .links a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 900px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

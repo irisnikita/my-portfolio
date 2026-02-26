@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"article">;
+const { class: className, ...rest } = Astro.props;
+---
+
+<article {...rest} class={['card', className].filter(Boolean).join(' ')}>
+  <slot />
+</article>
+
+<style>
+  .card {
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: radial-gradient(120% 160% at 20% 0%, rgba(124, 92, 255, 0.16), transparent 50%),
+      rgba(255, 255, 255, 0.03);
+    overflow: hidden;
+    position: relative;
+    transition: transform var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(50, 245, 255, 0.22);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card:hover {
+      transform: none;
+    }
+  }
+</style>
