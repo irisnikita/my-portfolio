@@ -16,9 +16,14 @@ projects.sort((a, b) => (b.data.date?.getTime?.() ?? 0) - (a.data.date?.getTime?
       {projects.map((p) => (
         <a class="cardLink" href={`/projects/${p.slug}`}> 
           <Card>
-            <div class="poster" aria-hidden="true" style={`--h:${(p.slug.length * 23) % 360}deg`}></div>
+            <div
+              class="poster"
+              aria-hidden="true"
+              style={`--h:${(p.slug.length * 23) % 360}deg`}
+              transition:name={`project-poster-${p.slug}`}
+            ></div>
             <div class="pad">
-              <h3 class="h3">{p.data.title}</h3>
+              <h3 class="h3" transition:name={`project-title-${p.slug}`}>{p.data.title}</h3>
               <p class="sum">{p.data.summary}</p>
 
               {p.data.metric ? <p class="metric">{p.data.metric}</p> : null}

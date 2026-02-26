@@ -35,8 +35,10 @@ const { title, summary, githubUrl, liveUrl, tags } = entry.data;
           ))}
         </div>
 
-        <h1 class="h1">{title}</h1>
+        <h1 class="h1" transition:name={`project-title-${slug}`}>{title}</h1>
         <p class="lede">{summary}</p>
+
+        <div class="detailPoster" aria-hidden="true" transition:name={`project-poster-${slug}`}></div>
 
         {(githubUrl || liveUrl) && (
           <div class="links" aria-label="Project links">
@@ -87,6 +89,18 @@ const { title, summary, githubUrl, liveUrl, tags } = entry.data;
     margin: 0;
     color: var(--c-muted);
     line-height: 1.7;
+  }
+
+  .detailPoster {
+    height: 160px;
+    margin-top: 18px;
+    border-radius: var(--radius);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: radial-gradient(240px 200px at 20% 20%, rgba(50, 245, 255, 0.22), transparent 62%),
+      radial-gradient(260px 220px at 75% 30%, rgba(255, 53, 213, 0.18), transparent 66%),
+      radial-gradient(120% 160% at 30% 10%, rgba(124, 92, 255, 0.14), transparent 60%),
+      rgba(255, 255, 255, 0.02);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
   }
 
   .links {
