@@ -5,11 +5,12 @@ import Button from "../components/ui/Button.astro";
 import Tag from "../components/ui/Tag.astro";
 import NeonGridParallax from "../components/hero/NeonGridParallax.astro";
 import ContactSection from "../components/sections/ContactSection.astro";
+import { site } from "../data/site";
 
-const title = "Nguyễn Lương Trường Vĩ — Full-stack";
+const title = `${site.name} — ${site.title}`;
 ---
 
-<BaseLayout title={title} description="Nguyễn Lương Trường Vĩ — performance-first full-stack craft. Cinematic interfaces, clean systems.">
+<BaseLayout title={title} description={`${site.tagline} • ${site.location}`}>
   <section class="hero">
     <NeonGridParallax />
     <div class="vignette" />
@@ -18,12 +19,9 @@ const title = "Nguyễn Lương Trường Vĩ — Full-stack";
     <Container>
       <div class="heroInner">
         <div class="stack">
-          <Tag tone="cyan">Performance-first full-stack craft.</Tag>
-          <h1 class="h1">Nguyễn Lương Trường Vĩ</h1>
-          <p class="sub">
-            Full-stack developer — HCM (GMT+7). UI chỉn chu, motion có kiểm soát, backend rõ ràng.
-            Ưu tiên performance, accessibility và shipping ổn định.
-          </p>
+          <Tag tone="cyan">{site.tagline}</Tag>
+          <h1 class="h1">{site.name}</h1>
+          <p class="sub">{site.bio} • {site.location}</p>
 
           <div class="ctaRow">
             <Button href="/projects" variant="primary">View Work</Button>
@@ -31,13 +29,13 @@ const title = "Nguyễn Lương Trường Vĩ — Full-stack";
           </div>
 
           <ul class="proof" aria-label="Proof points" data-reveal-container="heroProof" data-reveal-stagger="90">
-            <li data-reveal data-reveal-group="proof">Perf 90+</li>
+            <li data-reveal data-reveal-group="proof">{site.title}</li>
+            <li data-reveal data-reveal-group="proof">{site.location}</li>
+            <li data-reveal data-reveal-group="proof">Performance-first</li>
             <li data-reveal data-reveal-group="proof">Reduced-motion ready</li>
-            <li data-reveal data-reveal-group="proof">Transform-only motion</li>
-            <li data-reveal data-reveal-group="proof">Case studies</li>
           </ul>
 
-          <p class="meta">No layout shift • Transform-only parallax • Reduced motion supported</p>
+          <p class="meta">Transform-only motion • Reduced motion supported • Static-first</p>
         </div>
       </div>
     </Container>
@@ -47,9 +45,9 @@ const title = "Nguyễn Lương Trường Vĩ — Full-stack";
     <Container>
       <div class="grid">
         <div class="panel">
-          <h2>Projects</h2>
-          <p>Selected case studies with clear Problem → Approach → Result.</p>
-          <a class="textLink" href="/projects">Browse projects →</a>
+          <h2>Selected work</h2>
+          <p>Case studies are being prepared (no invented details). If you want to collaborate, reach out.</p>
+          <a class="textLink" href="/#contact">Get in touch →</a>
         </div>
         <div class="panel">
           <h2>About</h2>

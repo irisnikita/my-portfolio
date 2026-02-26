@@ -1,20 +1,26 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/ui/Section.astro";
+import { site } from "../data/site";
 ---
 
-<BaseLayout title="About • Cinematic Portfolio" description="About and principles.">
-  <Section title="About" eyebrow="Principles">
+<BaseLayout title={`About • ${site.name}`} description={`${site.tagline} • ${site.location}`}>
+  <Section title="About" eyebrow={site.title}>
     <div class="prose">
-      <p>
-        Cinematic dark neon, but performance-first. I prefer transform-only motion, avoid heavy blur filters, and always
-        respect <code>prefers-reduced-motion</code>.
-      </p>
+      <p class="lead">{site.bio}</p>
+
+      <h3>Working principles</h3>
       <ul>
-        <li>Mobile smooth first (360px baseline)</li>
-        <li>No layout shift: reserve space, avoid late-loading UI surprises</li>
-        <li>Accessible focus states and semantic headings</li>
+        <li>Performance-first: budgets, transform/opacity motion, no layout shift</li>
+        <li>Motion-safe: reduced-motion support and clear interaction hierarchy</li>
+        <li>A11y by default: focus-visible parity, semantic structure, readable contrast</li>
+        <li>Shipping mindset: small iterations, measurable outcomes, maintainable code</li>
       </ul>
+
+      <h3>Now</h3>
+      <p>
+        Based in {site.location}. If you’d like to work together, use the Contact section.
+      </p>
     </div>
   </Section>
 </BaseLayout>
@@ -25,10 +31,23 @@ import Section from "../components/ui/Section.astro";
     color: var(--c-muted);
     line-height: 1.75;
   }
-  code {
-    color: rgba(255, 255, 255, 0.85);
-    background: rgba(255, 255, 255, 0.06);
-    padding: 2px 6px;
-    border-radius: 8px;
+
+  .lead {
+    margin: 0 0 18px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 17px;
+    line-height: 1.8;
+  }
+
+  h3 {
+    margin: 22px 0 10px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 18px;
   }
 </style>

@@ -1,139 +1,73 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/ui/Section.astro";
-import Card from "../../components/ui/Card.astro";
-import Tag from "../../components/ui/Tag.astro";
-import { getCollection } from "astro:content";
-
-const projects = await getCollection("projects");
-// Newest first (optional)
-projects.sort((a, b) => (b.data.date?.getTime?.() ?? 0) - (a.data.date?.getTime?.() ?? 0));
+import { site } from "../../data/site";
 ---
 
-<BaseLayout title="Projects • Cinematic Portfolio" description="Selected work and case studies.">
-  <Section title="Projects" eyebrow="Selected Work">
-    <div
-      class="grid"
-      data-reveal-container="projectsGrid"
-      data-reveal-layout="grid"
-      data-reveal-col-stagger="70"
-      data-reveal-row-stagger="140"
-    >
-      {projects.map((p) => (
-        <a class="cardLink" href={`/projects/${p.slug}`} data-reveal data-reveal-group="projectCard">
-          <Card>
-            <div
-              class="poster"
-              aria-hidden="true"
-              style={`--h:${(p.slug.length * 23) % 360}deg`}
-              transition:name={`project-poster-${p.slug}`}
-            ></div>
-            <div class="pad">
-              <h3 class="h3" transition:name={`project-title-${p.slug}`}>{p.data.title}</h3>
-              <p class="sum">{p.data.summary}</p>
+<BaseLayout title={`Projects • ${site.name}`} description={`${site.tagline} • ${site.location}`}>
+  <Section title="Selected work" eyebrow="Coming soon">
+    <div class="empty">
+      <p class="p">
+        Projects are being curated. To avoid inventing details, this page is temporarily an empty state.
+      </p>
 
-              {p.data.metric ? <p class="metric">{p.data.metric}</p> : null}
+      <div class="todo" aria-label="To publish projects, prepare:">
+        <h3 class="h3">To publish case studies, prepare:</h3>
+        <ul>
+          <li>Project name + timeframe + your role</li>
+          <li>Stack + constraints</li>
+          <li>1–2 outcomes/metrics (optional)</li>
+          <li>Links (live/GitHub) + 2–3 screenshots</li>
+        </ul>
+      </div>
 
-              <div class="tags">
-                {(p.data.tags ?? []).map((t, i) => (
-                  <Tag tone={i % 2 === 0 ? "cyan" : "magenta"}>{t}</Tag>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </a>
-      ))}
+      <a class="cta" href="/#contact">Get in touch →</a>
     </div>
   </Section>
 </BaseLayout>
 
 <style>
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
+  .empty {
+    max-width: 78ch;
   }
 
-  .cardLink {
-    color: inherit;
-    text-decoration: none;
-    display: block;
-    border-radius: var(--radius);
+  .p {
+    margin: 0;
+    color: var(--c-muted);
+    line-height: 1.75;
   }
 
-  /* Focus parity: keyboard focus should feel as premium as hover */
-  .cardLink:focus-visible .card {
-    transform: translate3d(0, -2px, 0);
-    border-color: rgba(0, 229, 255, 0.22);
-    box-shadow: var(--shadow-glow-cyan);
-  }
-  .cardLink:focus-visible .card::before {
-    opacity: 1;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cardLink:focus-visible .card {
-      transform: none;
-      box-shadow: none;
-    }
-    .cardLink:focus-visible .card::before {
-      opacity: 0;
-    }
-  }
-
-  .poster {
-    height: 120px;
-    border-radius: calc(var(--radius) - 2px);
-    margin: 10px 10px 0;
+  .todo {
+    margin-top: 16px;
     border: 1px solid rgba(255, 255, 255, 0.10);
-    background:
-      radial-gradient(120px 120px at 20% 20%, rgba(50, 245, 255, 0.35), transparent 60%),
-      radial-gradient(160px 140px at 75% 30%, rgba(255, 53, 213, 0.28), transparent 62%),
-      linear-gradient(135deg, rgba(7, 6, 13, 0.0), rgba(255, 255, 255, 0.06)),
-      radial-gradient(120% 160% at 20% 0%, hsla(var(--h), 90%, 55%, 0.22), transparent 58%),
-      radial-gradient(140% 200% at 80% 40%, hsla(calc(var(--h) + 70deg), 90%, 55%, 0.12), transparent 62%),
-      rgba(255, 255, 255, 0.02);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) inset;
-  }
-
-  .pad {
-    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius);
+    padding: 14px 14px;
   }
 
   .h3 {
-    margin: 0 0 8px;
-    font-size: 18px;
+    margin: 0 0 10px;
+    font-size: 15px;
     letter-spacing: var(--tracking-tight);
+    color: rgba(255, 255, 255, 0.88);
   }
 
-  .sum {
-    margin: 0 0 12px;
-    color: var(--c-muted);
-    line-height: 1.55;
+  ul {
+    margin: 0;
+    padding-left: 18px;
+    color: rgba(255, 255, 255, 0.74);
+    line-height: 1.7;
   }
 
-  .metric {
-    margin: -4px 0 12px;
-    color: rgba(255, 255, 255, 0.75);
-    font-size: 13px;
-    line-height: 1.4;
+  .cta {
+    display: inline-block;
+    margin-top: 16px;
+    color: rgba(0, 229, 255, 0.88);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.25);
   }
 
-  .tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  @media (max-width: 980px) {
-    .grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-
-  @media (max-width: 620px) {
-    .grid {
-      grid-template-columns: 1fr;
-    }
+  .cta:hover {
+    border-bottom-color: rgba(0, 229, 255, 0.6);
   }
 </style>

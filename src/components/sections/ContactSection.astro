@@ -1,6 +1,7 @@
 ---
 import Section from "../ui/Section.astro";
 import Button from "../ui/Button.astro";
+import { site } from "../../data/site";
 
 const {
   id = "contact",
@@ -15,14 +16,17 @@ const {
   compact = false,
 } = Astro.props;
 
-const defaultMailto = import.meta.env.PUBLIC_CONTACT_EMAIL ?? "nltruongvi@gmail.com";
+const defaultMailto = import.meta.env.PUBLIC_CONTACT_EMAIL ?? site.email;
 const resolvedMailto = mailto ?? defaultMailto;
 
-const socialsFromEnv = [
-  { label: "GitHub", href: import.meta.env.PUBLIC_GITHUB_URL },
-  { label: "LinkedIn", href: import.meta.env.PUBLIC_LINKEDIN_URL },
-  { label: "X", href: import.meta.env.PUBLIC_X_URL },
-].filter((x) => typeof x.href === "string" && x.href.length > 0);
+const socials = [
+  { label: "GitHub", href: site.socials.githubUrl ?? import.meta.env.PUBLIC_GITHUB_URL ?? null },
+  { label: "LinkedIn", href: site.socials.linkedinUrl ?? import.meta.env.PUBLIC_LINKEDIN_URL ?? null, todo: true },
+  { label: "X", href: site.socials.xUrl ?? import.meta.env.PUBLIC_X_URL ?? null },
+];
+
+const socialsReady = socials.filter((x) => typeof x.href === "string" && x.href.length > 0);
+const linkedinMissing = !socialsReady.some((x) => x.label === "LinkedIn");
 ---
 
 <Section
@@ -54,11 +58,14 @@ const socialsFromEnv = [
       <Button href="/projects" variant="ghost" magnet={false}>View Projects</Button>
     </div>
 
-    {socialsFromEnv.length > 0 ? (
+    {socialsReady.length > 0 || linkedinMissing ? (
       <div class="socials" aria-label="Social links">
-        {socialsFromEnv.map((s) => (
+        {socialsReady.map((s) => (
           <a class="socialLink" href={s.href} target="_blank" rel="noreferrer">{s.label}</a>
         ))}
+        {linkedinMissing ? (
+          <span class="socialTodo" aria-label="LinkedIn URL missing">Add LinkedIn URL (TODO)</span>
+        ) : null}
       </div>
     ) : null}
   </div>
@@ -143,5 +150,11 @@ const socialsFromEnv = [
 
   .socialLink:hover {
     border-bottom-color: rgba(50, 245, 255, 0.6);
+  }
+
+  .socialTodo {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 14px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.22);
   }
 </style>

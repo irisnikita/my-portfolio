@@ -2,10 +2,11 @@
 import "../styles/global.css";
 import { ViewTransitions } from "astro:transitions";
 import RevealInit from "../components/motion/RevealInit.astro";
+import { site } from "../data/site";
 
 const {
-  title = "Cinematic Dark Neon Portfolio",
-  description = "Performance-first cinematic dark neon portfolio.",
+  title = `${site.name} — ${site.title}`,
+  description = `${site.tagline} • ${site.location}`,
   ogImage = "/og.svg",
   ogType = "website",
 } = Astro.props;
@@ -23,13 +24,29 @@ const isContactActive = pathname === "/" && Astro.url?.hash === "#contact";
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
 const ogImageAbs = Astro.site ? new URL(ogImage, Astro.site).toString() : ogImage;
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "WebPage",
-  name: title,
-  description,
-  url: canonical,
-};
+const personSameAs = [site.socials.githubUrl, site.socials.linkedinUrl, site.socials.xUrl].filter(Boolean);
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: `${site.name} — ${site.title}`,
+    url: Astro.site ? Astro.site.toString().replace(/\/$/, "") : canonical,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: site.name,
+    jobTitle: site.title,
+    email: site.email ? `mailto:${site.email}` : undefined,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Ho Chi Minh City",
+      addressCountry: "VN",
+    },
+    sameAs: personSameAs.length ? personSameAs : undefined,
+  },
+];
 ---
 
 <!doctype html>
@@ -70,7 +87,7 @@ const jsonLd = {
       <div class="wrap">
         <a class="brand" href="/" aria-label="Home">
           <span class="mark" aria-hidden="true"></span>
-          <span>Cinematic</span>
+          <span>Trường Vĩ</span>
         </a>
 
         <nav class="nav" aria-label="Primary">
@@ -97,7 +114,7 @@ const jsonLd = {
 
     <footer class="site-footer">
       <div class="wrap">
-        <p class="fine">© {new Date().getFullYear()} • Built with Astro</p>
+        <p class="fine">© {new Date().getFullYear()} • {site.name}</p>
       </div>
     </footer>
   </body>
