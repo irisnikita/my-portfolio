@@ -11,10 +11,14 @@ const {
 const HeadingTag = (`h${headingLevel}` as const);
 ---
 
-<section class={['section', className].filter(Boolean).join(' ')}>
+<section
+  class={['section', className].filter(Boolean).join(' ')}
+  data-reveal-container="section"
+  data-reveal-stagger="70"
+>
   <Container>
-    {eyebrow ? <p class="eyebrow">{eyebrow}</p> : null}
-    {title ? <HeadingTag class="title">{title}</HeadingTag> : null}
+    {eyebrow ? <p class="eyebrow" data-reveal data-reveal-group="sectionHead">{eyebrow}</p> : null}
+    {title ? <HeadingTag class="title" data-reveal data-reveal-group="sectionHead">{title}</HeadingTag> : null}
     <div class="body">
       <slot />
     </div>
