@@ -57,6 +57,28 @@ projects.sort((a, b) => (b.data.date?.getTime?.() ?? 0) - (a.data.date?.getTime?
   .cardLink {
     color: inherit;
     text-decoration: none;
+    display: block;
+    border-radius: var(--radius);
+  }
+
+  /* Focus parity: keyboard focus should feel as premium as hover */
+  .cardLink:focus-visible .card {
+    transform: translate3d(0, -2px, 0);
+    border-color: rgba(0, 229, 255, 0.22);
+    box-shadow: var(--shadow-glow-cyan);
+  }
+  .cardLink:focus-visible .card::before {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cardLink:focus-visible .card {
+      transform: none;
+      box-shadow: none;
+    }
+    .cardLink:focus-visible .card::before {
+      opacity: 0;
+    }
   }
 
   .poster {

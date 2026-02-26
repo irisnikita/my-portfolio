@@ -1,0 +1,11 @@
+{
+  "name": "Cinematic Portfolio",
+  "short_name": "Cinematic",
+  "icons": [
+    {"src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml"},
+    {"src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon"}
+  ],
+  "theme_color": "#060812",
+  "background_color": "#060812",
+  "display": "standalone"
+}
