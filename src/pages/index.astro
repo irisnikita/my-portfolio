@@ -4,6 +4,7 @@ import Container from "../components/ui/Container.astro";
 import Button from "../components/ui/Button.astro";
 import Tag from "../components/ui/Tag.astro";
 import NeonGridParallax from "../components/hero/NeonGridParallax.astro";
+import ContactSection from "../components/sections/ContactSection.astro";
 
 const title = "Cinematic Dark Neon — Portfolio";
 ---
@@ -25,7 +26,7 @@ const title = "Cinematic Dark Neon — Portfolio";
 
           <div class="ctaRow">
             <Button href="/projects" variant="primary">View Work</Button>
-            <Button href="/contact" variant="ghost">Contact</Button>
+            <Button href="/#contact" variant="ghost">Contact</Button>
           </div>
 
           <p class="meta">No layout shift • Transform-only parallax • Reduced motion supported</p>
@@ -50,6 +51,8 @@ const title = "Cinematic Dark Neon — Portfolio";
       </div>
     </Container>
   </section>
+
+  <ContactSection />
 </BaseLayout>
 
 <style>

@@ -1,0 +1,39 @@
+---
+import Section from "../ui/Section.astro";
+import Button from "../ui/Button.astro";
+
+const {
+  id = "contact",
+  title = "Contact",
+  eyebrow = "Let’s talk",
+  mailto = "hello@example.com",
+} = Astro.props;
+---
+
+<Section title={title} eyebrow={eyebrow} class="contactSection">
+  <div id={id} class="wrap">
+    <p class="p">Send a short note about what you’re building. I’ll reply with timelines and a perf budget.</p>
+    <div class="row">
+      <Button href={`mailto:${mailto}`} variant="primary" magnet={false}>Email</Button>
+      <Button href="/projects" variant="ghost" magnet={false}>View Projects</Button>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .wrap {
+    max-width: 72ch;
+    scroll-margin-top: 84px; /* header offset */
+  }
+  .p {
+    margin: 0;
+    color: var(--c-muted);
+    line-height: 1.7;
+  }
+  .row {
+    margin-top: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>
