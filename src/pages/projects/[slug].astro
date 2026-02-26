@@ -2,49 +2,60 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Container from "../../components/ui/Container.astro";
 import Tag from "../../components/ui/Tag.astro";
+import { getCollection, render } from "astro:content";
 
-export function getStaticPaths() {
-  // MVP: hardcoded slugs. Day 2: generated from Astro Content Collections.
-  return [{ params: { slug: "neon-landing" } }, { params: { slug: "case-study-template" } }];
+export async function getStaticPaths() {
+  const projects = await getCollection("projects");
+  return projects.map((p) => ({ params: { slug: p.slug } }));
 }
 
 const { slug } = Astro.params;
+if (!slug) {
+  throw new Error("Missing project slug");
+}
 
-// MVP placeholder; Day 2 will be Astro Content Collections.
-const doc = {
-  title: slug ? slug.split("-").map((s) => s[0].toUpperCase() + s.slice(1)).join(" ") : "Project",
-  problem: "What was the problem and why it mattered.",
-  approach: "How it was built (tradeoffs, constraints, performance budget).",
-  result: "Outcome, metrics, and links.",
-};
+const projects = await getCollection("projects");
+const entry = projects.find((p) => p.slug === slug);
+if (!entry) {
+  throw new Error(`Project not found: ${slug}`);
+}
+
+const { Content } = await render(entry);
+const { title, summary, githubUrl, liveUrl, tags } = entry.data;
 ---
 
-<BaseLayout title={`${doc.title} • Project`} description={`Case study: ${doc.title}`}>
+<BaseLayout title={`${title} • Project`} description={summary}>
   <article class="wrap">
     <Container>
       <header class="head">
-        <Tag tone="magenta">Case Study</Tag>
-        <h1 class="h1">{doc.title}</h1>
-        <p class="lede">Problem → Approach → Result (template). Day 2 will be wired to Content Collections.</p>
+        <div class="tagRow">
+          <Tag tone="magenta">Case Study</Tag>
+          {tags?.slice(0, 3).map((t, i) => (
+            <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{t}</Tag>
+          ))}
+        </div>
+
+        <h1 class="h1">{title}</h1>
+        <p class="lede">{summary}</p>
+
+        {(githubUrl || liveUrl) && (
+          <div class="links" aria-label="Project links">
+            {githubUrl && (
+              <a href={githubUrl} rel="noreferrer" target="_blank">
+                GitHub
+              </a>
+            )}
+            {liveUrl && (
+              <a href={liveUrl} rel="noreferrer" target="_blank">
+                Live
+              </a>
+            )}
+          </div>
+        )}
       </header>
 
-      <div class="grid">
-        <section class="block">
-          <h2>Problem</h2>
-          <p>{doc.problem}</p>
-        </section>
-        <section class="block">
-          <h2>Approach</h2>
-          <p>{doc.approach}</p>
-        </section>
-        <section class="block">
-          <h2>Result</h2>
-          <p>{doc.result}</p>
-          <div class="links">
-            <a href="#" aria-label="GitHub link (placeholder)">GitHub</a>
-            <a href="#" aria-label="Live link (placeholder)">Live</a>
-          </div>
-        </section>
+      <div class="content">
+        <Content />
       </div>
     </Container>
   </article>
@@ -54,60 +65,66 @@ const doc = {
   .wrap {
     padding-block: clamp(40px, 7vw, 80px);
   }
+
   .head {
-    max-width: 70ch;
+    max-width: 78ch;
   }
+
+  .tagRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
   .h1 {
     margin: 14px 0 10px;
     font-size: clamp(30px, 5vw, 46px);
     letter-spacing: var(--tracking-tight);
   }
+
   .lede {
     margin: 0;
     color: var(--c-muted);
-    line-height: 1.65;
-  }
-
-  .grid {
-    margin-top: 26px;
-    display: grid;
-    gap: 14px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .block {
-    border-radius: var(--radius);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    background: rgba(255, 255, 255, 0.03);
-    padding: 16px;
-  }
-  .block h2 {
-    margin: 0 0 8px;
-    font-size: 16px;
-    letter-spacing: var(--tracking-tight);
-  }
-  .block p {
-    margin: 0;
-    color: var(--c-muted);
-    line-height: 1.65;
+    line-height: 1.7;
   }
 
   .links {
     display: flex;
     gap: 12px;
-    margin-top: 12px;
+    margin-top: 14px;
   }
+
   .links a {
     color: rgba(50, 245, 255, 0.85);
     text-decoration: none;
-  }
-  .links a:hover {
-    text-decoration: underline;
+    border-bottom: 1px solid rgba(50, 245, 255, 0.25);
   }
 
-  @media (max-width: 900px) {
-    .grid {
-      grid-template-columns: 1fr;
-    }
+  .links a:hover {
+    border-bottom-color: rgba(50, 245, 255, 0.6);
+  }
+
+  .content {
+    margin-top: 26px;
+    max-width: 78ch;
+    color: var(--c-muted);
+    line-height: 1.8;
+  }
+
+  .content :global(h2) {
+    margin: 22px 0 10px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .content :global(p) {
+    margin: 0 0 12px;
+  }
+
+  .content :global(ul) {
+    margin: 0 0 12px;
+    padding-left: 18px;
   }
 </style>
