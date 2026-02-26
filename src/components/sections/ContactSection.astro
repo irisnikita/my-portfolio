@@ -17,6 +17,12 @@ const {
 
 const defaultMailto = import.meta.env.PUBLIC_CONTACT_EMAIL ?? "hello@yourdomain.com";
 const resolvedMailto = mailto ?? defaultMailto;
+
+const socialsFromEnv = [
+  { label: "GitHub", href: import.meta.env.PUBLIC_GITHUB_URL },
+  { label: "LinkedIn", href: import.meta.env.PUBLIC_LINKEDIN_URL },
+  { label: "X", href: import.meta.env.PUBLIC_X_URL },
+].filter((x) => typeof x.href === "string" && x.href.length > 0);
 ---
 
 <Section
@@ -47,6 +53,14 @@ const resolvedMailto = mailto ?? defaultMailto;
       <Button href={`mailto:${resolvedMailto}`} variant="primary" magnet={false}>Email</Button>
       <Button href="/projects" variant="ghost" magnet={false}>View Projects</Button>
     </div>
+
+    {socialsFromEnv.length > 0 ? (
+      <div class="socials" aria-label="Social links">
+        {socialsFromEnv.map((s) => (
+          <a class="socialLink" href={s.href} target="_blank" rel="noreferrer">{s.label}</a>
+        ))}
+      </div>
+    ) : null}
   </div>
 </Section>
 
@@ -111,5 +125,23 @@ const resolvedMailto = mailto ?? defaultMailto;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  .socials {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+
+  .socialLink {
+    color: rgba(50, 245, 255, 0.85);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(50, 245, 255, 0.25);
+    font-size: 14px;
+  }
+
+  .socialLink:hover {
+    border-bottom-color: rgba(50, 245, 255, 0.6);
   }
 </style>
