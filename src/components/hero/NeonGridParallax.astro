@@ -52,24 +52,29 @@ const { class: className } = Astro.props;
 
 <script>
   const root = document.currentScript?.previousElementSibling;
-  if (!root) {}
-
   const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-  if (!prefersReduced && root) {
+
+  // Reduced motion: do not attach listeners/loops.
+  if (prefersReduced || !root) {
+    // no-op
+  } else {
     const back = root.querySelector('.layerBack');
     const front = root.querySelector('.layerFront');
 
+    let active = !document.hidden;
+
     // Scroll parallax (rAF throttle)
-    let raf = 0;
+    let sRaf = 0;
     let lastY = -1;
 
     const tickScroll = () => {
-      raf = 0;
+      sRaf = 0;
+      if (!active) return;
+
       const y = window.scrollY || 0;
       if (y === lastY) return;
       lastY = y;
 
-      // Keep it subtle; move less on mobile.
       const s = Math.min(1.0, window.innerWidth / 900);
       const backY = (y * 0.05) * s;
       const frontY = (y * 0.09) * s;
@@ -79,51 +84,74 @@ const { class: className } = Astro.props;
     };
 
     const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(tickScroll);
+      if (!active) return;
+      if (sRaf) return;
+      sRaf = requestAnimationFrame(tickScroll);
     };
-
-    tickScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
 
     // Pointer-follow hotspot (fine pointer only)
     const canHover = window.matchMedia?.('(hover: hover)')?.matches;
     const finePointer = window.matchMedia?.('(pointer: fine)')?.matches;
 
-    if (canHover && finePointer) {
-      let praf = 0;
-      let targetX = 0.5;
-      let targetY = 0.25;
-      let curX = targetX;
-      let curY = targetY;
+    let pRaf = 0;
+    let targetX = 0.5;
+    let targetY = 0.25;
+    let curX = targetX;
+    let curY = targetY;
 
-      const clamp01 = (v) => Math.min(1, Math.max(0, v));
+    const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
-      const onMove = (ev) => {
-        const rect = root.getBoundingClientRect();
-        const x = (ev.clientX - rect.left) / rect.width;
-        const y = (ev.clientY - rect.top) / rect.height;
-        targetX = clamp01(x);
-        targetY = clamp01(y);
-        if (!praf) praf = requestAnimationFrame(step);
-      };
+    const stepPointer = () => {
+      pRaf = 0;
+      if (!active) return;
 
-      const step = () => {
-        praf = 0;
-        // easing (critically damped-ish)
-        curX += (targetX - curX) * 0.12;
-        curY += (targetY - curY) * 0.12;
-        root.style.setProperty('--hx', String(curX));
-        root.style.setProperty('--hy', String(curY));
+      curX += (targetX - curX) * 0.12;
+      curY += (targetY - curY) * 0.12;
+      root.style.setProperty('--hx', String(curX));
+      root.style.setProperty('--hy', String(curY));
 
-        // keep animating a bit while settling
-        if (Math.abs(targetX - curX) + Math.abs(targetY - curY) > 0.002) {
-          praf = requestAnimationFrame(step);
-        }
-      };
+      if (Math.abs(targetX - curX) + Math.abs(targetY - curY) > 0.002) {
+        pRaf = requestAnimationFrame(stepPointer);
+      }
+    };
 
-      root.addEventListener('pointermove', onMove, { passive: true });
-    }
+    const onPointerMove = (ev) => {
+      if (!active) return;
+      const rect = root.getBoundingClientRect();
+      const x = (ev.clientX - rect.left) / rect.width;
+      const y = (ev.clientY - rect.top) / rect.height;
+      targetX = clamp01(x);
+      targetY = clamp01(y);
+      if (!pRaf) pRaf = requestAnimationFrame(stepPointer);
+    };
+
+    const attach = () => {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      if (canHover && finePointer) root.addEventListener('pointermove', onPointerMove, { passive: true });
+    };
+
+    const detach = () => {
+      window.removeEventListener('scroll', onScroll);
+      root.removeEventListener('pointermove', onPointerMove);
+      if (sRaf) cancelAnimationFrame(sRaf);
+      if (pRaf) cancelAnimationFrame(pRaf);
+      sRaf = 0;
+      pRaf = 0;
+    };
+
+    const onVis = () => {
+      active = !document.hidden;
+      if (!active) {
+        detach();
+        return;
+      }
+      attach();
+      tickScroll();
+    };
+
+    attach();
+    tickScroll();
+    document.addEventListener('visibilitychange', onVis);
   }
 </script>
 
@@ -153,10 +181,10 @@ const { class: className } = Astro.props;
     opacity: 0.92;
   }
 
-  /* Mobile perf: reduce to 1 grid layer */
+  /* Mobile perf: reduce to 1 grid layer (remove from paint) */
   @media (max-width: 720px) {
     .layerFront {
-      opacity: 0;
+      display: none;
     }
   }
 
