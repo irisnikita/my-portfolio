@@ -18,11 +18,17 @@ DON'T:
 
 **Layer cap:** max **6 layers** (background, grid, glow accents, content, optional noise, optional foreground highlight).
 
+Allowed effects (if done well):
+- **Light sweep** (slow diagonal gradient band): `transform/opacity` only
+- **Cursor glow hotspot** (radial gradient follow): `transform/opacity` only, **disabled on touch/mobile**
+- **Scanline/interference**: ultra-low opacity overlay, no filters
+
 DO:
 - Animate only `transform` and `opacity`.
 - Keep parallax amplitude small (2–12px).
 - Keep SVG simple (few paths, low opacity lines).
-- Provide `prefers-reduced-motion` fallback (static hero).
+- Gate anything pointer-driven behind `matchMedia('(pointer:fine)')`.
+- Provide `prefers-reduced-motion` fallback (static hero, no rAF loops).
 
 DON'T:
 - No heavy SVG filters (large `feGaussianBlur`, animated filters).
