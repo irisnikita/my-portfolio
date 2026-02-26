@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Typecheck
+        run: npm run check --if-present
+
+      - name: Build
+        run: npm run build
+
+      # Optional: minimal internal link checker after build
+      # - name: Link check (internal)
+      #   run: npx -y linkinator ./dist --recurse --skip '^(https?:)?//' 
+
+      # Optional: Lighthouse CI (usually better against preview URLs)
+      # - name: Lighthouse CI
+      #   run: |
+      #     npm i -D @lhci/cli
+      #     npx lhci autorun

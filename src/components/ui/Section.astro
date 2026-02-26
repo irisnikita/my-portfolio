@@ -1,13 +1,20 @@
 ---
 import Container from "./Container.astro";
 
-const { title, eyebrow, class: className } = Astro.props;
+const {
+  title,
+  eyebrow,
+  class: className,
+  headingLevel = 2,
+} = Astro.props;
+
+const HeadingTag = (`h${headingLevel}` as const);
 ---
 
 <section class={['section', className].filter(Boolean).join(' ')}>
   <Container>
     {eyebrow ? <p class="eyebrow">{eyebrow}</p> : null}
-    {title ? <h2 class="title">{title}</h2> : null}
+    {title ? <HeadingTag class="title">{title}</HeadingTag> : null}
     <div class="body">
       <slot />
     </div>

@@ -6,21 +6,35 @@ const {
   id = "contact",
   title = "Contact",
   eyebrow = "Let’s talk",
-  mailto = "hello@example.com",
+  mailto,
+  headingLevel = 2,
+  compact = false,
 } = Astro.props;
+
+const defaultMailto = import.meta.env.PUBLIC_CONTACT_EMAIL ?? "hello@yourdomain.com";
+const resolvedMailto = mailto ?? defaultMailto;
 ---
 
-<Section title={title} eyebrow={eyebrow} class="contactSection">
+<Section
+  title={title}
+  eyebrow={eyebrow}
+  headingLevel={headingLevel}
+  class={"contactSection" + (compact ? " isCompact" : "")}
+>
   <div id={id} class="wrap">
     <p class="p">Send a short note about what you’re building. I’ll reply with timelines and a perf budget.</p>
     <div class="row">
-      <Button href={`mailto:${mailto}`} variant="primary" magnet={false}>Email</Button>
+      <Button href={`mailto:${resolvedMailto}`} variant="primary" magnet={false}>Email</Button>
       <Button href="/projects" variant="ghost" magnet={false}>View Projects</Button>
     </div>
   </div>
 </Section>
 
 <style>
+  .contactSection.isCompact {
+    padding-block: clamp(28px, 5vw, 56px);
+  }
+
   .wrap {
     max-width: 72ch;
     scroll-margin-top: 84px; /* header offset */

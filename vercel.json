@@ -1,0 +1,51 @@
+{
+  "redirects": [
+    {
+      "source": "https://www.:domain/:path*",
+      "destination": "https://:domain/:path*",
+      "permanent": true
+    },
+    {
+      "source": "http://www.:domain/:path*",
+      "destination": "https://:domain/:path*",
+      "permanent": true
+    },
+    {
+      "source": "http://:domain/:path*",
+      "destination": "https://:domain/:path*",
+      "permanent": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/_astro/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:; font-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https:"
+        }
+      ]
+    }
+  ]
+}

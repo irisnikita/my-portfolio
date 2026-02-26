@@ -3,21 +3,11 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/ui/Section.astro";
 import Card from "../../components/ui/Card.astro";
 import Tag from "../../components/ui/Tag.astro";
+import { getCollection } from "astro:content";
 
-const projects = [
-  {
-    slug: "neon-landing",
-    title: "Neon Landing (MVP)",
-    summary: "A performance-first landing with cinematic neon grid and clear CTAs.",
-    tags: ["Astro", "Motion rules"],
-  },
-  {
-    slug: "case-study-template",
-    title: "Case Study Template",
-    summary: "Problem / Approach / Result template with sensible typography and SEO hooks.",
-    tags: ["Content Collections", "MDX"],
-  },
-];
+const projects = await getCollection("projects");
+// Newest first (optional)
+projects.sort((a, b) => (b.data.date?.getTime?.() ?? 0) - (a.data.date?.getTime?.() ?? 0));
 ---
 
 <BaseLayout title="Projects • Cinematic Portfolio" description="Selected work and case studies.">
@@ -27,10 +17,10 @@ const projects = [
         <a class="cardLink" href={`/projects/${p.slug}`}> 
           <Card>
             <div class="pad">
-              <h3 class="h3">{p.title}</h3>
-              <p class="sum">{p.summary}</p>
+              <h3 class="h3">{p.data.title}</h3>
+              <p class="sum">{p.data.summary}</p>
               <div class="tags">
-                {p.tags.map((t, i) => (
+                {(p.data.tags ?? []).map((t, i) => (
                   <Tag tone={i % 2 === 0 ? "cyan" : "magenta"}>{t}</Tag>
                 ))}
               </div>
