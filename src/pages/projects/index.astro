@@ -16,9 +16,13 @@ projects.sort((a, b) => (b.data.date?.getTime?.() ?? 0) - (a.data.date?.getTime?
       {projects.map((p) => (
         <a class="cardLink" href={`/projects/${p.slug}`}> 
           <Card>
+            <div class="poster" aria-hidden="true" style={`--h:${(p.slug.length * 23) % 360}deg`}></div>
             <div class="pad">
               <h3 class="h3">{p.data.title}</h3>
               <p class="sum">{p.data.summary}</p>
+
+              {p.data.metric ? <p class="metric">{p.data.metric}</p> : null}
+
               <div class="tags">
                 {(p.data.tags ?? []).map((t, i) => (
                   <Tag tone={i % 2 === 0 ? "cyan" : "magenta"}>{t}</Tag>
@@ -44,6 +48,21 @@ projects.sort((a, b) => (b.data.date?.getTime?.() ?? 0) - (a.data.date?.getTime?
     text-decoration: none;
   }
 
+  .poster {
+    height: 120px;
+    border-radius: calc(var(--radius) - 2px);
+    margin: 10px 10px 0;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background:
+      radial-gradient(120px 120px at 20% 20%, rgba(50, 245, 255, 0.35), transparent 60%),
+      radial-gradient(160px 140px at 75% 30%, rgba(255, 53, 213, 0.28), transparent 62%),
+      linear-gradient(135deg, rgba(7, 6, 13, 0.0), rgba(255, 255, 255, 0.06)),
+      radial-gradient(120% 160% at 20% 0%, hsla(var(--h), 90%, 55%, 0.22), transparent 58%),
+      radial-gradient(140% 200% at 80% 40%, hsla(calc(var(--h) + 70deg), 90%, 55%, 0.12), transparent 62%),
+      rgba(255, 255, 255, 0.02);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35) inset;
+  }
+
   .pad {
     padding: 16px;
   }
@@ -58,6 +77,13 @@ projects.sort((a, b) => (b.data.date?.getTime?.() ?? 0) - (a.data.date?.getTime?
     margin: 0 0 12px;
     color: var(--c-muted);
     line-height: 1.55;
+  }
+
+  .metric {
+    margin: -4px 0 12px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    line-height: 1.4;
   }
 
   .tags {

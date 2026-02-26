@@ -21,13 +21,20 @@ const title = "Cinematic Dark Neon — Portfolio";
           <Tag tone="cyan">Performance-first • Cinematic Dark Neon</Tag>
           <h1 class="h1">I build fast, cinematic web experiences.</h1>
           <p class="sub">
-            A portfolio shaped by motion rules, careful typography, and performance budgets — smooth from 360 → 1440.
+            Frontend / creative dev — motion-safe by default, performance-budgeted, and built to ship clean case studies.
           </p>
 
           <div class="ctaRow">
             <Button href="/projects" variant="primary">View Work</Button>
             <Button href="/#contact" variant="ghost">Contact</Button>
           </div>
+
+          <ul class="proof" aria-label="Proof points">
+            <li>Perf 90+</li>
+            <li>Reduced-motion ready</li>
+            <li>Transform-only motion</li>
+            <li>Case studies</li>
+          </ul>
 
           <p class="meta">No layout shift • Transform-only parallax • Reduced motion supported</p>
         </div>
@@ -96,8 +103,26 @@ const title = "Cinematic Dark Neon — Portfolio";
     margin-top: 22px;
   }
 
+  .proof {
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .proof li {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 7px 10px;
+    border-radius: 999px;
+  }
+
   .meta {
-    margin-top: 18px;
+    margin-top: 16px;
     color: rgba(255, 255, 255, 0.55);
     font-size: 13px;
   }

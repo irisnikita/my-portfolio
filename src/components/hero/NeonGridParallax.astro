@@ -1,9 +1,10 @@
 ---
-// CSS/SVG neon grid parallax (2 layers)
+// CSS/SVG neon grid parallax (2 layers) + subtle cinematic layers
 // Performance rules:
-// - transform-only updates
+// - transform/opacity only
 // - requestAnimationFrame throttle
-// - disabled when prefers-reduced-motion
+// - prefers-reduced-motion disables motion loops
+// - pointer-follow only on fine pointer + hover-capable devices
 
 const { class: className } = Astro.props;
 ---
@@ -37,54 +38,105 @@ const { class: className } = Astro.props;
     <rect width="1200" height="600" fill="url(#p2)" />
   </svg>
 
+  <!-- Light sweep: slow diagonal, low opacity -->
+  <div class="sweep" />
+
+  <!-- Cursor hotspot: transform-only (no filters). JS updates CSS vars. -->
+  <div class="hotspot" />
+
+  <!-- Interference layer: scanlines + tiny drift -->
+  <div class="scan" />
+
   <div class="pulse" />
 </div>
 
 <script>
+  const root = document.currentScript?.previousElementSibling;
+  if (!root) {}
+
   const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-  if (!prefersReduced) {
-    const root = document.currentScript?.previousElementSibling;
-    if (root) {
-      const back = root.querySelector('.layerBack');
-      const front = root.querySelector('.layerFront');
+  if (!prefersReduced && root) {
+    const back = root.querySelector('.layerBack');
+    const front = root.querySelector('.layerFront');
 
-      let raf = 0;
-      let lastY = -1;
+    // Scroll parallax (rAF throttle)
+    let raf = 0;
+    let lastY = -1;
 
-      const tick = () => {
-        raf = 0;
-        const y = window.scrollY || 0;
-        if (y === lastY) return;
-        lastY = y;
+    const tickScroll = () => {
+      raf = 0;
+      const y = window.scrollY || 0;
+      if (y === lastY) return;
+      lastY = y;
 
-        // Keep it subtle; move less on mobile.
-        const s = Math.min(1.0, window.innerWidth / 900);
-        const backY = (y * 0.05) * s;
-        const frontY = (y * 0.09) * s;
+      // Keep it subtle; move less on mobile.
+      const s = Math.min(1.0, window.innerWidth / 900);
+      const backY = (y * 0.05) * s;
+      const frontY = (y * 0.09) * s;
 
-        // transform-only for perf
-        back?.style.setProperty('transform', `translate3d(0, ${backY}px, 0)`);
-        front?.style.setProperty('transform', `translate3d(0, ${frontY}px, 0)`);
+      back?.style.setProperty('transform', `translate3d(0, ${backY}px, 0)`);
+      front?.style.setProperty('transform', `translate3d(0, ${frontY}px, 0)`);
+    };
+
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(tickScroll);
+    };
+
+    tickScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Pointer-follow hotspot (fine pointer only)
+    const canHover = window.matchMedia?.('(hover: hover)')?.matches;
+    const finePointer = window.matchMedia?.('(pointer: fine)')?.matches;
+
+    if (canHover && finePointer) {
+      let praf = 0;
+      let targetX = 0.5;
+      let targetY = 0.25;
+      let curX = targetX;
+      let curY = targetY;
+
+      const clamp01 = (v) => Math.min(1, Math.max(0, v));
+
+      const onMove = (ev) => {
+        const rect = root.getBoundingClientRect();
+        const x = (ev.clientX - rect.left) / rect.width;
+        const y = (ev.clientY - rect.top) / rect.height;
+        targetX = clamp01(x);
+        targetY = clamp01(y);
+        if (!praf) praf = requestAnimationFrame(step);
       };
 
-      const onScroll = () => {
-        if (raf) return;
-        raf = requestAnimationFrame(tick);
+      const step = () => {
+        praf = 0;
+        // easing (critically damped-ish)
+        curX += (targetX - curX) * 0.12;
+        curY += (targetY - curY) * 0.12;
+        root.style.setProperty('--hx', String(curX));
+        root.style.setProperty('--hy', String(curY));
+
+        // keep animating a bit while settling
+        if (Math.abs(targetX - curX) + Math.abs(targetY - curY) > 0.002) {
+          praf = requestAnimationFrame(step);
+        }
       };
 
-      tick();
-      window.addEventListener('scroll', onScroll, { passive: true });
+      root.addEventListener('pointermove', onMove, { passive: true });
     }
   }
 </script>
 
 <style>
   .gridWrap {
+    --hx: 0.5;
+    --hy: 0.25;
+
     position: absolute;
     inset: -20% -10% -30% -10%;
     overflow: hidden;
     pointer-events: none;
-    opacity: 0.85;
+    opacity: 0.86;
     mask-image: radial-gradient(90% 70% at 50% 20%, #000 40%, transparent 78%);
   }
 
@@ -98,30 +150,113 @@ const { class: className } = Astro.props;
   }
 
   .layerFront {
-    opacity: 0.9;
+    opacity: 0.92;
+  }
+
+  /* Mobile perf: reduce to 1 grid layer */
+  @media (max-width: 720px) {
+    .layerFront {
+      opacity: 0;
+    }
   }
 
   .pulse {
     position: absolute;
     inset: 0;
-    background: radial-gradient(700px 420px at 50% 20%, rgba(50, 245, 255, 0.08), transparent 60%),
-      radial-gradient(900px 520px at 60% 25%, rgba(255, 53, 213, 0.06), transparent 62%);
-    animation: pulse 5.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    background: radial-gradient(700px 420px at 50% 20%, rgba(50, 245, 255, 0.07), transparent 60%),
+      radial-gradient(900px 520px at 60% 25%, rgba(255, 53, 213, 0.05), transparent 62%);
+    animation: pulse 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
   }
 
   @keyframes pulse {
     0%,
     100% {
-      opacity: 0.6;
+      opacity: 0.55;
     }
     50% {
       opacity: 1;
     }
   }
 
+  /* Light sweep: low-alpha diagonal pass */
+  .sweep {
+    position: absolute;
+    inset: -40%;
+    background: linear-gradient(
+      115deg,
+      transparent 35%,
+      rgba(50, 245, 255, 0.10) 47%,
+      rgba(255, 53, 213, 0.08) 52%,
+      transparent 65%
+    );
+    transform: translate3d(-12%, -10%, 0);
+    animation: sweep 14s linear infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes sweep {
+    0% {
+      transform: translate3d(-18%, -12%, 0);
+    }
+    100% {
+      transform: translate3d(18%, 12%, 0);
+    }
+  }
+
+  /* Cursor hotspot: transform-only via CSS vars, no runtime filters */
+  .hotspot {
+    position: absolute;
+    inset: 0;
+    opacity: 0.65;
+    background: radial-gradient(
+      520px 360px at calc(var(--hx) * 100%) calc(var(--hy) * 100%),
+      rgba(50, 245, 255, 0.12),
+      rgba(255, 53, 213, 0.06) 40%,
+      transparent 62%
+    );
+  }
+
+  /* Scanlines + gentle drift */
+  .scan {
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.35) 0px,
+      rgba(255, 255, 255, 0.35) 1px,
+      transparent 2px,
+      transparent 6px
+    );
+    transform: translate3d(0, 0, 0);
+    animation: scanDrift 12s linear infinite;
+  }
+
+  @keyframes scanDrift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(0, 18px, 0);
+    }
+  }
+
+  /* Reduced motion: freeze loops + hide pointer-follow feel */
   @media (prefers-reduced-motion: reduce) {
-    .pulse {
+    .pulse,
+    .sweep,
+    .scan {
       animation: none;
+    }
+    .hotspot {
+      opacity: 0.0;
+    }
+  }
+
+  /* Touch/coarse pointer: disable hotspot emphasis */
+  @media (hover: none), (pointer: coarse) {
+    .hotspot {
+      opacity: 0.0;
     }
   }
 </style>

@@ -6,7 +6,11 @@ const {
   id = "contact",
   title = "Contact",
   eyebrow = "Let’s talk",
+  description = "Send a short note about what you’re building. I’ll reply with timelines and a perf budget.",
   mailto,
+  availability = "Available for small freelance",
+  timezone = "GMT+7",
+  responseTime = "24–48h",
   headingLevel = 2,
   compact = false,
 } = Astro.props;
@@ -22,7 +26,23 @@ const resolvedMailto = mailto ?? defaultMailto;
   class={"contactSection" + (compact ? " isCompact" : "")}
 >
   <div id={id} class="wrap">
-    <p class="p">Send a short note about what you’re building. I’ll reply with timelines and a perf budget.</p>
+    <p class="p">{description}</p>
+
+    <ul class="meta" aria-label="Availability">
+      <li>
+        <span class="k">Status</span>
+        <span class="v"><span class="dot" aria-hidden="true"></span>{availability}</span>
+      </li>
+      <li>
+        <span class="k">Timezone</span>
+        <span class="v">{timezone}</span>
+      </li>
+      <li>
+        <span class="k">Response</span>
+        <span class="v">{responseTime}</span>
+      </li>
+    </ul>
+
     <div class="row">
       <Button href={`mailto:${resolvedMailto}`} variant="primary" magnet={false}>Email</Button>
       <Button href="/projects" variant="ghost" magnet={false}>View Projects</Button>
@@ -39,11 +59,53 @@ const resolvedMailto = mailto ?? defaultMailto;
     max-width: 72ch;
     scroll-margin-top: 84px; /* header offset */
   }
+
   .p {
     margin: 0;
     color: var(--c-muted);
     line-height: 1.7;
   }
+
+  .meta {
+    margin: 16px 0 0;
+    padding: 10px 12px;
+    list-style: none;
+    display: grid;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 14px;
+  }
+
+  .meta li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .k {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .v {
+    color: rgba(255, 255, 255, 0.78);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 30%, #fff, rgba(50, 245, 255, 0.8));
+    box-shadow: 0 0 0.5rem rgba(50, 245, 255, 0.22);
+    flex: 0 0 auto;
+  }
+
   .row {
     margin-top: 18px;
     display: flex;
