@@ -5,23 +5,25 @@ import { testimonials } from "../../data/testimonials";
 ---
 
 <Section title="What People Say" eyebrow="Testimonials">
-  <div class="grid">
-    {testimonials.map((t) => (
-      <Card>
-        <div class="testimonial">
-          <span class="quote-mark" aria-hidden="true">"</span>
-          <blockquote class="quote">{t.quote}</blockquote>
-          <div class="author">
-            <div class="avatar-placeholder" aria-hidden="true">
-              {t.author.charAt(0)}
-            </div>
-            <div>
-              <p class="name">{t.author}</p>
-              <p class="meta">{t.role} · {t.company}</p>
+  <div class="grid" data-reveal-container="testimonials" data-reveal-stagger="120">
+    {testimonials.map((t, i) => (
+      <div class="cardWrap" style={`--float-delay: ${i * 1.2}s`} data-reveal data-reveal-class="reveal-scale" data-reveal-group="tCard">
+        <Card>
+          <div class="testimonial">
+            <span class="quote-mark" aria-hidden="true">"</span>
+            <blockquote class="quote">{t.quote}</blockquote>
+            <div class="author">
+              <div class="avatar-placeholder" aria-hidden="true">
+                {t.author.charAt(0)}
+              </div>
+              <div>
+                <p class="name">{t.author}</p>
+                <p class="meta">{t.role} · {t.company}</p>
+              </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     ))}
   </div>
 </Section>
@@ -33,6 +35,21 @@ import { testimonials } from "../../data/testimonials";
     gap: 16px;
   }
 
+  .cardWrap {
+    animation: cardFloat 6s ease-in-out infinite;
+    animation-delay: var(--float-delay, 0s);
+    animation-play-state: paused;
+  }
+
+  .cardWrap.is-revealed {
+    animation-play-state: running;
+  }
+
+  @keyframes cardFloat {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -6px, 0); }
+  }
+
   .testimonial {
     padding: 20px 18px;
     position: relative;
@@ -42,11 +59,19 @@ import { testimonials } from "../../data/testimonials";
     position: absolute;
     top: 8px;
     left: 14px;
-    font-size: 48px;
+    font-size: 56px;
     line-height: 1;
-    color: rgba(0, 229, 255, 0.15);
+    color: rgba(0, 229, 255, 0.12);
     font-family: Georgia, serif;
     pointer-events: none;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-spring);
+  }
+
+  .cardWrap.is-revealed .quote-mark {
+    opacity: 1;
+    transform: scale(1);
   }
 
   .quote {
@@ -101,6 +126,17 @@ import { testimonials } from "../../data/testimonials";
   @media (max-width: 600px) {
     .grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cardWrap {
+      animation: none;
+    }
+    .quote-mark {
+      opacity: 1;
+      transform: none;
+      transition: none;
     }
   }
 </style>

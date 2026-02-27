@@ -1,0 +1,193 @@
+---
+// UI Sound Manager (Subtle Audio)
+// Adds a premium feel with soft hover ticks and click pops.
+---
+
+<div class="sound-toggle-wrapper">
+  <button id="sound-toggle" class="sound-toggle btn-icon" aria-label="Toggle sound" title="Toggle Sound">
+    <svg class="icon-on" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+    </svg>
+    <svg class="icon-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+      <line x1="23" y1="9" x2="17" y2="15"></line>
+      <line x1="17" y1="9" x2="23" y2="15"></line>
+    </svg>
+  </button>
+</div>
+
+<script>
+  function initSound() {
+    // Prevent double init on ViewTransitions
+    if ((window as any)._soundInit) return;
+    (window as any)._soundInit = true;
+
+    // We don't have actual sound files in the repo, so we use tiny Data URIs 
+    // to generate synthetic sounds (synth beeps) directly in the browser!
+    // This saves bundle size and requires no network requests.
+    
+    let isSoundEnabled = false; // Default off for UX, user must opt-in
+    const toggleBtn = document.getElementById('sound-toggle');
+
+    // Web Audio API context
+    let audioCtx: AudioContext | null = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    // Generator function for soft synthetic ticks
+    function playTone(freq: number, type: OscillatorType, duration: number, vol: number) {
+      if (!isSoundEnabled || !audioCtx) return;
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // Specific Sound Profiles
+    const playHover = () => playTone(800, 'sine', 0.05, 0.02); // very soft high tick
+    const playClick = () => playTone(400, 'triangle', 0.1, 0.05); // low tap
+    const playWoosh = () => playTone(200, 'square', 0.2, 0.03); // techy open sound
+
+    // Toggle logic
+    if (toggleBtn) {
+      // Check localStorage
+      const saved = localStorage.getItem('sound_enabled');
+      if (saved === 'true') {
+        isSoundEnabled = true;
+        toggleBtn.classList.add('is-active');
+      }
+
+      toggleBtn.addEventListener('click', () => {
+        initAudioContext();
+        isSoundEnabled = !isSoundEnabled;
+        localStorage.setItem('sound_enabled', String(isSoundEnabled));
+        
+        if (isSoundEnabled) {
+          toggleBtn.classList.add('is-active');
+          playClick();
+        } else {
+          toggleBtn.classList.remove('is-active');
+        }
+      });
+    }
+
+    // Attach global listeners
+    const onMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a') || target.closest('button')) {
+        playHover();
+      }
+    };
+
+    const onMouseDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'A' || target.tagName === 'BUTTON' || target.closest('a') || target.closest('button')) {
+        // Init context on first actual interaction
+        initAudioContext();
+        playClick();
+      }
+    };
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      // Cmd+K Woosh sound
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        initAudioContext();
+        playWoosh();
+      }
+    };
+
+    document.addEventListener('mouseover', onMouseOver, { passive: true });
+    document.addEventListener('mousedown', onMouseDown, { passive: true });
+    document.addEventListener('keydown', onKeyDown, { passive: true });
+
+    (window as any)._cleanupSound = () => {
+      document.removeEventListener('mouseover', onMouseOver);
+      document.removeEventListener('mousedown', onMouseDown);
+      document.removeEventListener('keydown', onKeyDown);
+      (window as any)._soundInit = false;
+    };
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    if ((window as any)._cleanupSound) (window as any)._cleanupSound();
+    initSound();
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSound);
+  } else {
+    initSound();
+  }
+</script>
+
+<style>
+  .sound-toggle-wrapper {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 90;
+    pointer-events: auto;
+  }
+
+  .sound-toggle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(6, 8, 18, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--c-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .sound-toggle:hover {
+    color: var(--c-text);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+  }
+
+  .icon-on { display: none; }
+  .icon-off { display: block; }
+
+  .sound-toggle.is-active {
+    color: var(--c-neon-cyan);
+    border-color: rgba(0, 229, 255, 0.3);
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+  }
+
+  .sound-toggle.is-active .icon-on { display: block; }
+  .sound-toggle.is-active .icon-off { display: none; }
+
+  @media (max-width: 768px) {
+    .sound-toggle-wrapper {
+      bottom: 16px;
+      right: 16px;
+    }
+  }
+</style>

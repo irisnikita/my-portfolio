@@ -1,0 +1,79 @@
+---
+// Global scramble text effect initializer
+---
+
+<script>
+  function initScramble() {
+    const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    if (prefersReduced) return;
+
+    const chars = '!<>-_\\/[]{}—=+*^?#_01';
+    
+    document.querySelectorAll('[data-scramble]').forEach((el) => {
+      // Avoid double init
+      if (el.hasAttribute('data-scramble-init')) return;
+      el.setAttribute('data-scramble-init', 'true');
+
+      // The original text to scramble to
+      const originalText = el.textContent?.trim() || '';
+      if (!originalText) return;
+
+      let raf = 0;
+
+      const scramble = () => {
+        let iteration = 0;
+        cancelAnimationFrame(raf);
+
+        const loop = () => {
+          el.textContent = originalText
+            .split('')
+            .map((char, index) => {
+              // Preserve spaces
+              if (char === ' ') return ' ';
+              // Once iteration passes index, lock in the correct character
+              if (index < iteration) {
+                return originalText[index];
+              }
+              // Otherwise, random character
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join('');
+
+          if (iteration >= originalText.length) {
+            cancelAnimationFrame(raf);
+            el.textContent = originalText;
+          } else {
+            iteration += 1 / 2; // speed of deciphering
+            raf = requestAnimationFrame(loop);
+          }
+        };
+
+        raf = requestAnimationFrame(loop);
+      };
+
+      // Trigger on hover
+      el.addEventListener('pointerenter', scramble);
+      
+      // Also trigger once on first reveal intersection
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          // slight delay for effect
+          setTimeout(scramble, 300);
+          observer.disconnect();
+        }
+      }, { threshold: 0.5 });
+      
+      observer.observe(el);
+    });
+  }
+
+  // Support Astro ViewTransitions
+  document.addEventListener('astro:page-load', initScramble);
+  
+  // Also run on first load just in case
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initScramble);
+  } else {
+    initScramble();
+  }
+</script>

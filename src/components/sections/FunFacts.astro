@@ -1,0 +1,90 @@
+---
+import Section from "../ui/Section.astro";
+import Card from "../ui/Card.astro";
+
+const funFacts = [
+  { icon: "☕", label: "Coffee per day", value: "3+ cups" },
+  { icon: "🎮", label: "Favorite game", value: "Genshin Impact" },
+  { icon: "🎵", label: "Coding soundtrack", value: "Lo-fi / Chill Hop" },
+  { icon: "🌏", label: "Dream destination", value: "Tokyo, Japan" },
+  { icon: "🐱", label: "Pet companion", value: "Cat lover" },
+  { icon: "📖", label: "Currently reading", value: "Clean Code" },
+];
+---
+
+<Section eyebrow="Beyond Code" title="Fun Facts">
+  <div class="funGrid" data-reveal-container="fun" data-reveal-stagger="80">
+    {funFacts.map((fact) => (
+      <div class="funItem" data-reveal data-reveal-class="reveal-scale" data-reveal-group="fun">
+        <span class="funIcon" aria-hidden="true">{fact.icon}</span>
+        <div>
+          <p class="funLabel">{fact.label}</p>
+          <p class="funValue">{fact.value}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</Section>
+
+<style>
+  .funGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .funItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.02);
+    transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out);
+  }
+
+  .funItem:hover {
+    border-color: rgba(0, 229, 255, 0.15);
+    box-shadow: 0 0 16px rgba(0, 229, 255, 0.06);
+    transform: translate3d(0, -2px, 0);
+  }
+
+  .funIcon {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .funLabel {
+    margin: 0;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .funValue {
+    margin: 2px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  @media (max-width: 768px) {
+    .funGrid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .funGrid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .funItem:hover {
+      transform: none;
+    }
+  }
+</style>

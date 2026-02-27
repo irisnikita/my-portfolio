@@ -10,28 +10,146 @@ const { class: className, reveal = true, ...rest } = Astro.props;
 
 <article
   {...rest}
-  class={['card', className].filter(Boolean).join(' ')}
+  class={['card card-tilt', className].filter(Boolean).join(' ')}
   {...(reveal ? { 'data-reveal': '', 'data-reveal-group': 'card' } : {})}
 >
+  <!-- Glow spotlight that follows cursor -->
+  <div class="card-glow" aria-hidden="true" />
+  <!-- Glare effect -->
+  <div class="card-glare" aria-hidden="true" />
   <slot />
 </article>
 
+<script>
+  function initHoverCards() {
+    // Only init if not reduced motion and has pointer
+    const pmr = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasCoarse = window.matchMedia('(pointer: coarse)').matches;
+    if (pmr || hasCoarse) return;
+
+    const cards = document.querySelectorAll('.card-tilt');
+    
+    cards.forEach((cardFn) => {
+      const card = cardFn as HTMLElement;
+      if (card.hasAttribute('data-tilt-init')) return;
+      card.setAttribute('data-tilt-init', 'true');
+
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Calculate rotation based on cursor position relative to center
+        // -1 to 1 multiplier
+        const xPct = (x / rect.width - 0.5) * 2;
+        const yPct = (y / rect.height - 0.5) * 2;
+        
+        // Max rotation 8 degrees
+        const rotX = yPct * -8;
+        const rotY = xPct * 8;
+
+        card.style.setProperty('--rot-x', `${rotX}deg`);
+        card.style.setProperty('--rot-y', `${rotY}deg`);
+        card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+        card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+        
+        // Keep standard glow synced too
+        card.style.setProperty('--glow-x', `${x}px`);
+        card.style.setProperty('--glow-y', `${y}px`);
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.setProperty('--rot-x', '0deg');
+        card.style.setProperty('--rot-y', '0deg');
+        card.style.setProperty('--mouse-x', '50%');
+        card.style.setProperty('--mouse-y', '50%');
+        // Reset glow slightly offset
+        card.style.setProperty('--glow-x', '50%');
+        card.style.setProperty('--glow-y', '50%');
+      });
+    });
+  }
+
+  document.addEventListener('astro:page-load', initHoverCards);
+  if (typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initHoverCards);
+    } else {
+      initHoverCards();
+    }
+  }
+</script>
+
 <style>
   .card {
+    --glow-x: 50%;
+    --glow-y: 50%;
+    --rot-x: 0deg;
+    --rot-y: 0deg;
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+
     border-radius: var(--radius);
     border: 1px solid rgba(234, 240, 255, 0.10);
     background:
       radial-gradient(120% 160% at 20% 0%, rgba(124, 59, 255, 0.16), transparent 52%),
       rgba(255, 255, 255, 0.03);
-    overflow: hidden;
     position: relative;
+    /* Spring physics feeling for rotation */
     transition:
-      transform 150ms cubic-bezier(0.3, 1, 0.3, 1),
-      border-color 180ms var(--ease-out),
-      box-shadow 180ms var(--ease-out);
+      transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275),
+      border-color 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out);
+    will-change: transform;
+    /* Wrap in perspective so children can be 3D transformed natively */
+    transform-style: preserve-3d;
+    transform: perspective(1000px) rotateX(var(--rot-x)) rotateY(var(--rot-y));
+    height: 100%;
   }
 
-  /* inner highlight line */
+  /* To prevent clipping z-translated children */
+  .card :global(*) {
+    transform-style: preserve-3d;
+  }
+
+  /* Glow spotlight */
+  .card-glow {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      320px 320px at var(--glow-x) var(--glow-y),
+      rgba(0, 229, 255, 0.12),
+      rgba(255, 43, 214, 0.06) 40%,
+      transparent 70%
+    );
+    transition: opacity 300ms var(--ease-out);
+    z-index: 1;
+  }
+
+  /* Hologram Glare */
+  .card-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    mix-blend-mode: soft-light;
+    background: 
+      radial-gradient(
+        farthest-corner circle at var(--mouse-x) var(--mouse-y),
+        rgba(255, 255, 255, 0.8) 0%,
+        rgba(255, 255, 255, 0.2) 20%,
+        rgba(255, 255, 255, 0) 100%
+      );
+    transition: opacity 300ms var(--ease-out);
+    z-index: 2;
+    transform: translateZ(10px); /* float slightly above content */
+  }
+
+  /* Inner highlight line */
   .card::before {
     content: "";
     position: absolute;
@@ -50,28 +168,52 @@ const { class: className, reveal = true, ...rest } = Astro.props;
     padding: 1px;
     -webkit-mask-composite: xor;
     mask-composite: exclude;
+    z-index: 3;
+    transform: translateZ(1px);
   }
 
   .card:hover {
-    transform: translate3d(0, -2px, 0);
     border-color: rgba(0, 229, 255, 0.22);
-    box-shadow: var(--shadow-glow-cyan);
+    box-shadow: 
+      var(--shadow-glow-cyan),
+      0 30px 60px -15px rgba(0, 0, 0, 0.6);
   }
 
   .card:hover::before {
     opacity: 1;
   }
 
+  .card:hover .card-glow {
+    opacity: 1;
+  }
+
+  .card:hover .card-glare {
+    opacity: 0.6;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .card {
       transition: none;
+      transform: none !important;
     }
     .card:hover {
-      transform: none;
       box-shadow: none;
     }
-    .card::before {
-      opacity: 0;
+    .card::before,
+    .card-glow,
+    .card-glare {
+      opacity: 0 !important;
+      transition: none;
+    }
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .card {
+      transform: none !important;
+    }
+    .card-glow,
+    .card-glare {
+      display: none;
     }
   }
 </style>

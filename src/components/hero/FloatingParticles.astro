@@ -1,0 +1,80 @@
+---
+// FloatingParticles — tiny neon dots drifting behind hero content
+const { count = 20 } = Astro.props;
+
+// Generate random particle configs at build time
+const particles = Array.from({ length: count }, (_, i) => ({
+  id: i,
+  left: Math.round(Math.random() * 100),
+  top: Math.round(Math.random() * 100),
+  size: 2 + Math.round(Math.random() * 3),
+  delay: Math.round(Math.random() * 8000),
+  duration: 8 + Math.round(Math.random() * 12),
+  hue: Math.random() > 0.5 ? 185 : 300, // cyan or magenta
+}));
+---
+
+<div class="particles" aria-hidden="true">
+  {particles.map((p) => (
+    <span
+      class="dot"
+      style={`left:${p.left}%;top:${p.top}%;width:${p.size}px;height:${p.size}px;animation-delay:${p.delay}ms;animation-duration:${p.duration}s;--hue:${p.hue}`}
+    />
+  ))}
+</div>
+
+<style>
+  .particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .dot {
+    position: absolute;
+    border-radius: 999px;
+    background: radial-gradient(
+      circle,
+      hsla(var(--hue), 100%, 65%, 0.6) 0%,
+      hsla(var(--hue), 100%, 65%, 0) 70%
+    );
+    animation: particleDrift linear infinite;
+    will-change: transform, opacity;
+  }
+
+  @keyframes particleDrift {
+    0% {
+      transform: translate3d(0, 0, 0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 0.4;
+    }
+    90% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translate3d(calc(-30px + 60px * var(--hue, 0.5) / 360), -80px, 0);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot {
+      animation: none;
+      opacity: 0.25;
+    }
+  }
+
+  /* Reduce count on mobile */
+  @media (max-width: 720px) {
+    .dot:nth-child(n + 10) {
+      display: none;
+    }
+  }
+</style>

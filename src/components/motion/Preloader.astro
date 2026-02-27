@@ -1,0 +1,130 @@
+---
+// Preloader — branded loading screen on page load
+import { site } from "../../data/site";
+---
+
+<!-- Start hidden to prevent flash on client-side nav -->
+<div class="preloader" id="preloader" aria-hidden="true" style="display:none">
+  <div class="preloaderContent">
+    <div class="preloaderName">{site.name}</div>
+    <div class="preloaderTitle">{site.title}</div>
+    <div class="preloaderBar">
+      <div class="preloaderFill" />
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function() {
+    var p = document.getElementById('preloader');
+    if (!p) return;
+
+    // Client-side nav (ViewTransitions) — don't show, just remove
+    if (window.__preloaderShown) {
+      p.remove();
+      return;
+    }
+
+    // Full page load — show preloader
+    window.__preloaderShown = true;
+    p.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    function dismiss() {
+      if (p.classList.contains('is-done')) return;
+      p.classList.add('is-done');
+      document.body.style.overflow = '';
+      setTimeout(function() { try { p.remove(); } catch(e) {} }, 800);
+    }
+
+    var fill = p.querySelector('.preloaderFill');
+    if (fill) {
+      fill.addEventListener('animationend', function() {
+        setTimeout(dismiss, 200);
+      }, { once: true });
+    }
+
+    // Safety fallback
+    setTimeout(dismiss, 2500);
+  })();
+
+  // Prevent preloader from appearing in incoming pages during ViewTransitions
+  document.addEventListener('astro:before-swap', function(e) {
+    var incoming = e.newDocument.getElementById('preloader');
+    if (incoming) incoming.remove();
+  });
+</script>
+
+<style>
+  .preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: var(--c-bg, #060812);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+  }
+
+  .preloader.is-done {
+    opacity: 0;
+    transform: translate3d(0, -100%, 0);
+    pointer-events: none;
+  }
+
+  .preloaderContent {
+    text-align: center;
+    animation: preloaderFadeIn 600ms var(--ease-out) both;
+  }
+
+  @keyframes preloaderFadeIn {
+    from { opacity: 0; transform: translate3d(0, 20px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+
+  .preloaderName {
+    font-size: clamp(24px, 5vw, 42px);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.95), rgba(255, 43, 214, 0.85));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .preloaderTitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .preloaderBar {
+    margin: 24px auto 0;
+    width: 120px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+
+  .preloaderFill {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--c-neon-cyan, #00e5ff), var(--c-neon-magenta, #ff2bd6));
+    border-radius: 999px;
+    animation: preloaderProgress 1.5s var(--ease-out) both;
+  }
+
+  @keyframes preloaderProgress {
+    to { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .preloader {
+      display: none !important;
+    }
+  }
+</style>

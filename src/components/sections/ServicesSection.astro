@@ -1,0 +1,59 @@
+---
+import Section from "../ui/Section.astro";
+import Card from "../ui/Card.astro";
+import { services } from "../../data/services";
+---
+
+<Section eyebrow="Services" title="What I Do">
+  <div class="servicesGrid" data-reveal-container="services" data-reveal-stagger="100">
+    {services.map((svc, i) => (
+      <div data-reveal data-reveal-class="reveal-scale" data-reveal-group="svc">
+        <Card>
+          <div class="svcCard">
+            <span class="svcIcon" aria-hidden="true">{svc.icon}</span>
+            <h4 class="svcTitle">{svc.title}</h4>
+            <p class="svcDesc">{svc.description}</p>
+          </div>
+        </Card>
+      </div>
+    ))}
+  </div>
+</Section>
+
+<style>
+  .servicesGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .svcCard {
+    padding: 22px 20px;
+  }
+
+  .svcIcon {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .svcTitle {
+    margin: 0 0 8px;
+    font-size: 17px;
+    letter-spacing: var(--tracking-tight);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .svcDesc {
+    margin: 0;
+    font-size: 14px;
+    color: var(--c-muted);
+    line-height: 1.7;
+  }
+
+  @media (max-width: 600px) {
+    .servicesGrid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

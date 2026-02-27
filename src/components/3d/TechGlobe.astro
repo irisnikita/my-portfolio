@@ -1,0 +1,162 @@
+---
+// TechGlobe — CSS 3D rotating sphere of tech icons
+const icons = [
+  "React", "Next.js", "TS", "NestJS",
+  "Astro", "Node", "Tailwind", "Zalo",
+  "Redis", "Docker", "GraphQL", "Git",
+];
+
+const radius = 140;
+const total = icons.length;
+---
+
+<div class="globeWrap" data-reveal data-reveal-class="reveal-scale">
+  <div class="globe" id="techGlobe">
+    {icons.map((icon, i) => {
+      // Fibonacci sphere distribution
+      const phi = Math.acos(1 - 2 * (i + 0.5) / total);
+      const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
+
+      const x = Math.round(radius * Math.sin(phi) * Math.cos(theta));
+      const y = Math.round(radius * Math.sin(phi) * Math.sin(theta));
+      const z = Math.round(radius * Math.cos(phi));
+
+      return (
+        <span
+          class="globeNode"
+          style={`transform: translate3d(${x}px, ${y}px, ${z}px)`}
+        >
+          {icon}
+        </span>
+      );
+    })}
+  </div>
+</div>
+
+<script>
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const globe = document.getElementById('techGlobe');
+
+  if (!reduced && globe) {
+    let angle = 0;
+    let dragging = false;
+    let dragStartX = 0;
+    let angleOffset = 0;
+    let velocity = 0.15; // base rotation speed (deg/frame)
+    let raf = 0;
+    let active = !document.hidden;
+
+    const spin = () => {
+      if (!active) { raf = requestAnimationFrame(spin); return; }
+
+      if (!dragging) {
+        angle += velocity;
+      }
+
+      globe.style.transform = `rotateY(${angle}deg) rotateX(-8deg)`;
+      raf = requestAnimationFrame(spin);
+    };
+
+    // Drag interaction
+    globe.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      dragStartX = e.clientX;
+      angleOffset = angle;
+      globe.style.cursor = 'grabbing';
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const delta = (e.clientX - dragStartX) * 0.3;
+      angle = angleOffset + delta;
+    });
+
+    window.addEventListener('pointerup', () => {
+      dragging = false;
+      if (globe) globe.style.cursor = 'grab';
+    });
+
+    // Pause on hover for readability
+    globe.addEventListener('mouseenter', () => { if (!dragging) velocity = 0.05; });
+    globe.addEventListener('mouseleave', () => { velocity = 0.15; });
+
+    document.addEventListener('visibilitychange', () => {
+      active = !document.hidden;
+    });
+
+    raf = requestAnimationFrame(spin);
+  }
+</script>
+
+<style>
+  .globeWrap {
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+    perspective: 600px;
+  }
+
+  .globe {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    transform-style: preserve-3d;
+    cursor: grab;
+    user-select: none;
+  }
+
+  .globeNode {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -28px;
+    margin-top: -14px;
+    width: 56px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 5px 4px;
+    backface-visibility: hidden;
+    transition: color 150ms, border-color 150ms, box-shadow 150ms;
+  }
+
+  .globeNode:hover {
+    color: rgba(0, 229, 255, 0.9);
+    border-color: rgba(0, 229, 255, 0.3);
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.15);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .globe {
+      transform: none !important;
+      animation: none;
+    }
+    .globeNode {
+      position: relative;
+      display: inline-block;
+      left: auto;
+      top: auto;
+      margin: 4px;
+      transform: none !important;
+    }
+    .globeWrap {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .globeWrap {
+      perspective: 400px;
+    }
+    .globe {
+      width: 220px;
+      height: 220px;
+    }
+  }
+</style>

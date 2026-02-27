@@ -1,0 +1,119 @@
+---
+import Section from "../ui/Section.astro";
+import Card from "../ui/Card.astro";
+import { stats } from "../../data/stats";
+---
+
+<Section eyebrow="Numbers" title="At a Glance">
+  <div class="statsGrid" data-reveal-container="stats" data-reveal-stagger="100">
+    {stats.map((stat) => (
+      <div data-reveal data-reveal-class="reveal-scale" data-reveal-group="stat">
+        <Card>
+          <div class="statCard">
+            <span class="statIcon" aria-hidden="true">{stat.icon}</span>
+            <div
+              class="statValue"
+              data-count-up
+              data-count-value={stat.numericValue}
+              data-count-suffix={stat.suffix}
+            >
+              {stat.value}
+            </div>
+            <p class="statLabel">{stat.label}</p>
+          </div>
+        </Card>
+      </div>
+    ))}
+  </div>
+</Section>
+
+<script>
+  // Count-up animation on scroll
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+
+  if (!reduced) {
+    const els = document.querySelectorAll<HTMLElement>('[data-count-up]');
+
+    const animateCount = (el: HTMLElement) => {
+      const target = parseInt(el.getAttribute('data-count-value') ?? '0', 10);
+      const suffix = el.getAttribute('data-count-suffix') ?? '';
+      const duration = 1200;
+      const start = performance.now();
+
+      const step = (now: number) => {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // ease-out
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(target * ease);
+        el.textContent = `${current}${suffix}`;
+
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        }
+      };
+
+      requestAnimationFrame(step);
+    };
+
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        animateCount(entry.target as HTMLElement);
+        io.unobserve(entry.target);
+      }
+    }, { threshold: 0.3 });
+
+    els.forEach((el) => io.observe(el));
+  }
+</script>
+
+<style>
+  .statsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .statCard {
+    padding: 22px 18px;
+    text-align: center;
+  }
+
+  .statIcon {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .statValue {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.95), rgba(255, 43, 214, 0.85));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
+  .statLabel {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 768px) {
+    .statsGrid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 420px) {
+    .statsGrid {
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+  }
+</style>

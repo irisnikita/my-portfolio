@@ -26,35 +26,47 @@ const classes = [
 </a>
 
 <script>
-  // Cursor magnet (lightweight): transform-only, respects reduced motion.
+  // Awwwards-level Cursor magnet + Inner parallax
   const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
   if (!prefersReduced) {
     for (const el of document.querySelectorAll('.magnet')) {
+      const htmlEl = el as HTMLElement;
+      const inner = htmlEl.querySelector('.btnInner') as HTMLElement | null;
       let raf = 0;
-      const strength = 10;
+      const strength = 20; // stronger pull for awwwards feel
+      const innerStrength = 8; // parallax amount for text
 
-      const onMove = (ev) => {
-        const rect = el.getBoundingClientRect();
+      const onMove = (ev: Event) => {
+        const pointerEv = ev as PointerEvent;
+        const rect = htmlEl.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
-        const dx = (ev.clientX - cx) / rect.width;
-        const dy = (ev.clientY - cy) / rect.height;
+        const dx = (pointerEv.clientX - cx) / rect.width;
+        const dy = (pointerEv.clientY - cy) / rect.height;
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(() => {
-          el.style.setProperty('--mx', String(dx * strength));
-          el.style.setProperty('--my', String(dy * strength));
+          htmlEl.style.setProperty('--mx', String(dx * strength));
+          htmlEl.style.setProperty('--my', String(dy * strength));
+          if (inner) {
+            inner.style.setProperty('--ix', String(dx * innerStrength));
+            inner.style.setProperty('--iy', String(dy * innerStrength));
+          }
         });
       };
       const onLeave = () => {
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(() => {
-          el.style.setProperty('--mx', '0');
-          el.style.setProperty('--my', '0');
+          htmlEl.style.setProperty('--mx', '0');
+          htmlEl.style.setProperty('--my', '0');
+          if (inner) {
+            inner.style.setProperty('--ix', '0');
+            inner.style.setProperty('--iy', '0');
+          }
         });
       };
 
-      el.addEventListener('pointermove', onMove);
-      el.addEventListener('pointerleave', onLeave);
+      htmlEl.addEventListener('pointermove', onMove);
+      htmlEl.addEventListener('pointerleave', onLeave);
     }
   }
 </script>
@@ -82,11 +94,16 @@ const classes = [
   }
 
   .btnInner {
+    --ix: 0;
+    --iy: 0;
     display: inline-flex;
     align-items: center;
     gap: 10px;
     font-weight: 650;
     letter-spacing: var(--tracking-tight);
+    transform: translate3d(calc(var(--ix) * 1px), calc(var(--iy) * 1px), 0);
+    transition: transform var(--dur-quick) var(--ease-out);
+    will-change: transform;
   }
 
   .btnPrimary {

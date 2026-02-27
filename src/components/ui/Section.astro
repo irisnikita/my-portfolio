@@ -18,7 +18,7 @@ const HeadingTag = (`h${headingLevel}` as const);
 >
   <Container>
     {eyebrow ? <p class="eyebrow" data-reveal data-reveal-group="sectionHead">{eyebrow}</p> : null}
-    {title ? <HeadingTag class="title" data-reveal data-reveal-group="sectionHead">{title}</HeadingTag> : null}
+    {title ? <HeadingTag class="title" data-scramble data-reveal data-reveal-group="sectionHead">{title}</HeadingTag> : null}
     <div class="body">
       <slot />
     </div>

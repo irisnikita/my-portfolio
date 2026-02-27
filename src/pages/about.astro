@@ -1,23 +1,22 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/ui/Section.astro";
+import GlowDivider from "../components/ui/GlowDivider.astro";
 import SkillsGrid from "../components/sections/SkillsGrid.astro";
 import ExperienceTimeline from "../components/sections/ExperienceTimeline.astro";
+import AnimeAvatar from "../components/3d/AnimeAvatar.astro";
+import TechGlobe from "../components/3d/TechGlobe.astro";
+import FunFacts from "../components/sections/FunFacts.astro";
+import LiveData from "../components/sections/LiveData.astro";
 import { site } from "../data/site";
 ---
 
 <BaseLayout title={`About • ${site.name}`} description={`${site.tagline} • ${site.location}`}>
   <Section title="About" eyebrow={site.title}>
     <div class="intro">
-      <div class="avatarWrap" data-reveal data-reveal-group="aboutHead">
-        <img
-          src="/avatar.webp"
-          alt={`Photo of ${site.name}`}
-          class="avatar"
-          width="120"
-          height="120"
-          loading="eager"
-        />
+      <div class="avatarWrap" data-reveal data-reveal-class="reveal-scale" data-reveal-group="aboutHead">
+        <!-- 3D Avatar (Interactive) -->
+        <AnimeAvatar />
       </div>
       <div class="bio" data-reveal data-reveal-group="aboutHead">
         <p class="lead">{site.bio}</p>
@@ -28,45 +27,59 @@ import { site } from "../data/site";
     </div>
   </Section>
 
+  <GlowDivider />
+
+  <!-- 3D Tech Globe -->
+  <Section title="Tech Universe" eyebrow="Interactive">
+    <TechGlobe />
+  </Section>
+
+  <GlowDivider />
+
   <Section title="Tech Stack" eyebrow="Skills">
     <SkillsGrid />
   </Section>
+
+  <GlowDivider />
 
   <Section title="Experience" eyebrow="Career">
     <ExperienceTimeline />
   </Section>
 
+  <GlowDivider />
+
   <Section title="Working Principles" eyebrow="Values">
-    <div class="prose">
+    <div class="prose" data-reveal-container="principles" data-reveal-stagger="100">
       <ul>
-        <li>Performance-first: budgets, transform/opacity motion, no layout shift</li>
-        <li>Motion-safe: reduced-motion support and clear interaction hierarchy</li>
-        <li>A11y by default: focus-visible parity, semantic structure, readable contrast</li>
-        <li>Shipping mindset: small iterations, measurable outcomes, maintainable code</li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">Performance-first: budgets, transform/opacity motion, no layout shift</li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">Motion-safe: reduced-motion support and clear interaction hierarchy</li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">A11y by default: focus-visible parity, semantic structure, readable contrast</li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">Shipping mindset: small iterations, measurable outcomes, maintainable code</li>
       </ul>
     </div>
   </Section>
+
+  <GlowDivider />
+
+  <!-- LiveData -->
+  <LiveData />
+
+  <!-- Fun Facts -->
+  <FunFacts />
 </BaseLayout>
 
 <style>
   .intro {
     display: flex;
-    align-items: flex-start;
-    gap: 24px;
-    max-width: 72ch;
+    align-items: center; /* Center vertically with bio */
+    gap: 40px;
+    max-width: 85ch; /* allow a bit more width for the box */
   }
 
   .avatarWrap {
     flex-shrink: 0;
-  }
-
-  .avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 999px;
-    object-fit: cover;
-    border: 2px solid rgba(0, 229, 255, 0.25);
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.12);
+    position: relative;
+    /* remove static styles that were for the old round avatar */
   }
 
   .bio {
@@ -74,7 +87,7 @@ import { site } from "../data/site";
   }
 
   .lead {
-    margin: 0 0 10px;
+    margin: 0 0 16px;
     color: rgba(255, 255, 255, 0.82);
     font-size: 17px;
     line-height: 1.8;
@@ -97,11 +110,20 @@ import { site } from "../data/site";
     padding-left: 18px;
   }
 
+  li {
+    padding: 4px 0;
+  }
+
   @media (max-width: 600px) {
     .intro {
       flex-direction: column;
       align-items: center;
       text-align: center;
     }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avatarGlow { animation: none; }
+    .avatar { animation: none; }
   }
 </style>

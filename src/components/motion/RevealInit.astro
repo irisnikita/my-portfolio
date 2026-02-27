@@ -1,9 +1,24 @@
 ---
-// Client-side init for reveal system.
-// Kept as a tiny script (no hydration framework).
+// Client-side init for all motion systems.
+// Kept as tiny scripts (no hydration framework).
 ---
 
 <script>
-  import { observeReveal } from "../../lib/motion";
+  import { observeReveal, observeParallax, observeScrollProgress, initCardTilt, initHeroScrollFade } from "../../lib/motion";
+
+  // Reveal on scroll
   observeReveal({});
+
+  // Scroll parallax elements
+  observeParallax();
+
+  // Scroll progress bar
+  const progressBar = document.querySelector<HTMLElement>(".scroll-progress-bar");
+  observeScrollProgress(progressBar);
+
+  // Card 3D tilt
+  initCardTilt();
+
+  // Hero scroll fade-out
+  initHeroScrollFade();
 </script>

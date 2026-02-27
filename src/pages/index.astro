@@ -4,27 +4,49 @@ import Container from "../components/ui/Container.astro";
 import Button from "../components/ui/Button.astro";
 import Tag from "../components/ui/Tag.astro";
 import NeonGridParallax from "../components/hero/NeonGridParallax.astro";
+import FloatingParticles from "../components/hero/FloatingParticles.astro";
+import GlowDivider from "../components/ui/GlowDivider.astro";
+import MarqueeTicker from "../components/ui/MarqueeTicker.astro";
+import StatsSection from "../components/sections/StatsSection.astro";
+import ServicesSection from "../components/sections/ServicesSection.astro";
+import ProjectCard from "../components/sections/ProjectCard.astro";
+import Section from "../components/ui/Section.astro";
 import ContactSection from "../components/sections/ContactSection.astro";
 import TestimonialsSection from "../components/sections/TestimonialsSection.astro";
 import { site } from "../data/site";
+import { getCollection } from "astro:content";
 
 const title = `${site.name} — ${site.title}`;
+const allProjects = await getCollection("projects");
+const featured = allProjects
+  .sort((a, b) => new Date(b.data.date ?? 0).valueOf() - new Date(a.data.date ?? 0).valueOf())
+  .slice(0, 3);
 ---
 
 <BaseLayout title={title} description={`${site.tagline} • ${site.location}`}>
+  <!-- Hero -->
   <section class="hero">
     <NeonGridParallax />
+    <FloatingParticles count={24} />
     <div class="vignette" />
     <div class="grain" />
 
     <Container>
       <div class="heroInner">
         <div class="stack">
-          <Tag tone="cyan">{site.tagline}</Tag>
-          <h1 class="h1">{site.name}</h1>
-          <p class="sub">{site.bio} • {site.location}</p>
+          <div data-reveal data-reveal-delay="0">
+            <Tag tone="cyan">{site.tagline}</Tag>
+          </div>
+          <h1 class="h1" data-reveal data-reveal-delay="80">
+            <span class="typingWrap">
+              <span class="typingText" data-scramble>{site.name}</span>
+              <span class="cursor" aria-hidden="true" />
+            </span>
+          </h1>
+          <p class="sub" data-reveal data-reveal-delay="200">{site.bio}</p>
+          <p class="location" data-reveal data-reveal-delay="280">{site.location}</p>
 
-          <div class="ctaRow">
+          <div class="ctaRow" data-reveal data-reveal-delay="380">
             <Button href="/projects" variant="primary">View Work</Button>
             <Button href="/#contact" variant="ghost">Contact</Button>
           </div>
@@ -35,32 +57,54 @@ const title = `${site.name} — ${site.title}`;
             <li data-reveal data-reveal-group="proof">Performance-first</li>
             <li data-reveal data-reveal-group="proof">Reduced-motion ready</li>
           </ul>
-
-          <p class="meta">Transform-only motion • Reduced motion supported • Static-first</p>
         </div>
       </div>
     </Container>
   </section>
 
-  <section class="below">
-    <Container>
-      <div class="grid">
-        <div class="panel">
-          <h2>Selected work</h2>
-          <p>Case studies are being prepared (no invented details). If you want to collaborate, reach out.</p>
-          <a class="textLink" href="/#contact">Get in touch →</a>
-        </div>
-        <div class="panel">
-          <h2>About</h2>
-          <p>My tools, principles, and the motion/perf rules I won’t compromise on.</p>
-          <a class="textLink" href="/about">Read about me →</a>
-        </div>
-      </div>
-    </Container>
-  </section>
+  <!-- Marquee -->
+  <MarqueeTicker />
 
+  <GlowDivider />
+
+  <!-- Stats -->
+  <StatsSection />
+
+  <GlowDivider />
+
+  <!-- Featured Projects -->
+  <Section eyebrow="Projects" title="Selected Work">
+    <div class="featuredGrid" data-reveal-container="featured" data-reveal-stagger="120">
+      {featured.map((project, i) => (
+        <div data-reveal data-reveal-group="feat">
+          <ProjectCard
+            title={project.data.title}
+            summary={project.data.summary}
+            slug={project.id}
+            tags={project.data.tags}
+            index={i}
+          />
+        </div>
+      ))}
+    </div>
+    <div class="viewAll" data-reveal>
+      <Button href="/projects" variant="ghost">View all projects →</Button>
+    </div>
+  </Section>
+
+  <GlowDivider />
+
+  <!-- Services -->
+  <ServicesSection />
+
+  <GlowDivider />
+
+  <!-- Testimonials -->
   <TestimonialsSection />
 
+  <GlowDivider />
+
+  <!-- Contact -->
   <ContactSection />
 </BaseLayout>
 
@@ -69,7 +113,6 @@ const title = `${site.name} — ${site.title}`;
     position: relative;
     padding-block: clamp(56px, 10vw, 120px);
     overflow: hidden;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   .heroInner {
@@ -91,11 +134,50 @@ const title = `${site.name} — ${site.title}`;
     letter-spacing: var(--tracking-tight);
   }
 
+  /* Typing effect */
+  .typingWrap {
+    display: inline-flex;
+    align-items: baseline;
+  }
+
+  .typingText {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typingReveal 1.2s steps(24) 0.4s both;
+    max-width: 0;
+  }
+
+  @keyframes typingReveal {
+    to { max-width: 100%; }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 3px;
+    height: 0.9em;
+    background: rgba(0, 229, 255, 0.8);
+    margin-left: 2px;
+    animation: blink 0.7s step-end infinite;
+    border-radius: 1px;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
   .sub {
     margin: 0;
     color: var(--c-muted);
     font-size: clamp(16px, 2.1vw, 19px);
     line-height: 1.6;
+  }
+
+  .location {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 14px;
   }
 
   .ctaRow {
@@ -121,57 +203,51 @@ const title = `${site.name} — ${site.title}`;
     background: rgba(255, 255, 255, 0.03);
     padding: 7px 10px;
     border-radius: 999px;
+    transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
   }
 
-  .meta {
-    margin-top: 16px;
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 13px;
+  .proof li:hover {
+    border-color: rgba(0, 229, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.08);
   }
 
-  .below {
-    padding-block: clamp(36px, 6vw, 72px);
-  }
-
-  .grid {
+  /* Featured projects */
+  .featuredGrid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
 
-  .panel {
-    border-radius: var(--radius);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    background: rgba(255, 255, 255, 0.03);
-    padding: 18px 16px;
+  .viewAll {
+    margin-top: 24px;
+    text-align: center;
   }
 
-  .panel h2 {
-    margin: 0 0 6px;
-    font-size: 18px;
-    letter-spacing: var(--tracking-tight);
+  @media (max-width: 900px) {
+    .featuredGrid {
+      grid-template-columns: 1fr 1fr;
+    }
   }
 
-  .panel p {
-    margin: 0 0 10px;
-    color: var(--c-muted);
-    line-height: 1.55;
-  }
-
-  .textLink {
-    color: rgba(50, 245, 255, 0.85);
-    text-decoration: none;
-  }
-  .textLink:hover {
-    text-decoration: underline;
-  }
-
-  @media (max-width: 720px) {
-    .grid {
+  @media (max-width: 600px) {
+    .featuredGrid {
       grid-template-columns: 1fr;
     }
     .heroInner {
       min-height: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .typingText {
+      max-width: 100%;
+      animation: none;
+    }
+    .cursor {
+      display: none;
+    }
+    .proof li:hover {
+      box-shadow: none;
     }
   }
 </style>

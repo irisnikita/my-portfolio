@@ -1,0 +1,124 @@
+---
+// CustomCursor — branded dot + ring cursor for desktop only
+---
+
+<div class="cursor-dot" aria-hidden="true" />
+<div class="cursor-ring" aria-hidden="true" />
+
+<script>
+  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const canHover = window.matchMedia?.('(hover: hover)')?.matches;
+  const finePointer = window.matchMedia?.('(pointer: fine)')?.matches;
+
+  if (!reducedMotion && canHover && finePointer) {
+    const dot = document.querySelector<HTMLElement>('.cursor-dot');
+    const ring = document.querySelector<HTMLElement>('.cursor-ring');
+
+    if (dot && ring) {
+      let mouseX = -100, mouseY = -100;
+      let ringX = -100, ringY = -100;
+      let raf = 0;
+      let isHover = false;
+
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+
+        if (!raf) raf = requestAnimationFrame(lerp);
+      }, { passive: true });
+
+      const lerp = () => {
+        raf = 0;
+        ringX += (mouseX - ringX) * 0.15;
+        ringY += (mouseY - ringY) * 0.15;
+        ring.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0) scale(${isHover ? 1.5 : 1})`;
+
+        if (Math.abs(mouseX - ringX) + Math.abs(mouseY - ringY) > 0.5) {
+          raf = requestAnimationFrame(lerp);
+        }
+      };
+
+      // Detect hoverable elements
+      const hoverTargets = 'a, button, [role="button"], .btn, .card-tilt, .projectCardLink';
+
+      document.addEventListener('mouseover', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest(hoverTargets)) {
+          isHover = true;
+          dot.classList.add('is-hover');
+          ring.classList.add('is-hover');
+        }
+      });
+
+      document.addEventListener('mouseout', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.closest(hoverTargets)) {
+          isHover = false;
+          dot.classList.remove('is-hover');
+          ring.classList.remove('is-hover');
+        }
+      });
+
+      // Show cursor elements
+      dot.style.opacity = '1';
+      ring.style.opacity = '1';
+
+      // Hide default cursor globally
+      document.documentElement.style.cursor = 'none';
+
+      // Restore cursors for inputs
+      const style = document.createElement('style');
+      style.textContent = 'input, textarea, select, [contenteditable] { cursor: text !important; }';
+      document.head.appendChild(style);
+    }
+  }
+</script>
+
+<style>
+  .cursor-dot,
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    will-change: transform;
+  }
+
+  .cursor-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(0, 229, 255, 0.9);
+    box-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
+    mix-blend-mode: screen;
+    transition: background 200ms, width 200ms, height 200ms;
+  }
+
+  .cursor-ring {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(0, 229, 255, 0.35);
+    transition: border-color 200ms, transform 200ms var(--ease-out);
+  }
+
+  .cursor-dot.is-hover {
+    background: rgba(255, 43, 214, 0.9);
+    box-shadow: 0 0 8px rgba(255, 43, 214, 0.5);
+  }
+
+  .cursor-ring.is-hover {
+    border-color: rgba(255, 43, 214, 0.4);
+  }
+
+  /* Hide on touch/mobile */
+  @media (hover: none), (pointer: coarse) {
+    .cursor-dot,
+    .cursor-ring {
+      display: none !important;
+    }
+  }
+</style>

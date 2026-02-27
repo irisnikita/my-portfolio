@@ -1,0 +1,278 @@
+---
+import Container from "../ui/Container.astro";
+---
+
+<section class="liveDataSection" data-reveal-container="liveData" data-reveal-stagger="100">
+  <Container>
+    <div class="grid">
+      
+      <!-- Spotify Now Playing Mock/Template -->
+      <div class="widget spotifyWidget" data-reveal data-reveal-group="liveData">
+        <div class="widgetHeader">
+          <span class="icon">🎧</span>
+          <span class="title">Now Playing</span>
+        </div>
+        
+        <div class="spotifyContent">
+          <div class="albumArt">
+            <!-- Example album art. User can replace with real API data -->
+            <img src="https://i.scdn.co/image/ab67616d0000b273b0606b6375ae9a2e6b1d408b" alt="Album Art" class="artImg" loading="lazy" />
+            <div class="artOverlay" />
+          </div>
+          
+          <div class="trackInfo">
+            <h4 class="trackName">Starboy</h4>
+            <p class="artistName">The Weeknd, Daft Punk</p>
+            
+            <div class="visualizer">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </div>
+          </div>
+        </div>
+        <!-- 
+          Note: To make this live, you can connect to the Spotify API or use Lanyard (Discord RPC). 
+          Since this is a static site without a backend for secrets, using a serverless function 
+          is recommended to fetch the "Now Playing" track securely.
+        -->
+      </div>
+
+      <!-- GitHub Activity Graph -->
+      <a href="https://github.com/irisnikita" target="_blank" rel="noopener noreferrer" class="widget githubWidget magnet" data-reveal data-reveal-group="liveData">
+        <div class="btnInner">
+          <div class="widgetHeader flex-between">
+            <div>
+              <span class="icon">👾</span>
+              <span class="title">GitHub Contributions</span>
+            </div>
+            <span class="arrow">↗</span>
+          </div>
+          <div class="githubContent">
+            <!-- We color the chart with our cyan hex #00e5ff -->
+            <img src="https://ghchart.rshah.org/00e5ff/irisnikita" alt="irisnikita's GitHub chart" class="ghChart" loading="lazy" />
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </Container>
+</section>
+
+<style>
+  .liveDataSection {
+    padding-block: min(8vw, 80px);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr 2fr; /* Github graph is wider */
+    }
+  }
+
+  .widget {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: background var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
+    text-decoration: none;
+    color: var(--c-text);
+  }
+
+  .widget:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Specific fix for github widget since it is a magnet link wrapper */
+  .githubWidget {
+    --mx: 0;
+    --my: 0;
+    transform: translate3d(calc(var(--mx) * 1px), calc(var(--my) * 1px), 0);
+    will-change: transform;
+    display: block;
+    padding: 0; /* padding moves to btnInner */
+  }
+  
+  .githubWidget .btnInner {
+    --ix: 0;
+    --iy: 0;
+    padding: 24px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transform: translate3d(calc(var(--ix) * 1px), calc(var(--iy) * 1px), 0);
+    transition: transform var(--dur-quick) var(--ease-out);
+    will-change: transform;
+  }
+
+  .widgetHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .arrow {
+    opacity: 0.5;
+    transition: transform var(--dur-quick) var(--ease-out), opacity var(--dur-quick) var(--ease-out);
+  }
+  
+  .githubWidget:hover .arrow {
+    transform: translate3d(2px, -2px, 0);
+    opacity: 1;
+    color: var(--c-neon-cyan);
+  }
+
+  .spotifyContent {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .albumArt {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    background: rgba(255,255,255,0.05); /* Placeholder */
+  }
+
+  .artImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    animation: spin 8s linear infinite;
+  }
+
+  .artOverlay {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%; /* Make it look like a vinyl spinning */
+    box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+  }
+  
+  .albumArt {
+    border-radius: 50%; /* vinyl look */
+  }
+
+  @keyframes spin {
+    100% { transform: rotate(360deg); }
+  }
+
+  .trackInfo {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .trackName {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--c-text);
+  }
+
+  .artistName {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Audio visualizer bars */
+  .visualizer {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 12px;
+  }
+
+  .bar {
+    width: 3px;
+    background: var(--c-neon-cyan);
+    border-radius: 2px;
+    animation: bounce 1s ease-in-out infinite alternate;
+  }
+
+  .bar:nth-child(1) { animation-delay: 0.1s; height: 60%; }
+  .bar:nth-child(2) { animation-delay: 0.4s; height: 100%; }
+  .bar:nth-child(3) { animation-delay: 0.2s; height: 80%; }
+  .bar:nth-child(4) { animation-delay: 0.5s; height: 40%; }
+
+  @keyframes bounce {
+    0% { height: 20%; }
+    100% { height: 100%; }
+  }
+
+  /* Github Chart */
+  .githubContent {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: auto; /* handle small screens */
+    margin-inline: -12px; /* Pull to edges slightly */
+    padding-inline: 12px;
+  }
+  
+  .githubContent::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ghChart {
+    width: 100%;
+    min-width: 400px;
+    height: auto;
+    filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.1));
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .artImg {
+      animation: none;
+    }
+    .bar {
+      animation: none;
+      height: 50% !important;
+    }
+    .githubWidget {
+      transform: none;
+    }
+    .githubWidget .btnInner {
+      transform: none;
+    }
+  }
+</style>

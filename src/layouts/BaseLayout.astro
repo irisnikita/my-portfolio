@@ -2,6 +2,14 @@
 import "../styles/global.css";
 import { ViewTransitions } from "astro:transitions";
 import RevealInit from "../components/motion/RevealInit.astro";
+import CustomCursor from "../components/motion/CustomCursor.astro";
+import Preloader from "../components/motion/Preloader.astro";
+import FluidBackground from "../components/hero/FluidBackground.astro";
+import CommandPalette from "../components/ui/CommandPalette.astro";
+import ScrambleText from "../components/motion/ScrambleText.astro";
+import ScrollDistortion from "../components/motion/ScrollDistortion.astro";
+import SoundManager from "../components/ui/SoundManager.astro";
+import LenisScroll from "../components/motion/LenisScroll.astro";
 import { site } from "../data/site";
 
 const {
@@ -14,6 +22,7 @@ const {
 const nav = [
   { href: "/projects", label: "Projects" },
   { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
   { href: "/#contact", label: "Contact" },
 ];
 
@@ -83,9 +92,34 @@ const jsonLd = [
     {pathname.startsWith('/projects') ? <ViewTransitions /> : null}
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    
+    <!-- Track click coords for ViewTransitions Wipe Effect -->
+    <script is:inline>
+      document.addEventListener('click', (e) => {
+        // Find closest anchor
+        const a = e.target.closest('a');
+        if (a && a.href && a.hostname === location.hostname && !a.hash) {
+          // Set CSS vars on html element
+          document.documentElement.style.setProperty('--click-x', e.clientX + 'px');
+          document.documentElement.style.setProperty('--click-y', e.clientY + 'px');
+        }
+      });
+    </script>
   </head>
   <body>
+    <!-- Smooth Scroll Init -->
+    <LenisScroll />
+    
+    <!-- 3D WebGL Fluid Canvas -->
+    <FluidBackground />
+    <Preloader />
+    <CustomCursor />
+    <div class="scroll-progress-bar" aria-hidden="true" />
     <RevealInit />
+    <CommandPalette />
+    <ScrollDistortion />
+    <ScrambleText />
+    <SoundManager />
     <a href="#main" class="skip-link">Skip to content</a>
 
     <header class="site-header">
@@ -140,6 +174,21 @@ const jsonLd = [
 </html>
 
 <style>
+  .scroll-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--c-neon-cyan), var(--c-neon-magenta), var(--c-neon-violet));
+    transform-origin: left center;
+    transform: scaleX(0);
+    z-index: 50;
+    will-change: transform;
+    pointer-events: none;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+  }
+
   .skip-link {
     position: absolute;
     left: 12px;

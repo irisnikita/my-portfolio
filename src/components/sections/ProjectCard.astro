@@ -1,6 +1,7 @@
 ---
 import Tag from "../ui/Tag.astro";
 import Card from "../ui/Card.astro";
+import WebGlHoverImage from "../motion/WebGlHoverImage.astro";
 
 interface Props {
   title: string;
@@ -11,6 +12,15 @@ interface Props {
 }
 
 const { title, summary, slug, tags = [], index = 0 } = Astro.props;
+
+// Placeholders until real images are added
+const images = [
+  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop', // liquid
+  'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop', // neon
+  'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=400&auto=format&fit=crop', // matrix
+  'https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=400&auto=format&fit=crop', // space
+];
+const posterSrc = images[index % images.length];
 ---
 
 <a href={`/projects/${slug}`} class="projectCardLink">
@@ -20,7 +30,9 @@ const { title, summary, slug, tags = [], index = 0 } = Astro.props;
         class="poster"
         aria-hidden="true"
         transition:name={`project-poster-${slug}`}
-      />
+      >
+        <WebGlHoverImage src={posterSrc} alt={title} />
+      </div>
       <div class="body">
         <h3 class="title" transition:name={`project-title-${slug}`}>{title}</h3>
         <p class="summary">{summary}</p>
@@ -49,13 +61,40 @@ const { title, summary, slug, tags = [], index = 0 } = Astro.props;
   }
 
   .poster {
-    height: 120px;
+    height: 140px;
     border-radius: var(--radius) var(--radius) 0 0;
     background:
       radial-gradient(240px 200px at 20% 20%, rgba(50, 245, 255, 0.18), transparent 62%),
       radial-gradient(260px 220px at 75% 30%, rgba(255, 53, 213, 0.14), transparent 66%),
       radial-gradient(120% 160% at 30% 10%, rgba(124, 92, 255, 0.12), transparent 60%),
       rgba(255, 255, 255, 0.02);
+    position: relative;
+    overflow: hidden;
+    transition: transform 350ms var(--ease-out);
+  }
+
+  .projectCardLink:hover .poster {
+    transform: scale(1.03);
+  }
+
+  .posterShimmer {
+    position: absolute;
+    inset: -100%;
+    background: linear-gradient(
+      115deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.04) 45%,
+      rgba(0, 229, 255, 0.06) 50%,
+      rgba(255, 255, 255, 0.04) 55%,
+      transparent 60%
+    );
+    animation: posterSweep 8s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes posterSweep {
+    0% { transform: translate3d(-60%, -10%, 0); }
+    100% { transform: translate3d(60%, 10%, 0); }
   }
 
   .body {
@@ -84,5 +123,14 @@ const { title, summary, slug, tags = [], index = 0 } = Astro.props;
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .posterShimmer {
+      animation: none;
+    }
+    .projectCardLink:hover .poster {
+      transform: none;
+    }
   }
 </style>

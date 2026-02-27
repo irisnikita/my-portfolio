@@ -32,8 +32,11 @@
 
   /* Motion */
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);
   --dur-quick: 120ms;
   --dur-med: 220ms;
+  --dur-slow: 600ms;
 
   /* Glow recipe (core hot + soft bloom) */
   --shadow-glow-cyan: 0 0 8px rgba(0, 229, 255, 0.45), 0 0 28px rgba(124, 59, 255, 0.22), 0 0 52px rgba(255, 43, 214, 0.14);
@@ -47,9 +50,19 @@
   --vignette: radial-gradient(80% 65% at 50% 35%, rgba(6, 8, 18, 0) 0%, rgba(6, 8, 18, 0.55) 70%, rgba(6, 8, 18, 0.92) 100%);
 }
 
-html,
+html {
+  height: 100%;
+  scroll-behavior: smooth;
+}
+
 body {
   height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {
@@ -68,16 +81,59 @@ body {
 /* Reveal system (transform/opacity only) */
 .reveal {
   opacity: 0;
-  transform: translate3d(0, 10px, 0);
+  transform: translate3d(0, 14px, 0);
   transition:
-    opacity 420ms var(--ease-out),
-    transform 420ms var(--ease-out);
+    opacity 520ms var(--ease-out),
+    transform 520ms var(--ease-out);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: transform, opacity;
 }
 .reveal.is-revealed {
   opacity: 1;
   transform: translate3d(0, 0, 0);
+}
+
+/* Reveal variants */
+.reveal-slide-left {
+  opacity: 0;
+  transform: translate3d(-30px, 0, 0);
+  transition:
+    opacity 520ms var(--ease-out),
+    transform 520ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity;
+}
+.reveal-slide-left.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-slide-right {
+  opacity: 0;
+  transform: translate3d(30px, 0, 0);
+  transition:
+    opacity 520ms var(--ease-out),
+    transform 520ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity;
+}
+.reveal-slide-right.is-revealed {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.85);
+  transition:
+    opacity 450ms var(--ease-spring),
+    transform 450ms var(--ease-spring);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity;
+}
+.reveal-scale.is-revealed {
+  opacity: 1;
+  transform: scale(1);
 }
 
 /* Prefer reduced motion: disable loops/parallax/stagger */
@@ -115,4 +171,37 @@ body {
   position: absolute;
   inset: -1px;
   background: var(--vignette);
+}
+
+/* 
+  Custom View Transitions (Awwwards style pseudo-elements)
+  Replaces default crossfade with a circular wipe from the click position. 
+*/
+::view-transition-old(root) {
+  animation: none;
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  animation: clipReveal 0.6s var(--ease-out) forwards;
+  z-index: 2;
+}
+
+@keyframes clipReveal {
+  from {
+    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%));
+    opacity: 0;
+  }
+  to {
+    clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%));
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

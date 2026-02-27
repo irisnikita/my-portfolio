@@ -1,0 +1,242 @@
+---
+// 3D Anime Avatar Component (Interactive)
+// Replaces the static photo on the About page.
+// The character looks at the cursor.
+---
+
+<div class="animeAvatarContainer" id="avatar-container" aria-label="3D Interactive Avatar">
+  <!-- Loading spinner before 3D model loads -->
+  <div class="loading-indicator" id="avatar-loading">
+    <div class="spinner"></div>
+  </div>
+  <canvas id="animeAvatarCanvas"></canvas>
+</div>
+
+<script>
+  import * as THREE from 'three';
+  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+  function initAvatar() {
+    const container = document.getElementById('avatar-container');
+    const canvas = document.getElementById('animeAvatarCanvas') as HTMLCanvasElement;
+    const loading = document.getElementById('avatar-loading');
+    if (!container || !canvas) return;
+
+    // Only init once (prevents double init on Astro view transitions)
+    if (container.hasAttribute('data-init')) return;
+    container.setAttribute('data-init', 'true');
+
+    // 1. Scene Setup
+    const scene = new THREE.Scene();
+    
+    // Transparent background
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    const rect = container.getBoundingClientRect();
+    renderer.setSize(rect.width, rect.height);
+    
+    const camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 100);
+    // Adjusted camera position depending on model height (will adjust after load)
+    camera.position.set(0, 1.5, 5); 
+
+    // 2. Lighting (Neon/Cyberpunk vibe)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
+
+    const dirLight = new THREE.DirectionalLight(0x00e5ff, 2);
+    dirLight.position.set(5, 5, 5);
+    scene.add(dirLight);
+
+    const backLight = new THREE.DirectionalLight(0xff2bd6, 2);
+    backLight.position.set(-5, 5, -5);
+    scene.add(backLight);
+
+    // 3. Variables for interaction
+    let model: THREE.Group | null = null;
+    let headBone: THREE.Object3D | null = null;
+    let neckBone: THREE.Object3D | null = null;
+    let mixer: THREE.AnimationMixer | null = null;
+    
+    // Mouse coords targeting
+    const target = new THREE.Vector2(0, 0);
+    const current = new THREE.Vector2(0, 0);
+
+    // 4. Load the GLTF/VRM Model
+    const loader = new GLTFLoader();
+    // Using the placeholder we downloaded, or the user's future file:
+    loader.load('/models/avatar.glb', (gltf) => {
+      model = gltf.scene;
+      
+      // Auto-scale and center the model
+      const box = new THREE.Box3().setFromObject(model);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
+      
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const desiredHeight = 3.5; // fits well in the canvas
+      const scale = desiredHeight / maxDim;
+      model.scale.set(scale, scale, scale);
+      
+      // Center horizontally and match feet to bottom
+      model.position.set(-center.x * scale, -box.min.y * scale - 1.5, -center.z * scale);
+      
+      // Find head/neck bones exactly or partially matching common names
+      model.traverse((child) => {
+        if ((child as THREE.Bone).isBone) {
+          const name = child.name.toLowerCase();
+          if (name.includes('head')) headBone = child;
+          if (name.includes('neck')) neckBone = child;
+        }
+      });
+
+      // If there are animations (like Idle), play them
+      if (gltf.animations && gltf.animations.length > 0) {
+        mixer = new THREE.AnimationMixer(model);
+        // Find an 'idle' animation or just play the first one
+        const idleAnim = gltf.animations.find(a => a.name.toLowerCase().includes('idle')) || gltf.animations[0];
+        if (idleAnim) {
+          mixer.clipAction(idleAnim).play();
+        }
+      }
+
+      scene.add(model);
+      if (loading) loading.style.opacity = '0';
+      
+    }, undefined, (error) => {
+      console.error('Error loading avatar GLB:', error);
+      if (loading) loading.textContent = 'Model not found (needs /public/models/avatar.glb)';
+    });
+
+    // 5. Mouse tracking
+    const onMouseMove = (e: MouseEvent) => {
+      // Normalize mouse to -1 to 1 based on screen
+      target.x = (e.clientX / window.innerWidth) * 2 - 1;
+      target.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    };
+    window.addEventListener('mousemove', onMouseMove);
+
+    // 6. Animation Loop
+    const clock = new THREE.Clock();
+    let rafId = 0;
+
+    const animate = () => {
+      rafId = requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+
+      if (mixer) mixer.update(delta);
+
+      // Interpolate current rotation towards target
+      current.x += (target.x - current.x) * 0.1;
+      current.y += (target.y - current.y) * 0.1;
+
+      if (model) {
+        // If we found a head/neck bone, rotate them
+        if (headBone) {
+          // Clamp the angles so it doesn't break its neck
+          const headX = Math.max(-0.5, Math.min(0.5, current.y * 1.5));
+          const headY = Math.max(-1.0, Math.min(1.0, -current.x * 1.5));
+          
+          // Apply rotation (exact axes depend on rigging, but this works for most standard characters)
+          headBone.rotation.x = headX;
+          headBone.rotation.y = headY;
+        } else {
+          // Fallback: rotate the whole model slightly
+          model.rotation.y = -current.x * 0.5;
+          model.rotation.x = current.y * 0.2;
+        }
+      }
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+
+    // 7. Handle Resize
+    const onResize = () => {
+      const parentRect = container.getBoundingClientRect();
+      renderer.setSize(parentRect.width, parentRect.height);
+      camera.aspect = parentRect.width / parentRect.height;
+      camera.updateProjectionMatrix();
+    };
+    window.addEventListener('resize', onResize);
+
+    // Cleanup on view transitions
+    (window as any)._cleanupAvatar = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('resize', onResize);
+      cancelAnimationFrame(rafId);
+      renderer.dispose();
+    };
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    if ((window as any)._cleanupAvatar) (window as any)._cleanupAvatar();
+    initAvatar();
+  });
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAvatar);
+  } else {
+    initAvatar();
+  }
+</script>
+
+<style>
+  .animeAvatarContainer {
+    width: 220px;
+    height: 280px;
+    position: relative;
+    border-radius: 16px;
+    background: radial-gradient(circle at center, rgba(0, 229, 255, 0.08), rgba(6, 8, 18, 0.8));
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    box-shadow: 0 0 30px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(255, 43, 214, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none; /* Let clicks pass through if needed, but we track document mousemove anyway */
+    margin: 0 auto; /* Center in mobile view */
+    overflow: hidden; /* Keep the glow inside */
+  }
+
+  /* Add an inner glow ring */
+  .animeAvatarContainer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+  }
+
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+    outline: none;
+    filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.15));
+  }
+
+  .loading-indicator {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-muted);
+    font-size: 13px;
+    font-family: var(--f-mono);
+    transition: opacity 0.5s ease;
+  }
+
+  .spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--c-neon-cyan);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
