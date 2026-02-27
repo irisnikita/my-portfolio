@@ -93,6 +93,16 @@ const jsonLd = [
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     
+    <!-- Apply vibe theme from local storage before page render to prevent FOUC -->
+    <script is:inline>
+      try {
+        const theme = localStorage.getItem('theme-vibe');
+        if (theme && theme !== 'cyberpunk') {
+          document.documentElement.setAttribute('data-vibe', theme);
+        }
+      } catch (e) {}
+    </script>
+    
     <!-- Track click coords for ViewTransitions Wipe Effect -->
     <script is:inline>
       document.addEventListener('click', (e) => {

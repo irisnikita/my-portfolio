@@ -1,6 +1,7 @@
 ---
 import Section from "../ui/Section.astro";
 import Button from "../ui/Button.astro";
+import LiquidText from "../motion/LiquidText.astro";
 import { site } from "../../data/site";
 
 const {
@@ -30,11 +31,11 @@ const socialsReady = socials.filter((x) => typeof x.href === "string" && x.href.
 
 <Section
   title={title}
-  eyebrow={eyebrow}
-  headingLevel={headingLevel}
   class={"contactSection" + (compact ? " isCompact" : "")}
 >
   <div id={id} class="wrap">
+    <LiquidText text="Let's Talk" />
+    
     <p class="p">{description}</p>
 
     <ul class="meta" aria-label="Availability">

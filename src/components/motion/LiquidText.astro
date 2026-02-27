@@ -1,0 +1,173 @@
+---
+import type { HTMLAttributes } from "astro/types";
+
+type Props = HTMLAttributes<"div"> & {
+  text: string;
+};
+
+const { class: className, text, ...rest } = Astro.props;
+// Use a unique ID for the SVG filter so multiple instances don't collide
+const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
+---
+
+<div class={['liquid-text-container', className].filter(Boolean).join(' ')} {...rest}>
+  <!-- SVG Filter definition (hidden) -->
+  <svg class="liquid-svg" aria-hidden="true" width="0" height="0" xmlns="http://www.w3.org/2000/svg">
+    <filter id={filterId}>
+      <feTurbulence 
+        type="fractalNoise" 
+        baseFrequency="0.01 0.01" 
+        numOctaves="1" 
+        result="noise" 
+        class="turbulence"
+      />
+      <!-- Higher scale = stronger melting effect -->
+      <feDisplacementMap 
+        in="SourceGraphic" 
+        in2="noise" 
+        scale="0" 
+        xChannelSelector="R" 
+        yChannelSelector="G" 
+        class="displacement"
+      />
+    </filter>
+  </svg>
+
+  <h2 
+    class="liquid-heading" 
+    style={`filter: url(#${filterId});`}
+    data-liquid-text
+  >
+    {text}
+  </h2>
+</div>
+
+<script>
+  function initLiquidText() {
+    const pmr = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (pmr) return;
+
+    const containers = document.querySelectorAll('.liquid-text-container');
+    
+    containers.forEach((containerFn) => {
+      const container = containerFn as HTMLElement;
+      if (container.hasAttribute('data-liquid-init')) return;
+      container.setAttribute('data-liquid-init', 'true');
+
+      const filter = container.querySelector('.displacement') as SVGFEDisplacementMapElement;
+      const turbulence = container.querySelector('.turbulence') as SVGFETurbulenceElement;
+      if (!filter || !turbulence) return;
+
+      let targetScale = 0;
+      let currentScale = 0;
+      let rafId: number;
+
+      // Base frequencies mapped to mouse hover
+      let baseFreqX = 0.01;
+      let baseFreqY = 0.01;
+
+      container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        // Calculate distance from center of bounding box to cursor
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        
+        // Intensity based on proximity
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const maxDist = Math.max(rect.width, rect.height);
+        
+        // Closer = higher scale (more distortion) up to max 120
+        const intensity = Math.max(0, 1 - (dist / (maxDist * 0.8)));
+        targetScale = intensity * 120;
+        
+        // Slightly tweak frequency based on x/y for dynamic rippling
+        baseFreqX = 0.01 + (dx / rect.width) * 0.02;
+        baseFreqY = 0.01 + (dy / rect.height) * 0.02;
+      });
+
+      container.addEventListener('mouseleave', () => {
+        targetScale = 0;
+      });
+
+      function animate() {
+        // Lerp the scale for smooth transition
+        currentScale += (targetScale - currentScale) * 0.1;
+        
+        // Only update DOM if there's a meaningful change
+        if (Math.abs(currentScale - targetScale) > 0.1 || currentScale > 0.5) {
+          filter.setAttribute('scale', currentScale.toString());
+          turbulence.setAttribute('baseFrequency', `${Math.abs(baseFreqX)} ${Math.abs(baseFreqY)}`);
+        } else if (currentScale <= 0.5 && targetScale === 0) {
+          // Snap to 0 to stop rendering filter
+          filter.setAttribute('scale', '0');
+        }
+
+        rafId = requestAnimationFrame(animate);
+      }
+      
+      animate();
+
+      (window as any)[`_cleanupLiquid_${container.id}`] = () => {
+        cancelAnimationFrame(rafId);
+      };
+    });
+  }
+
+  document.addEventListener('astro:page-load', initLiquidText);
+  if (typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLiquidText);
+    } else {
+      initLiquidText();
+    }
+  }
+</script>
+
+<style>
+  .liquid-text-container {
+    position: relative;
+    width: 100%;
+    /* Create a large hit area for tracking */
+    padding: 60px 0; 
+    cursor: crosshair;
+    overflow: hidden;
+  }
+
+  .liquid-svg {
+    position: absolute;
+    pointer-events: none;
+  }
+
+  .liquid-heading {
+    margin: 0;
+    font-size: clamp(4rem, 15vw, 12rem);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    text-transform: uppercase;
+    text-align: center;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--c-text);
+    text-stroke: 2px var(--c-text);
+    will-change: filter;
+    /* Optional: subtle ambient glow */
+    text-shadow: 0 0 20px rgba(var(--c-neon-cyan-rgb, 0, 229, 255), 0.2);
+    transition: color 400ms ease;
+  }
+
+  .liquid-text-container:hover .liquid-heading {
+    /* Fill with solid color when hovered + melting */
+    color: var(--c-text);
+    -webkit-text-stroke: 0;
+    text-shadow: var(--shadow-glow-cyan);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .liquid-heading {
+      filter: none !important;
+      transition: none;
+    }
+  }
+</style>

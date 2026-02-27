@@ -57,6 +57,23 @@ import { site } from "../../data/site";
         </button>
       </div>
 
+      <!-- Themes -->
+      <div class="palette-group" data-group="Themes">
+        <div class="palette-group-title">Themes & Vibes</div>
+        <button class="palette-item cmd-theme" data-theme="cyberpunk" role="option" aria-selected="false">
+          <span class="icon">🟣</span> <span>Vibe: Cyberpunk (Default)</span>
+        </button>
+        <button class="palette-item cmd-theme" data-theme="matrix" role="option" aria-selected="false">
+          <span class="icon">💻</span> <span>Vibe: The Matrix</span>
+        </button>
+        <button class="palette-item cmd-theme" data-theme="vaporwave" role="option" aria-selected="false">
+          <span class="icon">🌴</span> <span>Vibe: Vaporwave</span>
+        </button>
+        <button class="palette-item cmd-theme" data-theme="monochrome" role="option" aria-selected="false">
+          <span class="icon">⚫</span> <span>Vibe: Monochrome</span>
+        </button>
+      </div>
+
       <!-- Experiments -->
       <div class="palette-group" data-group="Experiments">
         <div class="palette-group-title">Experiments</div>
@@ -178,6 +195,12 @@ import { site } from "../../data/site";
                 }, 2000);
               });
             }
+          } else if (selected.classList.contains('cmd-theme')) {
+            const theme = selected.getAttribute('data-theme');
+            if (theme) {
+              setTheme(theme);
+              close();
+            }
           } else if (selected.id === 'cmd-gravity') {
             close();
             // Dynamic import to save bundle size until user activates it
@@ -188,6 +211,16 @@ import { site } from "../../data/site";
         }
       }
     };
+
+    function setTheme(theme: string) {
+      if (theme === 'cyberpunk') {
+        document.documentElement.removeAttribute('data-vibe'); // Default
+        localStorage.removeItem('theme-vibe');
+      } else {
+        document.documentElement.setAttribute('data-vibe', theme);
+        localStorage.setItem('theme-vibe', theme);
+      }
+    }
 
     const onInput = (e: Event) => filterList((e.target as HTMLInputElement).value);
 
@@ -211,6 +244,12 @@ import { site } from "../../data/site";
       const item = e.currentTarget as HTMLElement;
       if (item.tagName === 'A') {
         close();
+      } else if (item.classList.contains('cmd-theme')) {
+        const theme = item.getAttribute('data-theme');
+        if (theme) {
+          setTheme(theme);
+          close();
+        }
       } else if (item.id === 'cmd-gravity') {
         close();
         import('../../utils/gravityEgg').then(mod => {

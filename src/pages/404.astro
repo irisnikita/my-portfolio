@@ -1,0 +1,374 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Section from "../components/ui/Section.astro";
+import Button from "../components/ui/Button.astro";
+
+// A playful 404 page featuring a simple Canvas Pong game.
+---
+
+<BaseLayout
+  title="404 — Trang không tồn tại"
+  description="Lạc đường rồi? Chơi một ván Pong nhé."
+>
+  <Section 
+    id="not-found" 
+    title="404" 
+    eyebrow="Oh no..."
+    class="page-404"
+  >
+    <div class="wrap content-center">
+      <h1 class="h1">You look lost.</h1>
+      <p class="p">The page you are looking for has been moved or doesn't exist.</p>
+      
+      <div class="game-container" aria-label="A playable game of Pong">
+        <canvas id="pong-canvas" width="600" height="300"></canvas>
+        <div class="game-overlay" id="pong-overlay">
+          <p>Press <kbd>Space</kbd> to play</p>
+          <p class="small">Use <kbd>W</kbd> and <kbd>S</kbd> to move</p>
+        </div>
+      </div>
+
+      <div class="actions">
+        <Button href="/" variant="primary">Return Home</Button>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<script>
+  function initPong() {
+    const canvas = document.getElementById('pong-canvas') as HTMLCanvasElement;
+    const overlay = document.getElementById('pong-overlay');
+    if (!canvas || !overlay) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // State
+    let isPlaying = false;
+    let animationId: number;
+    let lastTime = 0;
+
+    const game = {
+      scorePlayer: 0,
+      scoreAI: 0,
+      width: 600,
+      height: 300
+    };
+
+    const paddle1 = { x: 20, y: 110, w: 10, h: 80, speed: 400, dy: 0 };
+    const paddle2 = { x: 570, y: 110, w: 10, h: 80, speed: 300 }; // AI a bit slower
+    const ball = { x: 300, y: 150, radius: 8, dx: 300, dy: 300, speedBase: 300 };
+
+    // Input state
+    const keys = { w: false, s: false };
+
+    function resetBall() {
+      ball.x = game.width / 2;
+      ball.y = game.height / 2;
+      ball.dx = ball.speedBase * (Math.random() > 0.5 ? 1 : -1);
+      ball.dy = ball.speedBase * (Math.random() > 0.5 ? 1 : -1);
+    }
+
+    function update(dt: number) {
+      // Player
+      if (keys.w) paddle1.y -= paddle1.speed * dt;
+      if (keys.s) paddle1.y += paddle1.speed * dt;
+
+      // Clamp player
+      paddle1.y = Math.max(0, Math.min(game.height - paddle1.h, paddle1.y));
+
+      // AI (simple prediction)
+      const aiCenter = paddle2.y + paddle2.h / 2;
+      // Only move if ball is coming towards AI
+      if (ball.dx > 0) {
+        if (aiCenter < ball.y - 10) {
+          paddle2.y += paddle2.speed * dt;
+        } else if (aiCenter > ball.y + 10) {
+          paddle2.y -= paddle2.speed * dt;
+        }
+      }
+      // Clamp AI
+      paddle2.y = Math.max(0, Math.min(game.height - paddle2.h, paddle2.y));
+
+      // Ball physics
+      ball.x += ball.dx * dt;
+      ball.y += ball.dy * dt;
+
+      // Top/bottom collisions
+      if (ball.y - ball.radius < 0) {
+        ball.y = ball.radius;
+        ball.dy *= -1;
+      } else if (ball.y + ball.radius > game.height) {
+        ball.y = game.height - ball.radius;
+        ball.dy *= -1;
+      }
+
+      // Paddle collisions
+      // Player (Left)
+      if (ball.x - ball.radius < paddle1.x + paddle1.w && 
+          ball.y > paddle1.y && ball.y < paddle1.y + paddle1.h &&
+          ball.dx < 0) {
+        ball.dx *= -1.1; // speed up slightly
+        // Add spin based on where it hit
+        const hitPoint = ball.y - (paddle1.y + paddle1.h/2);
+        ball.dy += hitPoint * 2;
+        ball.x = paddle1.x + paddle1.w + ball.radius; // avoid getting stuck
+      }
+
+      // AI (Right)
+      if (ball.x + ball.radius > paddle2.x && 
+          ball.y > paddle2.y && ball.y < paddle2.y + paddle2.h &&
+          ball.dx > 0) {
+        ball.dx *= -1.1;
+        const hitPoint = ball.y - (paddle2.y + paddle2.h/2);
+        ball.dy += hitPoint * 2;
+        ball.x = paddle2.x - ball.radius;
+      }
+
+      // Scoring
+      if (ball.x < 0) {
+        game.scoreAI++;
+        resetBall();
+      } else if (ball.x > game.width) {
+        game.scorePlayer++;
+        resetBall();
+      }
+    }
+
+    function draw() {
+      // Fetch CSS variables for colors (so it matches current vibe)
+      const rootStyles = getComputedStyle(document.documentElement);
+      const cyanHex = rootStyles.getPropertyValue('--c-neon-cyan').trim() || '#00e5ff';
+      const magHex = rootStyles.getPropertyValue('--c-neon-magenta').trim() || '#ff2bd6';
+      
+      // Clear
+      ctx!.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx!.fillRect(0, 0, game.width, game.height);
+
+      // Draw middle dashed line
+      ctx!.setLineDash([10, 15]);
+      ctx!.beginPath();
+      ctx!.moveTo(game.width / 2, 0);
+      ctx!.lineTo(game.width / 2, game.height);
+      ctx!.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx!.stroke();
+      ctx!.setLineDash([]); // reset
+
+      // Player Paddle (Cyan)
+      ctx!.fillStyle = cyanHex;
+      ctx!.fillRect(paddle1.x, paddle1.y, paddle1.w, paddle1.h);
+
+      // AI Paddle (Magenta)
+      ctx!.fillStyle = magHex;
+      ctx!.fillRect(paddle2.x, paddle2.y, paddle2.w, paddle2.h);
+
+      // Ball (White)
+      ctx!.fillStyle = '#ffffff';
+      ctx!.beginPath();
+      ctx!.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx!.fill();
+
+      // Scores
+      ctx!.font = '40px monospace';
+      ctx!.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx!.fillText(game.scorePlayer.toString(), game.width / 4, 60);
+      ctx!.fillText(game.scoreAI.toString(), game.width * 3 / 4, 60);
+    }
+
+    function loop(time: number) {
+      if (!lastTime) lastTime = time;
+      const dt = (time - lastTime) / 1000;
+      lastTime = time;
+
+      // Cap delta time to prevent physics explosions on lag spikes
+      const safeDt = Math.min(dt, 0.1);
+
+      if (isPlaying) {
+        update(safeDt);
+      }
+      draw();
+      animationId = requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      if (isPlaying) return;
+      isPlaying = true;
+      overlay!.style.display = 'none';
+      if (!animationId) {
+        lastTime = performance.now();
+        loop(performance.now());
+      }
+    }
+
+    function stopGame() {
+      isPlaying = false;
+      cancelAnimationFrame(animationId);
+      animationId = 0;
+    }
+
+    // Keyboard & Mouse listeners
+    const onKeydown = (e: KeyboardEvent) => {
+      if (e.code === 'Space' && !isPlaying) {
+        e.preventDefault();
+        startGame();
+      }
+      if (e.key.toLowerCase() === 'w') keys.w = true;
+      if (e.key.toLowerCase() === 's') keys.s = true;
+    };
+
+    const onKeyup = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === 'w') keys.w = false;
+      if (e.key.toLowerCase() === 's') keys.s = false;
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isPlaying) return;
+      
+      const rect = canvas.getBoundingClientRect();
+      const scaleY = game.height / rect.height;
+      const yClick = (e.clientY - rect.top) * scaleY;
+      
+      paddle1.y = yClick - paddle1.h / 2;
+      paddle1.y = Math.max(0, Math.min(game.height - paddle1.h, paddle1.y));
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (!isPlaying || !e.touches[0]) return;
+      e.preventDefault(); // Prevent scrolling while playing
+      
+      const rect = canvas.getBoundingClientRect();
+      const scaleY = game.height / rect.height;
+      const yClick = (e.touches[0].clientY - rect.top) * scaleY;
+      
+      paddle1.y = yClick - paddle1.h / 2;
+      paddle1.y = Math.max(0, Math.min(game.height - paddle1.h, paddle1.y));
+    };
+
+    window.addEventListener('keydown', onKeydown);
+    window.addEventListener('keyup', onKeyup);
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+    
+    // Allow clicking overlay to start
+    overlay.addEventListener('click', () => {
+      if (!isPlaying) startGame();
+    });
+
+    // Initial render without physics
+    setTimeout(draw, 100);
+
+    (window as any)._cleanupPong = () => {
+      stopGame();
+      window.removeEventListener('keydown', onKeydown);
+      window.removeEventListener('keyup', onKeyup);
+      canvas.removeEventListener('mousemove', onMouseMove);
+      canvas.removeEventListener('touchmove', onTouchMove);
+    };
+  }
+
+  const runInit = () => {
+    if ((window as any)._cleanupPong) (window as any)._cleanupPong();
+    initPong();
+  };
+
+  document.addEventListener('astro:page-load', runInit);
+  if (typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', runInit);
+    } else {
+      runInit();
+    }
+  }
+</script>
+
+<style>
+  .page-404 {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .content-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .h1 {
+    font-size: clamp(3rem, 8vw, 5rem);
+    margin: 0;
+    line-height: 1;
+    background: linear-gradient(135deg, #fff, var(--c-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .p {
+    color: var(--c-muted);
+    font-size: 1.1rem;
+    margin-top: 1rem;
+    max-width: 500px;
+  }
+
+  .game-container {
+    margin: 40px 0;
+    position: relative;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--c-border);
+    background: #000;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+    max-width: 100%;
+  }
+
+  #pong-canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    /* Maintain aspect ratio natively on responsive */
+    aspect-ratio: 2 / 1; 
+  }
+
+  .game-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .game-overlay p {
+    font-size: 1.5rem;
+    margin: 0;
+    font-weight: bold;
+  }
+
+  .game-overlay .small {
+    font-size: 0.9rem;
+    color: var(--c-muted);
+    margin-top: 10px;
+    font-weight: normal;
+  }
+
+  kbd {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+  }
+
+  .actions {
+    margin-top: 20px;
+  }
+</style>

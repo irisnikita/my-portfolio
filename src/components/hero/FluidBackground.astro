@@ -32,6 +32,9 @@
       uniform vec2 uResolution;
       uniform float uTime;
       uniform vec2 uMouse;
+      uniform vec3 uColorCyan;
+      uniform vec3 uColorMagenta;
+      uniform vec3 uColorDark;
       
       // Pseudo-random noise
       vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -79,14 +82,9 @@
         float mouseEffect = smoothstep(0.4, 0.0, dist);
         n += mouseEffect * 1.5; // push noise up near mouse
         
-        // Color mapping (Dark Neon Cyan & Magenta mix)
-        vec3 colorCyan = vec3(0.0, 0.898, 1.0); // #00e5ff
-        vec3 colorMagenta = vec3(1.0, 0.168, 0.839); // #ff2bd6
-        vec3 colorDark = vec3(0.02, 0.03, 0.07); // almost black
-        
-        // Mix colors based on noise
-        vec3 finalColor = mix(colorDark, colorCyan, smoothstep(0.0, 0.8, n) * 0.15);
-        finalColor = mix(finalColor, colorMagenta, smoothstep(0.4, 1.2, n) * 0.1);
+        // Mix colors based on noise using the dynamic uniforms
+        vec3 finalColor = mix(uColorDark, uColorCyan, smoothstep(0.0, 0.8, n) * 0.15);
+        finalColor = mix(finalColor, uColorMagenta, smoothstep(0.4, 1.2, n) * 0.1);
         
         // Add extreme vignette
         float vignette = 1.0 - smoothstep(0.5, 1.5, length(st - vec2(0.5 * (uResolution.x/uResolution.y), 0.5)));
@@ -141,6 +139,9 @@
     const uResolution = gl.getUniformLocation(program, "uResolution");
     const uTime = gl.getUniformLocation(program, "uTime");
     const uMouse = gl.getUniformLocation(program, "uMouse");
+    const uColorCyan = gl.getUniformLocation(program, "uColorCyan");
+    const uColorMagenta = gl.getUniformLocation(program, "uColorMagenta");
+    const uColorDark = gl.getUniformLocation(program, "uColorDark");
 
     // State variables
     let mouseX = 0, mouseY = 0;
@@ -171,6 +172,16 @@
     }
     window.addEventListener('mousemove', onMouseMove);
 
+    function hexToRgb(hex: string) {
+      // Basic parser, expecting format like #00e5ff
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex.trim());
+      return result ? {
+        r: parseInt(result[1], 16) / 255.0,
+        g: parseInt(result[2], 16) / 255.0,
+        b: parseInt(result[3], 16) / 255.0
+      } : { r: 1, g: 1, b: 1 };
+    }
+
     // Animation Loop
     function render() {
       // Lerp mouse
@@ -179,8 +190,23 @@
       
       time += 0.01;
 
+      // Fetch current CSS theme variables
+      // (Optimization: In a massive app we'd trigger this only on theme change, 
+      // but getComputedStyle per frame on 3 variables is fast enough for a portfolio effect)
+      const rootStyles = getComputedStyle(document.documentElement);
+      const cyanHex = rootStyles.getPropertyValue('--c-neon-cyan') || '#00e5ff';
+      const magHex = rootStyles.getPropertyValue('--c-neon-magenta') || '#ff2bd6';
+      const bgHex = rootStyles.getPropertyValue('--c-bg0') || '#060812';
+
+      const cCyan = hexToRgb(cyanHex);
+      const cMag = hexToRgb(magHex);
+      const cDark = hexToRgb(bgHex);
+
       gl!.uniform1f(uTime, time);
       gl!.uniform2f(uMouse, mouseX, mouseY);
+      gl!.uniform3f(uColorCyan, cCyan.r, cCyan.g, cCyan.b);
+      gl!.uniform3f(uColorMagenta, cMag.r, cMag.g, cMag.b);
+      gl!.uniform3f(uColorDark, cDark.r, cDark.g, cDark.b);
 
       gl!.drawArrays(gl!.TRIANGLES, 0, 6);
       rafId = requestAnimationFrame(render);
