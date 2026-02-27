@@ -7,16 +7,21 @@ import { site } from "../data/site";
 const {
   title = `${site.name} — ${site.title}`,
   description = `${site.tagline} • ${site.location}`,
-  ogImage = "/og.svg",
+  ogImage = "/og.png",
   ogType = "website",
 } = Astro.props;
 
 const nav = [
   { href: "/projects", label: "Projects" },
   { href: "/about", label: "About" },
-  // Contact lives on Home (anchor) for MVP speed.
   { href: "/#contact", label: "Contact" },
 ];
+
+const footerSocials = [
+  { label: "GitHub", href: site.socials.githubUrl },
+  { label: "LinkedIn", href: site.socials.linkedinUrl },
+  { label: "X", href: site.socials.xUrl },
+].filter((s) => typeof s.href === "string" && s.href.length > 0);
 
 const pathname = Astro.url?.pathname ?? "/";
 const isContactActive = pathname === "/" && Astro.url?.hash === "#contact";
@@ -104,6 +109,11 @@ const jsonLd = [
               </a>
             );
           })}
+          {site.cvUrl && (
+            <a href={site.cvUrl} class="navLink cvLink" target="_blank" rel="noreferrer" download>
+              CV ↓
+            </a>
+          )}
         </nav>
       </div>
     </header>
@@ -114,7 +124,16 @@ const jsonLd = [
 
     <footer class="site-footer">
       <div class="wrap">
-        <p class="fine">© {new Date().getFullYear()} • {site.name}</p>
+        <div class="footerInner">
+          <p class="fine">© {new Date().getFullYear()} • {site.name}</p>
+          {footerSocials.length > 0 && (
+            <div class="footerSocials">
+              {footerSocials.map((s) => (
+                <a href={s.href} class="footerLink" target="_blank" rel="noreferrer">{s.label}</a>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </footer>
   </body>
@@ -205,6 +224,18 @@ const jsonLd = [
     border: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  .cvLink {
+    color: rgba(0, 229, 255, 0.78);
+    border: 1px solid rgba(0, 229, 255, 0.18);
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+  }
+  .cvLink:hover {
+    color: rgba(0, 229, 255, 1);
+    background: rgba(0, 229, 255, 0.08);
+  }
+
   .site-footer {
     margin-top: 72px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -212,10 +243,34 @@ const jsonLd = [
   .site-footer .wrap {
     padding-block: 28px;
   }
+
+  .footerInner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
   .fine {
     margin: 0;
     color: rgba(255, 255, 255, 0.55);
     font-size: 14px;
+  }
+
+  .footerSocials {
+    display: flex;
+    gap: 14px;
+  }
+
+  .footerLink {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color var(--dur-quick) var(--ease-out);
+  }
+  .footerLink:hover {
+    color: rgba(0, 229, 255, 0.85);
   }
 
   @media (max-width: 520px) {

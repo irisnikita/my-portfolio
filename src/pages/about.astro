@@ -1,53 +1,107 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Section from "../components/ui/Section.astro";
+import SkillsGrid from "../components/sections/SkillsGrid.astro";
+import ExperienceTimeline from "../components/sections/ExperienceTimeline.astro";
 import { site } from "../data/site";
 ---
 
 <BaseLayout title={`About • ${site.name}`} description={`${site.tagline} • ${site.location}`}>
   <Section title="About" eyebrow={site.title}>
-    <div class="prose">
-      <p class="lead">{site.bio}</p>
+    <div class="intro">
+      <div class="avatarWrap" data-reveal data-reveal-group="aboutHead">
+        <img
+          src="/avatar.webp"
+          alt={`Photo of ${site.name}`}
+          class="avatar"
+          width="120"
+          height="120"
+          loading="eager"
+        />
+      </div>
+      <div class="bio" data-reveal data-reveal-group="aboutHead">
+        <p class="lead">{site.bio}</p>
+        <p class="sub">
+          Based in {site.location}. Available for freelance and full-time opportunities.
+        </p>
+      </div>
+    </div>
+  </Section>
 
-      <h3>Working principles</h3>
+  <Section title="Tech Stack" eyebrow="Skills">
+    <SkillsGrid />
+  </Section>
+
+  <Section title="Experience" eyebrow="Career">
+    <ExperienceTimeline />
+  </Section>
+
+  <Section title="Working Principles" eyebrow="Values">
+    <div class="prose">
       <ul>
         <li>Performance-first: budgets, transform/opacity motion, no layout shift</li>
         <li>Motion-safe: reduced-motion support and clear interaction hierarchy</li>
         <li>A11y by default: focus-visible parity, semantic structure, readable contrast</li>
         <li>Shipping mindset: small iterations, measurable outcomes, maintainable code</li>
       </ul>
-
-      <h3>Now</h3>
-      <p>
-        Based in {site.location}. If you’d like to work together, use the Contact section.
-      </p>
     </div>
   </Section>
 </BaseLayout>
 
 <style>
+  .intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    max-width: 72ch;
+  }
+
+  .avatarWrap {
+    flex-shrink: 0;
+  }
+
+  .avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 999px;
+    object-fit: cover;
+    border: 2px solid rgba(0, 229, 255, 0.25);
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.12);
+  }
+
+  .bio {
+    flex: 1;
+  }
+
+  .lead {
+    margin: 0 0 10px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 17px;
+    line-height: 1.8;
+  }
+
+  .sub {
+    margin: 0;
+    color: var(--c-muted);
+    line-height: 1.7;
+  }
+
   .prose {
     max-width: 72ch;
     color: var(--c-muted);
     line-height: 1.75;
   }
 
-  .lead {
-    margin: 0 0 18px;
-    color: rgba(255, 255, 255, 0.82);
-    font-size: 17px;
-    line-height: 1.8;
-  }
-
-  h3 {
-    margin: 22px 0 10px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 16px;
-    letter-spacing: var(--tracking-tight);
-  }
-
   ul {
     margin: 0;
     padding-left: 18px;
+  }
+
+  @media (max-width: 600px) {
+    .intro {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
   }
 </style>

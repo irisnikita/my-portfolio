@@ -1,0 +1,86 @@
+---
+import Tag from "../ui/Tag.astro";
+import { experience } from "../../data/experience";
+---
+
+<div class="timeline" data-reveal-container="experience" data-reveal-stagger="100">
+  {experience.map((entry) => (
+    <div class="entry" data-reveal data-reveal-group="exp">
+      <div class="marker" aria-hidden="true" />
+      <div class="content">
+        <p class="period">{entry.period}</p>
+        <h4 class="role">{entry.role}</h4>
+        <p class="company">{entry.company}</p>
+        <p class="desc">{entry.description}</p>
+        <div class="tags">
+          {entry.tags.map((tag, i) => (
+            <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
+          ))}
+        </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .timeline {
+    position: relative;
+    padding-left: 28px;
+    border-left: 2px solid rgba(0, 229, 255, 0.18);
+  }
+
+  .entry {
+    position: relative;
+    padding-bottom: 32px;
+  }
+
+  .entry:last-child {
+    padding-bottom: 0;
+  }
+
+  .marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: radial-gradient(circle at 30% 30%, #fff, rgba(0, 229, 255, 0.8));
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.35);
+  }
+
+  .period {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    color: rgba(0, 229, 255, 0.75);
+    text-transform: uppercase;
+  }
+
+  .role {
+    margin: 0 0 2px;
+    font-size: 17px;
+    letter-spacing: var(--tracking-tight);
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  .company {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .desc {
+    margin: 0 0 10px;
+    color: var(--c-muted);
+    line-height: 1.7;
+    max-width: 60ch;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+</style>

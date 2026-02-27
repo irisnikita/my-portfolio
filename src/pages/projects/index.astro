@@ -1,73 +1,62 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/ui/Section.astro";
+import ProjectCard from "../../components/sections/ProjectCard.astro";
+import { getCollection } from "astro:content";
 import { site } from "../../data/site";
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0)
+);
 ---
 
 <BaseLayout title={`Projects • ${site.name}`} description={`${site.tagline} • ${site.location}`}>
-  <Section title="Selected work" eyebrow="Coming soon">
-    <div class="empty">
-      <p class="p">
-        Projects are being curated. To avoid inventing details, this page is temporarily an empty state.
-      </p>
+  <Section title="Selected Work" eyebrow="Projects">
+    <div class="grid" data-reveal-container="projects" data-reveal-stagger="80">
+      {projects.map((project, i) => (
+        <div data-reveal data-reveal-group="project">
+          <ProjectCard
+            title={project.data.title}
+            summary={project.data.summary}
+            slug={project.slug}
+            tags={project.data.tags}
+            index={i}
+          />
+        </div>
+      ))}
+    </div>
 
-      <div class="todo" aria-label="To publish projects, prepare:">
-        <h3 class="h3">To publish case studies, prepare:</h3>
-        <ul>
-          <li>Project name + timeframe + your role</li>
-          <li>Stack + constraints</li>
-          <li>1–2 outcomes/metrics (optional)</li>
-          <li>Links (live/GitHub) + 2–3 screenshots</li>
-        </ul>
-      </div>
-
-      <a class="cta" href="/#contact">Get in touch →</a>
+    <div class="cta">
+      <a class="ctaLink" href="/#contact">Have a project in mind? Get in touch →</a>
     </div>
   </Section>
 </BaseLayout>
 
 <style>
-  .empty {
-    max-width: 78ch;
-  }
-
-  .p {
-    margin: 0;
-    color: var(--c-muted);
-    line-height: 1.75;
-  }
-
-  .todo {
-    margin-top: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius);
-    padding: 14px 14px;
-  }
-
-  .h3 {
-    margin: 0 0 10px;
-    font-size: 15px;
-    letter-spacing: var(--tracking-tight);
-    color: rgba(255, 255, 255, 0.88);
-  }
-
-  ul {
-    margin: 0;
-    padding-left: 18px;
-    color: rgba(255, 255, 255, 0.74);
-    line-height: 1.7;
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
 
   .cta {
-    display: inline-block;
-    margin-top: 16px;
+    margin-top: 28px;
+  }
+
+  .ctaLink {
     color: rgba(0, 229, 255, 0.88);
     text-decoration: none;
     border-bottom: 1px solid rgba(0, 229, 255, 0.25);
+    font-size: 15px;
   }
 
-  .cta:hover {
+  .ctaLink:hover {
     border-bottom-color: rgba(0, 229, 255, 0.6);
+  }
+
+  @media (max-width: 720px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
