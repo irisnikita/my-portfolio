@@ -1,42 +1,16 @@
 ---
 import Container from "../ui/Container.astro";
+import SpotifyWidget from "../widgets/SpotifyWidget";
+import GitHubGraph from "../widgets/GitHubGraph";
 ---
 
 <section class="liveDataSection" data-reveal-container="liveData" data-reveal-stagger="100">
   <Container>
     <div class="grid">
       
-      <!-- Spotify Now Playing Mock/Template -->
-      <div class="widget spotifyWidget" data-reveal data-reveal-group="liveData">
-        <div class="widgetHeader">
-          <span class="icon">🎧</span>
-          <span class="title">Now Playing</span>
-        </div>
-        
-        <div class="spotifyContent">
-          <div class="albumArt">
-            <!-- Example album art. User can replace with real API data -->
-            <img src="https://i.scdn.co/image/ab67616d0000b273b0606b6375ae9a2e6b1d408b" alt="Album Art" class="artImg" loading="lazy" />
-            <div class="artOverlay" />
-          </div>
-          
-          <div class="trackInfo">
-            <h4 class="trackName">Starboy</h4>
-            <p class="artistName">The Weeknd, Daft Punk</p>
-            
-            <div class="visualizer">
-              <span class="bar"></span>
-              <span class="bar"></span>
-              <span class="bar"></span>
-              <span class="bar"></span>
-            </div>
-          </div>
-        </div>
-        <!-- 
-          Note: To make this live, you can connect to the Spotify API or use Lanyard (Discord RPC). 
-          Since this is a static site without a backend for secrets, using a serverless function 
-          is recommended to fetch the "Now Playing" track securely.
-        -->
+      <!-- Spotify Now Playing (React) -->
+      <div class="widgetWrapper" data-reveal data-reveal-group="liveData">
+        <SpotifyWidget client:only="react" />
       </div>
 
       <!-- GitHub Activity Graph -->
@@ -50,8 +24,7 @@ import Container from "../ui/Container.astro";
             <span class="arrow">↗</span>
           </div>
           <div class="githubContent">
-            <!-- We color the chart with our cyan hex #00e5ff -->
-            <img src="https://ghchart.rshah.org/00e5ff/irisnikita" alt="irisnikita's GitHub chart" class="ghChart" loading="lazy" />
+            <GitHubGraph username="irisnikita" client:only="react" />
           </div>
         </div>
       </a>

@@ -7,6 +7,10 @@ import tailwindcss from '@tailwindcss/vite';
 
 import mdx from '@astrojs/mdx';
 
+import react from '@astrojs/react';
+
+import typography from '@tailwindcss/typography';
+
 const site =
   process.env.SITE_URL ? process.env.SITE_URL :
   process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
@@ -24,5 +28,15 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
 
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx({
+      syntaxHighlight: 'shiki',
+      shikiConfig: {
+        theme: 'dracula',
+        wrap: true,
+      },
+    }),
+    sitemap(),
+    react()
+  ],
 });

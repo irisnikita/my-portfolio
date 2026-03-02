@@ -10,6 +10,7 @@ import ScrambleText from "../components/motion/ScrambleText.astro";
 import ScrollDistortion from "../components/motion/ScrollDistortion.astro";
 import SoundManager from "../components/ui/SoundManager.astro";
 import LenisScroll from "../components/motion/LenisScroll.astro";
+import AIChatbot from "../components/widgets/AIChatbot";
 import { site } from "../data/site";
 
 const {
@@ -180,6 +181,7 @@ const jsonLd = [
         </div>
       </div>
     </footer>
+    <AIChatbot client:only="react" />
   </body>
 </html>
 

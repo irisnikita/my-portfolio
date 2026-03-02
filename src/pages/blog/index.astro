@@ -1,11 +1,24 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../../components/ui/Section.astro";
 import Card from "../../components/ui/Card.astro";
 import Tag from "../../components/ui/Tag.astro";
 import GlowDivider from "../../components/ui/GlowDivider.astro";
 import { site } from "../../data/site";
-import { blogPosts } from "../../data/blog";
+
+// Fetch all non-draft blog posts, sorted by newest first
+const posts = (await getCollection('blog', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+})).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Calculate reading time roughly based on word count
+function getReadingTime(text: string) {
+  const wordsPerMinute = 200;
+  const words = text.split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return `${minutes} min read`;
+}
 ---
 
 <BaseLayout title={`Blog • ${site.name}`} description="Thoughts on web development, performance, and building at scale.">
@@ -17,24 +30,28 @@ import { blogPosts } from "../../data/blog";
 
   <Section>
     <div class="postList" data-reveal-container="posts" data-reveal-stagger="120">
-      {blogPosts.map((post) => (
+      {posts.map((post) => (
         <article class="postItem" data-reveal data-reveal-class="reveal-slide-right" data-reveal-group="post">
-          <Card>
-            <div class="postCard">
-              <div class="postMeta">
-                <time class="postDate">{new Date(post.date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</time>
-                <span class="postRead">{post.readTime}</span>
+          <a href={`/blog/${post.slug}`} class="block no-underline">
+            <Card>
+              <div class="postCard">
+                <div class="postMeta">
+                  <time class="postDate">
+                    {post.data.pubDate.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                  </time>
+                  <span class="postRead">{post.data.readingTime || getReadingTime(post.body)}</span>
+                </div>
+                <h3 class="postTitle">{post.data.title}</h3>
+                <p class="postExcerpt">{post.data.description}</p>
+                <div class="postTags">
+                  {post.data.tags.map((tag: string, i: number) => (
+                    <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
+                  ))}
+                </div>
+                <span class="readMore">Read article →</span>
               </div>
-              <h3 class="postTitle">{post.title}</h3>
-              <p class="postExcerpt">{post.excerpt}</p>
-              <div class="postTags">
-                {post.tags.map((tag, i) => (
-                  <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
-                ))}
-              </div>
-              <span class="readMore">Read article →</span>
-            </div>
-          </Card>
+            </Card>
+          </a>
         </article>
       ))}
     </div>

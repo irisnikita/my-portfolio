@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /*
   Cinematic Dark Neon — design tokens
@@ -286,4 +287,30 @@ body {
   ::view-transition-new(*) {
     animation: none !important;
   }
+}
+
+/* --- Shiki ASTRO MDX CODE BLOCKS --- */
+.prose pre {
+  background-color: var(--c-bg1) !important;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 1.5rem !important;
+  overflow-x: auto;
+  margin-top: 2rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.prose code {
+  color: var(--c-neon-cyan);
+  background: rgba(0, 229, 255, 0.08);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* Reset for code inside Pre */
+.prose pre code {
+  color: inherit !important;
+  background: transparent !important;
+  padding: 0 !important;
 }
