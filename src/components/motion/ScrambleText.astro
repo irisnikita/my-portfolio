@@ -67,13 +67,6 @@
     });
   }
 
-  // Support Astro ViewTransitions
+  // astro:page-load fires on initial load AND after every ViewTransition
   document.addEventListener('astro:page-load', initScramble);
-  
-  // Also run on first load just in case
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initScramble);
-  } else {
-    initScramble();
-  }
 </script>

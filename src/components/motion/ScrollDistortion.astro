@@ -87,21 +87,12 @@
     };
   }
 
+  // astro:page-load fires on initial load AND after every ViewTransition
   document.addEventListener('astro:page-load', () => {
     if ((window as any)._cleanupCrt) (window as any)._cleanupCrt();
-    initScrollDistortion();
+    const pmr = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    if (!pmr?.matches) initScrollDistortion();
   });
-
-  if (typeof window !== 'undefined') {
-    const pmr = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (!pmr.matches) {
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initScrollDistortion);
-      } else {
-        initScrollDistortion();
-      }
-    }
-  }
 </script>
 
 <style>

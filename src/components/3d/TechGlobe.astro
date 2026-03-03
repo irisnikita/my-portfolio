@@ -34,58 +34,80 @@ const total = icons.length;
 </div>
 
 <script>
-  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-  const globe = document.getElementById('techGlobe');
+  function initTechGlobe() {
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    const globe = document.getElementById('techGlobe');
 
-  if (!reduced && globe) {
-    let angle = 0;
-    let dragging = false;
-    let dragStartX = 0;
-    let angleOffset = 0;
-    let velocity = 0.15; // base rotation speed (deg/frame)
-    let raf = 0;
-    let active = !document.hidden;
+    // Clean up previous instance
+    if ((window as any)._cleanupTechGlobe) {
+      (window as any)._cleanupTechGlobe();
+    }
 
-    const spin = () => {
-      if (!active) { raf = requestAnimationFrame(spin); return; }
+    if (!reduced && globe) {
+      let angle = 0;
+      let dragging = false;
+      let dragStartX = 0;
+      let angleOffset = 0;
+      let velocity = 0.15;
+      let raf = 0;
+      let active = !document.hidden;
 
-      if (!dragging) {
-        angle += velocity;
-      }
+      const spin = () => {
+        if (!active) { raf = requestAnimationFrame(spin); return; }
+        if (!dragging) {
+          angle += velocity;
+        }
+        globe.style.transform = `rotateY(${angle}deg) rotateX(-8deg)`;
+        raf = requestAnimationFrame(spin);
+      };
 
-      globe.style.transform = `rotateY(${angle}deg) rotateX(-8deg)`;
+      const onPointerDown = (e: PointerEvent) => {
+        dragging = true;
+        dragStartX = e.clientX;
+        angleOffset = angle;
+        globe.style.cursor = 'grabbing';
+      };
+
+      const onPointerMove = (e: PointerEvent) => {
+        if (!dragging) return;
+        const delta = (e.clientX - dragStartX) * 0.3;
+        angle = angleOffset + delta;
+      };
+
+      const onPointerUp = () => {
+        dragging = false;
+        if (globe) globe.style.cursor = 'grab';
+      };
+
+      const onMouseEnter = () => { if (!dragging) velocity = 0.05; };
+      const onMouseLeave = () => { velocity = 0.15; };
+      const onVisChange = () => { active = !document.hidden; };
+
+      globe.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointerup', onPointerUp);
+      globe.addEventListener('mouseenter', onMouseEnter);
+      globe.addEventListener('mouseleave', onMouseLeave);
+      document.addEventListener('visibilitychange', onVisChange);
+
       raf = requestAnimationFrame(spin);
-    };
 
-    // Drag interaction
-    globe.addEventListener('pointerdown', (e) => {
-      dragging = true;
-      dragStartX = e.clientX;
-      angleOffset = angle;
-      globe.style.cursor = 'grabbing';
-    });
-
-    window.addEventListener('pointermove', (e) => {
-      if (!dragging) return;
-      const delta = (e.clientX - dragStartX) * 0.3;
-      angle = angleOffset + delta;
-    });
-
-    window.addEventListener('pointerup', () => {
-      dragging = false;
-      if (globe) globe.style.cursor = 'grab';
-    });
-
-    // Pause on hover for readability
-    globe.addEventListener('mouseenter', () => { if (!dragging) velocity = 0.05; });
-    globe.addEventListener('mouseleave', () => { velocity = 0.15; });
-
-    document.addEventListener('visibilitychange', () => {
-      active = !document.hidden;
-    });
-
-    raf = requestAnimationFrame(spin);
+      (window as any)._cleanupTechGlobe = () => {
+        cancelAnimationFrame(raf);
+        globe.removeEventListener('pointerdown', onPointerDown);
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        globe.removeEventListener('mouseenter', onMouseEnter);
+        globe.removeEventListener('mouseleave', onMouseLeave);
+        document.removeEventListener('visibilitychange', onVisChange);
+      };
+    }
   }
+
+  // astro:page-load fires on initial load AND after every ViewTransition
+  document.addEventListener('astro:page-load', () => {
+    initTechGlobe();
+  });
 </script>
 
 <style>

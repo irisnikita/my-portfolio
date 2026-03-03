@@ -6,19 +6,26 @@
 <script>
   import { observeReveal, observeParallax, observeScrollProgress, initCardTilt, initHeroScrollFade } from "../../lib/motion";
 
-  // Reveal on scroll
-  observeReveal({});
+  function initMotion() {
+    // Reveal on scroll
+    observeReveal({});
 
-  // Scroll parallax elements
-  observeParallax();
+    // Scroll parallax elements
+    observeParallax();
 
-  // Scroll progress bar
-  const progressBar = document.querySelector<HTMLElement>(".scroll-progress-bar");
-  observeScrollProgress(progressBar);
+    // Scroll progress bar
+    const progressBar = document.querySelector<HTMLElement>(".scroll-progress-bar");
+    observeScrollProgress(progressBar);
 
-  // Card 3D tilt
-  initCardTilt();
+    // Card 3D tilt
+    initCardTilt();
 
-  // Hero scroll fade-out
-  initHeroScrollFade();
+    // Hero scroll fade-out
+    initHeroScrollFade();
+  }
+
+  // astro:page-load fires on initial page load AND after every ViewTransition
+  document.addEventListener('astro:page-load', () => {
+    initMotion();
+  });
 </script>

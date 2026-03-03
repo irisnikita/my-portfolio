@@ -41,20 +41,11 @@
     };
   }
 
-  // Astro ViewTransitions support
+  // astro:page-load fires on initial load AND after every ViewTransition
   document.addEventListener('astro:page-load', () => {
     if ((window as any)._cleanupLenis) (window as any)._cleanupLenis();
     initLenis();
   });
-
-  // Fallback for initial load
-  if (typeof window !== 'undefined') {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initLenis);
-    } else {
-      initLenis();
-    }
-  }
 </script>
 
 <style is:global>

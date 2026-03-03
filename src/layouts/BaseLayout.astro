@@ -3,7 +3,6 @@ import "../styles/global.css";
 import { ViewTransitions } from "astro:transitions";
 import RevealInit from "../components/motion/RevealInit.astro";
 import CustomCursor from "../components/motion/CustomCursor.astro";
-import Preloader from "../components/motion/Preloader.astro";
 import FluidBackground from "../components/hero/FluidBackground.astro";
 import CommandPalette from "../components/ui/CommandPalette.astro";
 import ScrambleText from "../components/motion/ScrambleText.astro";
@@ -93,8 +92,7 @@ const jsonLd = [
 
     <title>{title}</title>
 
-    {/* Scope transitions to projects pages only (avoid global) */}
-    {pathname.startsWith('/projects') ? <ViewTransitions /> : null}
+    <ViewTransitions />
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     
@@ -127,7 +125,6 @@ const jsonLd = [
     
     <!-- 3D WebGL Fluid Canvas -->
     <FluidBackground />
-    <Preloader />
     <CustomCursor />
     <div class="scroll-progress-bar" aria-hidden="true" />
     <RevealInit />

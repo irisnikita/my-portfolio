@@ -6,73 +6,81 @@
 <div class="cursor-ring" aria-hidden="true" />
 
 <script>
-  const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-  const canHover = window.matchMedia?.('(hover: hover)')?.matches;
-  const finePointer = window.matchMedia?.('(pointer: fine)')?.matches;
+  function initCustomCursor() {
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    const canHover = window.matchMedia?.('(hover: hover)')?.matches;
+    const finePointer = window.matchMedia?.('(pointer: fine)')?.matches;
 
-  if (!reducedMotion && canHover && finePointer) {
-    const dot = document.querySelector<HTMLElement>('.cursor-dot');
-    const ring = document.querySelector<HTMLElement>('.cursor-ring');
+    if (!reducedMotion && canHover && finePointer) {
+      const dot = document.querySelector<HTMLElement>('.cursor-dot');
+      const ring = document.querySelector<HTMLElement>('.cursor-ring');
 
-    if (dot && ring) {
-      let mouseX = -100, mouseY = -100;
-      let ringX = -100, ringY = -100;
-      let raf = 0;
-      let isHover = false;
+      if (dot && ring) {
+        let mouseX = -100, mouseY = -100;
+        let ringX = -100, ringY = -100;
+        let raf = 0;
+        let isHover = false;
 
-      document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-        dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+        const onMouseMove = (e: MouseEvent) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+          if (!raf) raf = requestAnimationFrame(lerp);
+        };
 
-        if (!raf) raf = requestAnimationFrame(lerp);
-      }, { passive: true });
+        const lerp = () => {
+          raf = 0;
+          ringX += (mouseX - ringX) * 0.15;
+          ringY += (mouseY - ringY) * 0.15;
+          ring.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0) scale(${isHover ? 1.5 : 1})`;
+          if (Math.abs(mouseX - ringX) + Math.abs(mouseY - ringY) > 0.5) {
+            raf = requestAnimationFrame(lerp);
+          }
+        };
 
-      const lerp = () => {
-        raf = 0;
-        ringX += (mouseX - ringX) * 0.15;
-        ringY += (mouseY - ringY) * 0.15;
-        ring.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0) scale(${isHover ? 1.5 : 1})`;
+        const hoverTargets = 'a, button, [role="button"], .btn, .card-tilt, .projectCardLink';
 
-        if (Math.abs(mouseX - ringX) + Math.abs(mouseY - ringY) > 0.5) {
-          raf = requestAnimationFrame(lerp);
+        const onMouseOver = (e: MouseEvent) => {
+          const target = e.target as HTMLElement;
+          if (target.closest(hoverTargets)) {
+            isHover = true;
+            dot.classList.add('is-hover');
+            ring.classList.add('is-hover');
+          }
+        };
+
+        const onMouseOut = (e: MouseEvent) => {
+          const target = e.target as HTMLElement;
+          if (target.closest(hoverTargets)) {
+            isHover = false;
+            dot.classList.remove('is-hover');
+            ring.classList.remove('is-hover');
+          }
+        };
+
+        document.addEventListener('mousemove', onMouseMove, { passive: true });
+        document.addEventListener('mouseover', onMouseOver);
+        document.addEventListener('mouseout', onMouseOut);
+
+        dot.style.opacity = '1';
+        ring.style.opacity = '1';
+        document.documentElement.style.cursor = 'none';
+
+        // Restore cursors for inputs
+        if (!document.getElementById('cursor-input-style')) {
+          const style = document.createElement('style');
+          style.id = 'cursor-input-style';
+          style.textContent = 'input, textarea, select, [contenteditable] { cursor: text !important; }';
+          document.head.appendChild(style);
         }
-      };
-
-      // Detect hoverable elements
-      const hoverTargets = 'a, button, [role="button"], .btn, .card-tilt, .projectCardLink';
-
-      document.addEventListener('mouseover', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.closest(hoverTargets)) {
-          isHover = true;
-          dot.classList.add('is-hover');
-          ring.classList.add('is-hover');
-        }
-      });
-
-      document.addEventListener('mouseout', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.closest(hoverTargets)) {
-          isHover = false;
-          dot.classList.remove('is-hover');
-          ring.classList.remove('is-hover');
-        }
-      });
-
-      // Show cursor elements
-      dot.style.opacity = '1';
-      ring.style.opacity = '1';
-
-      // Hide default cursor globally
-      document.documentElement.style.cursor = 'none';
-
-      // Restore cursors for inputs
-      const style = document.createElement('style');
-      style.textContent = 'input, textarea, select, [contenteditable] { cursor: text !important; }';
-      document.head.appendChild(style);
+      }
     }
   }
+
+  // astro:page-load fires on initial load AND after every ViewTransition
+  document.addEventListener('astro:page-load', () => {
+    initCustomCursor();
+  });
 </script>
 
 <style>

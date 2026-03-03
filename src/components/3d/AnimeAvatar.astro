@@ -169,16 +169,11 @@
     };
   }
 
+  // astro:page-load fires on initial load AND after every ViewTransition
   document.addEventListener('astro:page-load', () => {
     if ((window as any)._cleanupAvatar) (window as any)._cleanupAvatar();
     initAvatar();
   });
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAvatar);
-  } else {
-    initAvatar();
-  }
 </script>
 
 <style>
