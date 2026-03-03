@@ -1,0 +1,76 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { site } from "../../data/site";
+import ImageCompressorClient from "../tools/ImageCompressor";
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const isVi = lang === 'vi';
+
+const viDict = {
+  errorType: "Vui lòng chỉ upload file ảnh (JPG, PNG, WebP).",
+  errorCompress: "Đã xảy ra lỗi khi nén ảnh. Vui lòng thử lại với ảnh khác.",
+  dragDrop: "Drag & drop hình ảnh của bạn vào đây",
+  supported: "Hỗ trợ JPG, PNG, WebP. Nén hoàn toàn trên thiết bị của bạn, cấu trúc file không bao giờ bị lộ ra ngoài.",
+  selectFile: "Chọn tập tin",
+  unlimited: "Kích thước tối đa không giới hạn",
+  originalTitle: "Ảnh gốc",
+  originalPrefix: "Gốc:",
+  recompressHint: "Nén lại với cài đặt mới",
+  compressedTitle: "Ảnh nén",
+  compressing: "Đang thuật toán nén cục bộ...",
+  doneTitle: "Hoàn tất nén!",
+  savedInfo1: "Tiết kiệm được ",
+  savedInfo2: " dung lượng",
+  compressAnother: "Nén ảnh khác",
+  downloadNow: "Tải Về Ngay"
+};
+---
+
+<BaseLayout 
+  title={isVi ? `Nén Ảnh Thông Minh | ${site.title}` : `Smart Image Compressor | ${site.title}`}
+  description={isVi 
+    ? "Công cụ nén ảnh chất lượng cao chạy hoàn toàn trên trình duyệt dành cho lập trình viên và designer."
+    : "High-quality image compression tool running entirely in the browser for developers and designers."}
+>
+  <main class="page-tool wrap pt-32 pb-24">
+    <header class="mb-12">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium mb-6 backdrop-blur-md">
+        <a href={translatePath("/tools")} class="opacity-70 hover:opacity-100 transition-opacity">
+          {isVi ? "Công cụ" : "Tools"}
+        </a>
+        <span class="opacity-40">/</span>
+        <span class="text-[color:var(--c-neon-cyan)]">
+          {isVi ? "Nén Ảnh Thông Minh" : "Image Compressor"}
+        </span>
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4" style="background: linear-gradient(135deg, var(--c-neon-cyan), var(--c-neon-magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        {isVi ? "Nén Ảnh Thông Minh" : "Smart Image Compressor"}
+      </h1>
+      <p class="text-xl opacity-70 max-w-2xl">
+        {isVi
+          ? "Nén ảnh siêu tốc mà không làm giảm file chất lượng mắt thường. Chạy 100% bằng Web Worker trên trình duyệt, đảm bảo quyền riêng tư tuyệt đối (hình ảnh của bạn không bao giờ được tải lên bất kỳ máy chủ nào)."
+          : "Super-fast image compression without visible quality loss. Runs 100% via Web Worker in your browser, ensuring absolute privacy (your images are never uploaded to any server)."}
+      </p>
+    </header>
+
+    <div class="tool-container bg-[#0a0a10] border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden">
+      <!-- Glow ambient background -->
+      <div class="absolute -top-40 -left-40 w-96 h-96 bg-[var(--c-neon-cyan)] rounded-full blur-[120px] opacity-[0.15] mix-blend-screen pointer-events-none"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-[var(--c-neon-magenta)] rounded-full blur-[120px] opacity-[0.15] mix-blend-screen pointer-events-none"></div>
+      
+      <!-- Core Client Component -->
+      <ImageCompressorClient client:load dict={isVi ? viDict : undefined} />
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .tool-container {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+</style>

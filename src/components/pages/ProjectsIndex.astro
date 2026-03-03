@@ -1,0 +1,73 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../ui/Section.astro";
+import ProjectCard from "../sections/ProjectCard.astro";
+import { getCollection } from "astro:content";
+import { site } from "../../data/site";
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const isVi = lang === 'vi';
+
+const projects = (await getCollection("projects")).sort(
+  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0)
+);
+---
+
+<BaseLayout 
+  title={isVi ? `Dự Án • ${site.name}` : `Projects • ${site.name}`} 
+  description={`${site.tagline} • ${site.location}`}
+>
+  <Section title={isVi ? "Dự Án Chọn Lọc" : "Selected Work"} eyebrow={isVi ? "Dự Án" : "Projects"}>
+    <div class="grid" data-reveal-container="projects" data-reveal-stagger="80">
+      {projects.map((project, i) => (
+        <div data-reveal data-reveal-group="project">
+          <ProjectCard
+            title={project.data.title}
+            summary={project.data.summary}
+            slug={project.slug}
+            tags={project.data.tags}
+            index={i}
+          />
+        </div>
+      ))}
+    </div>
+
+    <div class="cta">
+      <a class="ctaLink" href={translatePath("/#contact")}>
+        {isVi ? "Bạn sắp triển khai dự án? Hãy liên hệ ngay →" : "Have a project in mind? Get in touch →"}
+      </a>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .cta {
+    margin-top: 28px;
+  }
+
+  .ctaLink {
+    color: rgba(0, 229, 255, 0.88);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.25);
+    font-size: 15px;
+  }
+
+  .ctaLink:hover {
+    border-bottom-color: rgba(0, 229, 255, 0.6);
+  }
+
+  @media (max-width: 720px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

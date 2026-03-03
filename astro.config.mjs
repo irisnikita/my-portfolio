@@ -39,4 +39,13 @@ export default defineConfig({
     sitemap(),
     react()
   ],
+
+  // i18n configuration
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'vi'],
+    routing: {
+      prefixDefaultLocale: false
+    }
+  }
 });

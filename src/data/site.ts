@@ -17,8 +17,8 @@ export type SiteData = {
 };
 
 export const site: SiteData = {
-  name: "Nguyễn Lương Trường Vĩ",
-  title: "Full-stack Developer",
+  name: "Truong Vi Nguyen",
+  title: "Developer",
   location: "Ho Chi Minh City (GMT+7)",
   email: "nltruongvi@gmail.com",
   tagline: "Performance-first full-stack craft.",

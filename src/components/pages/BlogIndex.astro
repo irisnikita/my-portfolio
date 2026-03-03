@@ -1,0 +1,168 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../ui/Section.astro";
+import Card from "../ui/Card.astro";
+import Tag from "../ui/Tag.astro";
+import GlowDivider from "../ui/GlowDivider.astro";
+import { site } from "../../data/site";
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+const isVi = lang === 'vi';
+
+// Fetch all non-draft blog posts, sorted by newest first
+const posts = (await getCollection('blog', ({ data }) => {
+  return import.meta.env.PROD ? data.draft !== true : true;
+})).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+// Calculate reading time roughly based on word count
+function getReadingTime(text: string) {
+  const wordsPerMinute = 200;
+  const words = text.split(/\s+/).length;
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return isVi ? `${minutes} phút đọc` : `${minutes} min read`;
+}
+---
+
+<BaseLayout 
+  title={isVi ? `Góc Nhìn • ${site.name}` : `Blog • ${site.name}`} 
+  description={isVi 
+    ? "Những suy nghĩ về phát triển web, tối ưu hiệu suất và xây dựng sản phẩm chất lượng cao."
+    : "Thoughts on web development, performance, and building at scale."}
+>
+  <Section eyebrow={isVi ? "Góc Nhìn" : "Writing"} title={isVi ? "Bài Viết" : "Blog"}>
+    <p class="intro">
+      {isVi 
+        ? "Những suy nghĩ về phát triển web, tối ưu hiệu suất và xây dựng sản phẩm chất lượng cao."
+        : "Thoughts on web development, performance, and building production apps at scale."}
+    </p>
+  </Section>
+
+  <GlowDivider />
+
+  <Section>
+    <div class="postList" data-reveal-container="posts" data-reveal-stagger="120">
+      {posts.map((post) => (
+        <article class="postItem" data-reveal data-reveal-class="reveal-slide-right" data-reveal-group="post">
+          <a href={translatePath(`/blog/${post.slug}`)} class="block no-underline">
+            <Card>
+              <div class="postCard">
+                <div class="postMeta">
+                  <time class="postDate">
+                    {post.data.pubDate.toLocaleDateString(isVi ? "vi-VN" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
+                  </time>
+                  <span class="postRead">{post.data.readingTime || getReadingTime(post.body)}</span>
+                </div>
+                <h3 class="postTitle">{post.data.title}</h3>
+                <p class="postExcerpt">{post.data.description}</p>
+                <div class="postTags">
+                  {post.data.tags.map((tag: string, i: number) => (
+                    <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
+                  ))}
+                </div>
+                <span class="readMore">{isVi ? "Đọc tiếp →" : "Read article →"}</span>
+              </div>
+            </Card>
+          </a>
+        </article>
+      ))}
+    </div>
+  </Section>
+
+  <GlowDivider />
+
+  <Section>
+    <div class="comingSoon" data-reveal>
+      <p>
+        📝 {isVi ? "Sẽ có thêm nhiều bài viết sớm thôi. Trong lúc chờ đợi, " : "More articles coming soon. In the meantime, feel free to "}
+        <a href={translatePath("/#contact")}>{isVi ? "liên hệ với tôi" : "reach out"}</a>
+        {isVi ? " để thảo luận ý tưởng mới." : " to discuss ideas."}
+      </p>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .intro {
+    color: var(--c-muted);
+    font-size: 16px;
+    line-height: 1.7;
+    max-width: 60ch;
+  }
+
+  .postList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .postCard {
+    padding: 22px 20px;
+  }
+
+  .postMeta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .postDate {
+    font-size: 12px;
+    color: rgba(0, 229, 255, 0.65);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .postRead {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .postTitle {
+    margin: 0 0 8px;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.92);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .postExcerpt {
+    margin: 0 0 14px;
+    color: var(--c-muted);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 70ch;
+  }
+
+  .postTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .readMore {
+    font-size: 13px;
+    color: rgba(50, 245, 255, 0.7);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .comingSoon {
+    text-align: center;
+    padding: 20px;
+    color: var(--c-muted);
+  }
+
+  .comingSoon a {
+    color: rgba(50, 245, 255, 0.85);
+    text-decoration: none;
+  }
+  .comingSoon a:hover {
+    text-decoration: underline;
+  }
+</style>

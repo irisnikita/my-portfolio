@@ -13,6 +13,9 @@ import LenisScroll from "../components/motion/LenisScroll.astro";
 import AIChatbot from "../components/widgets/AIChatbot";
 import Header from "../components/ui/Header";
 import { site } from "../data/site";
+import { getLangFromUrl } from "../i18n/utils";
+
+const lang = getLangFromUrl(Astro.url);
 
 const {
   title = `${site.name} — ${site.title}`,
@@ -66,7 +69,7 @@ const jsonLd = [
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -132,7 +135,7 @@ const jsonLd = [
     <ScrollDistortion />
     <ScrambleText />
     <SoundManager />
-    <a href="#main" class="skip-link">Skip to content</a>
+    <a href="#main" class="skip-link">{lang === 'vi' ? 'Chuyển đến nội dung chính' : 'Skip to content'}</a>
 
     <Header client:load currentPath={pathname} />
 
@@ -154,7 +157,7 @@ const jsonLd = [
         </div>
       </div>
     </footer>
-    <AIChatbot client:only="react" />
+    <AIChatbot client:only="react" lang={lang} />
   </body>
 </html>
 

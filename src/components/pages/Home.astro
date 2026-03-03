@@ -1,0 +1,260 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../ui/Container.astro";
+import Button from "../ui/Button.astro";
+import Tag from "../ui/Tag.astro";
+import NeonGridParallax from "../hero/NeonGridParallax.astro";
+import FloatingParticles from "../hero/FloatingParticles.astro";
+import GlowDivider from "../ui/GlowDivider.astro";
+import MarqueeTicker from "../ui/MarqueeTicker.astro";
+import StatsSection from "../sections/StatsSection.astro";
+import ServicesSection from "../sections/ServicesSection.astro";
+import ProjectCard from "../sections/ProjectCard.astro";
+import Section from "../ui/Section.astro";
+import ContactSection from "../sections/ContactSection.astro";
+import TestimonialsSection from "../sections/TestimonialsSection.astro";
+import { site } from "../../data/site";
+import { getCollection } from "astro:content";
+
+import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const title = `${site.name} — ${site.title}`;
+const allProjects = await getCollection("projects");
+const featured = allProjects
+  .sort((a, b) => new Date(b.data.date ?? 0).valueOf() - new Date(a.data.date ?? 0).valueOf())
+  .slice(0, 3);
+---
+
+<BaseLayout title={title} description={`${site.tagline} • ${site.location}`}>
+  <!-- Hero -->
+  <section class="hero">
+    <NeonGridParallax />
+    <FloatingParticles count={24} />
+    <div class="vignette" />
+    <div class="grain" />
+
+    <Container>
+      <div class="heroInner">
+        <div class="stack">
+          <div data-reveal data-reveal-delay="0">
+            <Tag tone="cyan">{site.tagline}</Tag>
+          </div>
+          <h1 class="h1" data-reveal data-reveal-delay="80">
+            <span class="typingWrap">
+              <span class="typingText" data-scramble>{site.name}</span>
+              <span class="cursor" aria-hidden="true" />
+            </span>
+          </h1>
+          <p class="sub" data-reveal data-reveal-delay="200">{t('hero.bio')}</p>
+          <p class="location" data-reveal data-reveal-delay="280">{site.location}</p>
+
+          <div class="ctaRow" data-reveal data-reveal-delay="380">
+            <Button href={translatePath('/projects')} variant="primary">{t('hero.cta')}</Button>
+            <Button href={translatePath('/#contact')} variant="ghost">{t('hero.contact')}</Button>
+          </div>
+
+          <ul class="proof" aria-label="Proof points" data-reveal-container="heroProof" data-reveal-stagger="90">
+            <li data-reveal data-reveal-group="proof">{site.title}</li>
+            <li data-reveal data-reveal-group="proof">{site.location}</li>
+            <li data-reveal data-reveal-group="proof">Performance-first</li>
+            <li data-reveal data-reveal-group="proof">Reduced-motion ready</li>
+          </ul>
+        </div>
+      </div>
+    </Container>
+  </section>
+
+  <!-- Marquee -->
+  <MarqueeTicker />
+
+  <GlowDivider />
+
+  <!-- Stats -->
+  <StatsSection />
+
+  <GlowDivider />
+
+  <!-- Featured Projects -->
+  <Section eyebrow={t('nav.projects')} title={t('stats.projects')}>
+    <div class="featuredGrid" data-reveal-container="featured" data-reveal-stagger="120">
+      {featured.map((project, i) => (
+        <div data-reveal data-reveal-group="feat">
+          <ProjectCard
+            title={project.data.title}
+            summary={project.data.summary}
+            slug={project.id}
+            tags={project.data.tags}
+            index={i}
+          />
+        </div>
+      ))}
+    </div>
+    <div class="viewAll" data-reveal>
+      <Button href={translatePath('/projects')} variant="ghost">{t('hero.viewAll')} →</Button>
+    </div>
+  </Section>
+
+  <GlowDivider />
+
+  <!-- Services -->
+  <ServicesSection />
+
+  <GlowDivider />
+
+  <!-- Testimonials -->
+  <TestimonialsSection />
+
+  <GlowDivider />
+
+  <!-- Contact -->
+  <ContactSection />
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    padding-top: clamp(100px, 15vw, 160px);
+    padding-bottom: clamp(56px, 10vw, 120px);
+    overflow: hidden;
+  }
+
+  .heroInner {
+    position: relative;
+    z-index: 2;
+    min-height: min(70vh, 640px);
+    display: grid;
+    align-items: center;
+  }
+
+  .stack {
+    max-width: 56ch;
+  }
+
+  .h1 {
+    margin: 16px 0 10px;
+    font-size: clamp(34px, 6vw, 60px);
+    line-height: 1.5;
+    letter-spacing: var(--tracking-tight);
+  }
+
+  /* Typing effect */
+  .typingWrap {
+    display: inline-flex;
+    align-items: baseline;
+  }
+
+  .typingText {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typingReveal 1.2s steps(24) 0.4s both;
+    max-width: 0;
+  }
+
+  @keyframes typingReveal {
+    to { max-width: 100%; }
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 3px;
+    height: 0.9em;
+    background: rgba(0, 229, 255, 0.8);
+    margin-left: 2px;
+    animation: blink 0.7s step-end infinite;
+    border-radius: 1px;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .sub {
+    margin: 0;
+    color: var(--c-muted);
+    font-size: clamp(16px, 2.1vw, 19px);
+    line-height: 1.6;
+  }
+
+  .location {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 14px;
+  }
+
+  .ctaRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .proof {
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .proof li {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 7px 10px;
+    border-radius: 999px;
+    transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+  }
+
+  .proof li:hover {
+    border-color: rgba(0, 229, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.08);
+  }
+
+  /* Featured projects */
+  .featuredGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .viewAll {
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .featuredGrid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .featuredGrid {
+      grid-template-columns: 1fr;
+    }
+    .heroInner {
+      min-height: auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .typingText {
+      max-width: 100%;
+      animation: none;
+    }
+    .cursor {
+      display: none;
+    }
+    .proof li:hover {
+      box-shadow: none;
+    }
+  }
+</style>

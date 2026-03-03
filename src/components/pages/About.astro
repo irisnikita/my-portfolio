@@ -1,0 +1,147 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Section from "../ui/Section.astro";
+import GlowDivider from "../ui/GlowDivider.astro";
+import SkillsGrid from "../sections/SkillsGrid.astro";
+import ExperienceTimeline from "../sections/ExperienceTimeline.astro";
+import AnimeAvatar from "../3d/AnimeAvatar.astro";
+import TechGlobe from "../3d/TechGlobe.astro";
+import FunFacts from "../sections/FunFacts.astro";
+import LiveData from "../sections/LiveData.astro";
+import { site } from "../../data/site";
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const isVi = lang === 'vi';
+---
+
+<BaseLayout 
+  title={isVi ? `Giới thiệu • ${site.name}` : `About • ${site.name}`} 
+  description={`${site.tagline} • ${site.location}`}
+>
+  <Section title={t('nav.about')} eyebrow={site.title}>
+    <div class="intro">
+      <div class="avatarWrap" data-reveal data-reveal-class="reveal-scale" data-reveal-group="aboutHead">
+        <!-- 3D Avatar (Interactive) -->
+        <AnimeAvatar />
+      </div>
+      <div class="bio" data-reveal data-reveal-group="aboutHead">
+        <p class="lead">{isVi ? "Tôi là một Kỹ sư Phần mềm đam mê xây dựng những trải nghiệm web hướng đến hiệu suất. Thông thạo cả front-end và back-end architecture, tôi thích thu hẹp khoảng cách giữa thiết kế tuyệt vời và kỹ thuật vững chắc." : site.bio}</p>
+        <p class="sub">
+          {isVi 
+            ? `Hiện đang làm việc tại ${site.location}. Sẵn sàng nhận dự án freelance và cơ hội làm việc full-time.` 
+            : `Based in ${site.location}. Available for freelance and full-time opportunities.`}
+        </p>
+      </div>
+    </div>
+  </Section>
+
+  <GlowDivider />
+
+  <!-- 3D Tech Globe -->
+  <Section title={isVi ? "Vũ trụ Công nghệ" : "Tech Universe"} eyebrow={isVi ? "Tương tác" : "Interactive"}>
+    <TechGlobe />
+  </Section>
+
+  <GlowDivider />
+
+  <Section title={isVi ? "Công Nghệ" : "Tech Stack"} eyebrow={isVi ? "Kỹ Năng" : "Skills"}>
+    <SkillsGrid />
+  </Section>
+
+  <GlowDivider />
+
+  <Section title={isVi ? "Kinh Nghiệm" : "Experience"} eyebrow={isVi ? "Sự Nghiệp" : "Career"}>
+    <ExperienceTimeline />
+  </Section>
+
+  <GlowDivider />
+
+  <Section title={isVi ? "Nguyên tắc Làm việc" : "Working Principles"} eyebrow={isVi ? "Giá trị" : "Values"}>
+    <div class="prose" data-reveal-container="principles" data-reveal-stagger="100">
+      <ul>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">
+          {isVi ? "Ưu tiên hiệu suất (Performance-first): ngân sách, chuyển động transform/opacity, không gây ra layout shift." : "Performance-first: budgets, transform/opacity motion, no layout shift"}
+        </li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">
+          {isVi ? "Chuyển động an toàn: hỗ trợ reduced-motion và phân cấp tương tác rõ ràng." : "Motion-safe: reduced-motion support and clear interaction hierarchy"}
+        </li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">
+          {isVi ? "Mặc định chuẩn tiếp cận (A11y by default): hỗ trợ focus-visible, cấu trúc ngữ nghĩa (semantic structure), độ tương phản dễ đọc." : "A11y by default: focus-visible parity, semantic structure, readable contrast"}
+        </li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">
+          {isVi ? "Tư duy ra mắt sản phẩm: các vòng lặp nhỏ, kết quả đo lường được, mã nguồn dễ bảo trì." : "Shipping mindset: small iterations, measurable outcomes, maintainable code"}
+        </li>
+      </ul>
+    </div>
+  </Section>
+
+  <GlowDivider />
+
+  <!-- LiveData -->
+  <LiveData />
+
+  <!-- Fun Facts -->
+  <FunFacts />
+</BaseLayout>
+
+<style>
+  .intro {
+    display: flex;
+    align-items: center; /* Center vertically with bio */
+    gap: 40px;
+    max-width: 85ch; /* allow a bit more width for the box */
+  }
+
+  .avatarWrap {
+    flex-shrink: 0;
+    position: relative;
+    /* remove static styles that were for the old round avatar */
+  }
+
+  .bio {
+    flex: 1;
+  }
+
+  .lead {
+    margin: 0 0 16px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 17px;
+    line-height: 1.8;
+  }
+
+  .sub {
+    margin: 0;
+    color: var(--c-muted);
+    line-height: 1.7;
+  }
+
+  .prose {
+    max-width: 72ch;
+    color: var(--c-muted);
+    line-height: 1.75;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  li {
+    padding: 4px 0;
+  }
+
+  @media (max-width: 600px) {
+    .intro {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avatarGlow { animation: none; }
+    .avatar { animation: none; }
+  }
+</style>

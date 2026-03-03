@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { site } from "../../data/site";
 
-const nav = [
-  { href: "/projects", label: "Projects" },
-  { href: "/about", label: "About" },
-  { href: "/blog", label: "Blog" },
-  { href: "/#contact", label: "Contact" },
+import { ui } from "../../i18n/ui";
+
+const navKeys: Array<{ href: string; labelKey: keyof (typeof ui)["en"] }> = [
+  { href: "/projects", labelKey: "nav.projects" },
+  { href: "/tools", labelKey: "nav.tools" },
+  { href: "/about", labelKey: "nav.about" },
+  { href: "/blog", labelKey: "nav.blog" },
+  { href: "/#contact", labelKey: "nav.contact" },
 ];
 
 export default function Header({ currentPath }: { currentPath: string }) {
@@ -14,6 +17,19 @@ export default function Header({ currentPath }: { currentPath: string }) {
   const [isHidden, setIsHidden] = useState(false);
   const [currentHash, setCurrentHash] = useState("");
   const { scrollY } = useScroll();
+
+  const lang = currentPath.startsWith("/vi") ? "vi" : "en";
+  const t = (key: keyof (typeof ui)["en"]) => ui[lang][key] || ui["en"][key];
+  const translatePath = (path: string, l: string = lang) => {
+    if (l === "en") return path;
+    if (path.startsWith("/#")) return `/${l}${path.substring(1)}`;
+    return `/${l}${path}`;
+  };
+
+  const toggleLangPath =
+    lang === "en"
+      ? `/vi${currentPath === "/" ? "" : currentPath}`
+      : currentPath.replace(/^\/vi/, "") || "/";
 
   useEffect(() => {
     setCurrentHash(window.location.hash);
@@ -34,13 +50,14 @@ export default function Header({ currentPath }: { currentPath: string }) {
   });
 
   const getIsActive = (href: string) => {
+    const translatedHref = translatePath(href);
     if (href === "/#contact") {
-      return currentPath === "/" && currentHash === "#contact";
+      return (currentPath === "/" || currentPath === "/vi/") && currentHash === "#contact";
     }
     if (href === "/") {
-      return currentPath === "/" && currentHash !== "#contact";
+      return (currentPath === "/" || currentPath === "/vi/") && currentHash !== "#contact";
     }
-    return currentPath.startsWith(href);
+    return currentPath === translatedHref || currentPath.startsWith(translatedHref + "/");
   };
 
   return (
@@ -214,15 +231,54 @@ export default function Header({ currentPath }: { currentPath: string }) {
           aria-label="Primary"
           style={{ display: "flex", alignItems: "center", gap: "6px" }}
         >
-          {nav.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={`navLink ${getIsActive(item.href) ? "isActive" : ""}`}
-            >
-              {item.label}
-            </a>
-          ))}
+          {navKeys.map((item) => {
+            const translatedHref = translatePath(item.href);
+            return (
+              <a
+                key={item.href}
+                href={translatedHref}
+                className={`navLink ${getIsActive(item.href) ? "isActive" : ""}`}
+              >
+                {t(item.labelKey)}
+              </a>
+            );
+          })}
+
+          <div
+            style={{
+              width: "1px",
+              height: "20px",
+              background: "rgba(255,255,255,0.1)",
+              margin: "0 8px",
+            }}
+          />
+
+          <a
+            href={toggleLangPath}
+            className="lang-switcher"
+            title={`Switch to ${lang === "en" ? "Vietnamese" : "English"}`}
+            style={{
+              padding: "4px 8px",
+              fontSize: "13px",
+              fontWeight: 800,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              color: "rgba(255,255,255,0.6)",
+              textDecoration: "none",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--c-neon-cyan)";
+              e.currentTarget.style.textShadow = "0 0 8px rgba(0, 229, 255, 0.4)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "rgba(255,255,255,0.6)";
+              e.currentTarget.style.textShadow = "none";
+            }}
+          >
+            {lang === "en" ? "VI" : "EN"}
+          </a>
+
           {site.cvUrl && (
             <a
               href={site.cvUrl}
@@ -231,7 +287,7 @@ export default function Header({ currentPath }: { currentPath: string }) {
               rel="noreferrer"
               download
             >
-              CV ↓
+              {t("nav.cv")}
             </a>
           )}
         </nav>
@@ -286,21 +342,43 @@ export default function Header({ currentPath }: { currentPath: string }) {
             <nav
               style={{ display: "flex", flexDirection: "column", padding: "16px 24px", gap: "8px" }}
             >
-              {nav.map((item) => (
+              <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "8px" }}>
                 <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`navLink ${getIsActive(item.href) ? "isActive" : ""}`}
+                  href={toggleLangPath}
+                  className="lang-switcher"
                   style={{
-                    fontSize: "1.2rem",
-                    padding: "12px 16px",
-                    borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    padding: "6px 16px",
+                    background: "rgba(255,255,255,0.05)",
+                    borderRadius: "20px",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    fontSize: "14px",
+                    fontWeight: 800,
+                    color: "var(--c-neon-cyan)",
+                    textDecoration: "none",
                   }}
                 >
-                  {item.label}
+                  🌐 {lang === "en" ? "Tiếng Việt" : "English"}
                 </a>
-              ))}
+              </div>
+
+              {navKeys.map((item) => {
+                const translatedHref = translatePath(item.href);
+                return (
+                  <a
+                    key={item.href}
+                    href={translatedHref}
+                    onClick={() => setIsOpen(false)}
+                    className={`navLink ${getIsActive(item.href) ? "isActive" : ""}`}
+                    style={{
+                      fontSize: "1.2rem",
+                      padding: "12px 16px",
+                      borderBottom: "1px solid rgba(255,255,255,0.05)",
+                    }}
+                  >
+                    {t(item.labelKey)}
+                  </a>
+                );
+              })}
               {site.cvUrl && (
                 <a
                   href={site.cvUrl}
@@ -315,7 +393,7 @@ export default function Header({ currentPath }: { currentPath: string }) {
                     marginTop: "12px",
                   }}
                 >
-                  Download CV ↓
+                  {t("nav.cv")}
                 </a>
               )}
             </nav>
