@@ -1,0 +1,77 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { site } from "../../data/site";
+import MeshGradientClient from "../tools/MeshGradientGenerator";
+import { getLangFromUrl, useTranslatedPath } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const translatePath = useTranslatedPath(lang);
+const isVi = lang === 'vi';
+
+const viDict = {
+  randomize: "Ngẫu nhiên",
+  copyCSS: "Sao chép CSS",
+  copyTailwind: "Sao chép Tailwind",
+  downloadPNG: "Tải xuống PNG",
+  copied: "Đã sao chép!",
+  colors: "Màu sắc",
+  settings: "Cài đặt",
+  exportLabel: "Xuất",
+  presets: "Mẫu có sẵn",
+  addPoint: "Thêm điểm",
+  blur: "Độ mờ",
+  grain: "Hiệu ứng hạt",
+  aspectRatio: "Tỉ lệ",
+  bgColor: "Màu nền",
+  viewCode: "Xem mã CSS",
+  position: "Vị trí",
+  size: "Kích thước",
+  locked: "Đã khóa",
+  unlock: "Mở khóa",
+  free: "Tự do",
+};
+---
+
+<BaseLayout 
+  title={isVi ? `CSS Mesh Gradient | ${site.title}` : `CSS Mesh Gradient Generator | ${site.title}`}
+  description={isVi 
+    ? "Tạo các dải màu mesh gradient tuyệt đẹp bằng CSS thuần túy. Chạy 100% trên trình duyệt."
+    : "Generate beautiful mesh gradients with pure CSS. Runs 100% in your browser."}
+>
+  <main class="page-tool wrap pt-32 pb-24">
+    <header class="mb-12">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-sm font-medium mb-6 backdrop-blur-md">
+        <a href={translatePath("/tools")} class="opacity-70 hover:opacity-100 transition-opacity">
+          {isVi ? "Công cụ" : "Tools"}
+        </a>
+        <span class="opacity-40">/</span>
+        <span class="text-[color:var(--c-neon-cyan)]">
+          CSS Mesh Gradient
+        </span>
+      </div>
+      
+      <h1 class="text-4xl md:text-5xl font-extrabold mb-4" style="background: linear-gradient(135deg, var(--c-neon-cyan), var(--c-neon-magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+        CSS Mesh Gradient
+      </h1>
+      <p class="text-xl opacity-70 max-w-2xl">
+        {isVi
+          ? "Tạo các dải màu mesh gradient tuyệt đẹp chỉ bằng CSS thuần túy. Chạy 100% trên trình duyệt, copy CSS và sử dụng ngay."
+          : "Create stunning mesh gradients with pure CSS. Runs 100% in your browser — copy the code and use it anywhere."}
+      </p>
+    </header>
+
+    <div class="tool-container bg-[#0a0a10] border border-white/10 rounded-3xl p-4 md:p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute -top-40 -left-40 w-96 h-96 bg-[var(--c-neon-cyan)] rounded-full blur-[120px] opacity-[0.08] mix-blend-screen pointer-events-none"></div>
+      <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-[var(--c-neon-magenta)] rounded-full blur-[120px] opacity-[0.08] mix-blend-screen pointer-events-none"></div>
+      
+      <MeshGradientClient client:load dict={isVi ? viDict : undefined} />
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .tool-container {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+</style>

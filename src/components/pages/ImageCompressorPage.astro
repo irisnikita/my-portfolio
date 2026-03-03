@@ -2,10 +2,9 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { site } from "../../data/site";
 import ImageCompressorClient from "../tools/ImageCompressor";
-import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+import { getLangFromUrl, useTranslatedPath } from '../../i18n/utils';
 
 const lang = getLangFromUrl(Astro.url);
-const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 const isVi = lang === 'vi';
 
@@ -32,7 +31,8 @@ const viDict = {
   clearAll: "Xóa tất cả",
   statusReady: "Sẵn sàng",
   statusCompressing: "Đang nén...",
-  statusDone: "Hoàn tất"
+  statusDone: "Hoàn tất",
+  pasteInstruction: "Hoặc nhấn (Cmd/Ctrl + V) để dán ảnh từ màn hình",
 };
 ---
 

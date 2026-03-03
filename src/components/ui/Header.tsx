@@ -1,21 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { site } from "../../data/site";
 
 import { ui } from "../../i18n/ui";
 
-const navKeys: Array<{ href: string; labelKey: keyof (typeof ui)["en"] }> = [
+const navKeys: Array<{ href: string; labelKey: keyof (typeof ui)["en"]; hasDropdown?: boolean }> = [
   { href: "/projects", labelKey: "nav.projects" },
-  { href: "/tools", labelKey: "nav.tools" },
+  { href: "/tools", labelKey: "nav.tools", hasDropdown: true },
   { href: "/about", labelKey: "nav.about" },
   { href: "/blog", labelKey: "nav.blog" },
   { href: "/#contact", labelKey: "nav.contact" },
+];
+
+// Sub-items for the "Tools" dropdown
+const toolsSubItems = [
+  {
+    href: "/tools/image-compressor",
+    label: { en: "Image Compressor", vi: "Nén Ảnh Thông Minh" },
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <polyline points="21 15 16 10 5 21" />
+      </svg>
+    ),
+    description: { en: "Compress images client-side", vi: "Nén ảnh trực tiếp trên trình duyệt" },
+  },
+  {
+    href: "/tools/css-mesh-gradient",
+    label: { en: "CSS Mesh Gradient", vi: "Tạo Mesh Gradient" },
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+      </svg>
+    ),
+    description: { en: "Beautiful mesh gradients in pure CSS", vi: "Tạo mesh gradient tuyệt đẹp bằng CSS" },
+  },
 ];
 
 export default function Header({ currentPath }: { currentPath: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [currentHash, setCurrentHash] = useState("");
+  const [toolsExpanded, setToolsExpanded] = useState(false);
+  const [toolsHover, setToolsHover] = useState(false);
+  const toolsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { scrollY } = useScroll();
 
   const lang = currentPath.startsWith("/vi") ? "vi" : "en";
@@ -40,7 +69,6 @@ export default function Header({ currentPath }: { currentPath: string }) {
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() || 0;
-    // Hide header if scrolling down and scrolled past 100px.
     if (latest > previous && latest > 100) {
       setIsHidden(true);
       setIsOpen(false);
@@ -60,6 +88,15 @@ export default function Header({ currentPath }: { currentPath: string }) {
     return currentPath === translatedHref || currentPath.startsWith(translatedHref + "/");
   };
 
+  const handleToolsMouseEnter = () => {
+    if (toolsTimeoutRef.current) clearTimeout(toolsTimeoutRef.current);
+    setToolsHover(true);
+  };
+
+  const handleToolsMouseLeave = () => {
+    toolsTimeoutRef.current = setTimeout(() => setToolsHover(false), 150);
+  };
+
   return (
     <motion.header
       initial={{ y: 0 }}
@@ -67,7 +104,7 @@ export default function Header({ currentPath }: { currentPath: string }) {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="site-header"
       style={{
-        position: "fixed", // Switched from sticky to fixed for smooth motion
+        position: "fixed",
         width: "100%",
         top: 0,
         zIndex: 40,
@@ -233,6 +270,159 @@ export default function Header({ currentPath }: { currentPath: string }) {
         >
           {navKeys.map((item) => {
             const translatedHref = translatePath(item.href);
+
+            if (item.hasDropdown) {
+              return (
+                <div
+                  key={item.href}
+                  style={{ position: "relative" }}
+                  onMouseEnter={handleToolsMouseEnter}
+                  onMouseLeave={handleToolsMouseLeave}
+                >
+                  <a
+                    href={translatedHref}
+                    className={`navLink ${getIsActive(item.href) ? "isActive" : ""}`}
+                    style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
+                  >
+                    {t(item.labelKey)}
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.5, transition: "transform 0.2s", transform: toolsHover ? "rotate(180deg)" : "rotate(0deg)" }}>
+                      <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
+
+                  <AnimatePresence>
+                    {toolsHover && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                        transition={{ duration: 0.18, ease: "easeOut" }}
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 8px)",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          minWidth: "260px",
+                          background: "rgba(10, 10, 20, 0.95)",
+                          backdropFilter: "blur(20px)",
+                          WebkitBackdropFilter: "blur(20px)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          borderRadius: "16px",
+                          padding: "8px",
+                          boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(0,229,255,0.05)",
+                          zIndex: 100,
+                        }}
+                      >
+                        {/* Caret arrow */}
+                        <div style={{
+                          position: "absolute",
+                          top: "-6px",
+                          left: "50%",
+                          transform: "translateX(-50%) rotate(45deg)",
+                          width: "12px",
+                          height: "12px",
+                          background: "rgba(10, 10, 20, 0.95)",
+                          border: "1px solid rgba(255,255,255,0.1)",
+                          borderBottom: "none",
+                          borderRight: "none",
+                          borderRadius: "2px",
+                        }} />
+
+                        {/* "All Tools" link */}
+                        <a
+                          href={translatedHref}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            padding: "10px 14px",
+                            borderRadius: "10px",
+                            textDecoration: "none",
+                            color: "rgba(255,255,255,0.5)",
+                            fontSize: "13px",
+                            fontWeight: 600,
+                            transition: "all 0.15s ease",
+                            marginBottom: "4px",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                            e.currentTarget.style.color = "rgba(255,255,255,0.8)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = "transparent";
+                            e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                          }}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                          </svg>
+                          {lang === "vi" ? "Tất cả công cụ" : "All Tools"}
+                        </a>
+
+                        <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "0 8px 4px" }} />
+
+                        {toolsSubItems.map((sub) => (
+                          <a
+                            key={sub.href}
+                            href={translatePath(sub.href)}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                              padding: "12px 14px",
+                              borderRadius: "10px",
+                              textDecoration: "none",
+                              color: "#fff",
+                              transition: "all 0.15s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = "rgba(0, 229, 255, 0.08)";
+                              (e.currentTarget.querySelector(".tool-icon") as HTMLElement).style.background = "rgba(0, 229, 255, 0.15)";
+                              (e.currentTarget.querySelector(".tool-icon") as HTMLElement).style.color = "var(--c-neon-cyan)";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = "transparent";
+                              (e.currentTarget.querySelector(".tool-icon") as HTMLElement).style.background = "rgba(255,255,255,0.06)";
+                              (e.currentTarget.querySelector(".tool-icon") as HTMLElement).style.color = "rgba(255,255,255,0.7)";
+                            }}
+                          >
+                            <div
+                              className="tool-icon"
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                width: "36px",
+                                height: "36px",
+                                borderRadius: "10px",
+                                background: "rgba(255,255,255,0.06)",
+                                color: "rgba(255,255,255,0.7)",
+                                flexShrink: 0,
+                                transition: "all 0.15s ease",
+                              }}
+                            >
+                              {sub.icon}
+                            </div>
+                            <div>
+                              <div style={{ fontSize: "14px", fontWeight: 600, lineHeight: 1.3 }}>
+                                {sub.label[lang]}
+                              </div>
+                              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: 1.4, marginTop: "2px" }}>
+                                {sub.description[lang]}
+                              </div>
+                            </div>
+                          </a>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            }
+
             return (
               <a
                 key={item.href}
@@ -363,6 +553,128 @@ export default function Header({ currentPath }: { currentPath: string }) {
 
               {navKeys.map((item) => {
                 const translatedHref = translatePath(item.href);
+
+                if (item.hasDropdown) {
+                  return (
+                    <div key={item.href}>
+                      <button
+                        onClick={() => setToolsExpanded(!toolsExpanded)}
+                        className={`navLink ${getIsActive(item.href) ? "isActive" : ""}`}
+                        style={{
+                          fontSize: "1.2rem",
+                          padding: "12px 16px",
+                          borderBottom: "1px solid rgba(255,255,255,0.05)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          width: "100%",
+                          background: "none",
+                          border: "none",
+                          borderBottomWidth: "1px",
+                          borderBottomStyle: "solid",
+                          borderBottomColor: "rgba(255,255,255,0.05)",
+                          cursor: "pointer",
+                          textAlign: "left",
+                          color: "inherit",
+                          fontFamily: "inherit",
+                        }}
+                      >
+                        <span>{t(item.labelKey)}</span>
+                        <motion.svg
+                          animate={{ rotate: toolsExpanded ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}
+                          width="16" height="16" viewBox="0 0 16 16" fill="none"
+                          style={{ opacity: 0.5 }}
+                        >
+                          <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </motion.svg>
+                      </button>
+
+                      <AnimatePresence>
+                        {toolsExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2, ease: "easeInOut" }}
+                            style={{ overflow: "hidden" }}
+                          >
+                            <div style={{ padding: "8px 0 8px 16px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                              {/* All Tools link */}
+                              <a
+                                href={translatedHref}
+                                onClick={() => setIsOpen(false)}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  padding: "10px 14px",
+                                  borderRadius: "12px",
+                                  textDecoration: "none",
+                                  color: "rgba(255,255,255,0.5)",
+                                  fontSize: "14px",
+                                  fontWeight: 600,
+                                  background: "rgba(255,255,255,0.03)",
+                                }}
+                              >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="3" y="3" width="7" height="7" />
+                                  <rect x="14" y="3" width="7" height="7" />
+                                  <rect x="14" y="14" width="7" height="7" />
+                                  <rect x="3" y="14" width="7" height="7" />
+                                </svg>
+                                {lang === "vi" ? "Tất cả công cụ" : "All Tools"}
+                              </a>
+
+                              {toolsSubItems.map((sub) => (
+                                <a
+                                  key={sub.href}
+                                  href={translatePath(sub.href)}
+                                  onClick={() => setIsOpen(false)}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "12px",
+                                    padding: "12px 14px",
+                                    borderRadius: "12px",
+                                    textDecoration: "none",
+                                    color: "#fff",
+                                    background: "rgba(255,255,255,0.03)",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      width: "36px",
+                                      height: "36px",
+                                      borderRadius: "10px",
+                                      background: "rgba(0, 229, 255, 0.1)",
+                                      color: "var(--c-neon-cyan)",
+                                      flexShrink: 0,
+                                    }}
+                                  >
+                                    {sub.icon}
+                                  </div>
+                                  <div>
+                                    <div style={{ fontSize: "15px", fontWeight: 600, lineHeight: 1.3 }}>
+                                      {sub.label[lang]}
+                                    </div>
+                                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: 1.4, marginTop: "2px" }}>
+                                      {sub.description[lang]}
+                                    </div>
+                                  </div>
+                                </a>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                }
+
                 return (
                   <a
                     key={item.href}
@@ -403,3 +715,4 @@ export default function Header({ currentPath }: { currentPath: string }) {
     </motion.header>
   );
 }
+
