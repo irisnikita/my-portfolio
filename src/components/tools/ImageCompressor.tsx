@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import imageCompression from "browser-image-compression";
 import JSZip from "jszip";
 import {
@@ -69,11 +69,28 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
   const [tasks, setTasks] = useState<CompressTask[]>([]);
   const [isDragActive, setIsDragActive] = useState(false);
 
-  // Settings: Default to aggressive WebP like TinyWebP
-  const [maxSizeMB, setMaxSizeMB] = useState("0.8");
-  const [maxWidthOrHeight, setMaxWidthOrHeight] = useState("2560");
-  const [forceWebp, setForceWebp] = useState(true);
+  // Settings: Load from localStorage or use aggressive defaults
+  const [maxSizeMB, setMaxSizeMB] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('ic-maxSizeMB') || '0.8';
+    return '0.8';
+  });
+  const [maxWidthOrHeight, setMaxWidthOrHeight] = useState(() => {
+    if (typeof window !== 'undefined') return localStorage.getItem('ic-maxWH') || '2560';
+    return '2560';
+  });
+  const [forceWebp, setForceWebp] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ic-forceWebp');
+      return saved !== null ? saved === 'true' : true;
+    }
+    return true;
+  });
   const [showSettings, setShowSettings] = useState(false);
+
+  // Persist settings to localStorage
+  useEffect(() => { localStorage.setItem('ic-maxSizeMB', maxSizeMB); }, [maxSizeMB]);
+  useEffect(() => { localStorage.setItem('ic-maxWH', maxWidthOrHeight); }, [maxWidthOrHeight]);
+  useEffect(() => { localStorage.setItem('ic-forceWebp', String(forceWebp)); }, [forceWebp]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -287,15 +304,23 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
         style={{ display: "none" }}
       />
 
-      {/* Advanced Settings Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 bg-white/5 border border-white/10 rounded-2xl">
-        <div
-          className="flex items-center gap-2 mb-4 md:mb-0 cursor-pointer text-white/70 hover:text-white"
+      {/* Advanced Settings — Collapsible Panel */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl">
+        <button
+          type="button"
+          className="flex items-center justify-between w-full p-4 cursor-pointer text-white/70 hover:text-white transition-colors"
           onClick={() => setShowSettings(!showSettings)}
         >
-          <Settings size={18} />
-          <span className="font-semibold text-sm">Settings & Options</span>
-        </div>
+          <div className="flex items-center gap-2">
+            <Settings size={18} />
+            <span className="font-semibold text-sm">Settings &amp; Options</span>
+          </div>
+          <motion.div animate={{ rotate: showSettings ? 180 : 0 }} transition={{ duration: 0.2 }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.div>
+        </button>
 
         <AnimatePresence>
           {showSettings && (
@@ -303,66 +328,61 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="flex flex-col sm:flex-row flex-wrap gap-4 items-start sm:items-center w-full overflow-hidden mt-4 md:mt-0"
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
             >
-              <div className="flex items-center justify-between sm:justify-start gap-4 w-full sm:w-auto sm:border-r border-white/10 sm:pr-4">
-                <label className="text-xs text-white/50 uppercase tracking-wider font-semibold whitespace-nowrap">
-                  Max Size (MB)
-                </label>
-                <input
-                  type="number"
-                  value={maxSizeMB}
-                  onChange={(e) => setMaxSizeMB(e.target.value)}
-                  className="w-20 bg-black/40 border border-white/20 rounded px-2 py-1 text-sm text-center focus:border-[var(--c-neon-cyan)] outline-none"
-                />
-              </div>
+              <div className="mx-4 mb-4 flex flex-col gap-4 border-t border-white/10 pt-4">
+                {/* Max Size */}
+                <div className="flex items-center justify-between">
+                  <label className="text-sm text-white/60 font-medium">Max file size (MB)</label>
+                  <input
+                    type="number"
+                    value={maxSizeMB}
+                    onChange={(e) => setMaxSizeMB(e.target.value)}
+                    className="w-24 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-sm text-center focus:border-[var(--c-neon-cyan)] outline-none transition-colors"
+                  />
+                </div>
 
-              <div className="flex items-center justify-between sm:justify-start gap-4 w-full sm:w-auto sm:border-r border-white/10 sm:pr-4">
-                <label className="text-xs text-white/50 uppercase tracking-wider font-semibold whitespace-nowrap">
-                  Max W/H (px)
-                </label>
-                <input
-                  type="number"
-                  value={maxWidthOrHeight}
-                  onChange={(e) => setMaxWidthOrHeight(e.target.value)}
-                  className="w-24 bg-black/40 border border-white/20 rounded px-2 py-1 text-sm text-center focus:border-[var(--c-neon-cyan)] outline-none"
-                />
-              </div>
+                {/* Max Width/Height */}
+                <div className="flex items-center justify-between">
+                  <label className="text-sm text-white/60 font-medium">Max width / height (px)</label>
+                  <input
+                    type="number"
+                    value={maxWidthOrHeight}
+                    onChange={(e) => setMaxWidthOrHeight(e.target.value)}
+                    className="w-24 bg-black/40 border border-white/20 rounded-lg px-3 py-2 text-sm text-center focus:border-[var(--c-neon-cyan)] outline-none transition-colors"
+                  />
+                </div>
 
-              <div className="flex items-center justify-between sm:justify-start gap-4 w-full sm:w-auto">
-                <label className="flex items-center gap-2 cursor-pointer text-sm">
-                  <div className="relative shrink-0">
+                {/* Force WebP Toggle */}
+                <div className="flex items-center justify-between">
+                  <span className={`text-sm font-medium transition-colors ${forceWebp ? 'text-white' : 'text-white/60'}`}>
+                    {dict.forceWebp}
+                  </span>
+                  <label className="relative cursor-pointer shrink-0">
                     <input
                       type="checkbox"
                       className="sr-only"
                       checked={forceWebp}
                       onChange={(e) => setForceWebp(e.target.checked)}
                     />
-                    <div
-                      className={`block w-10 h-6 rounded-full transition-colors ${forceWebp ? "bg-[var(--c-neon-cyan)]/80" : "bg-white/20"}`}
-                    ></div>
-                    <div
-                      className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${forceWebp ? "transform translate-x-4" : ""}`}
-                    ></div>
-                  </div>
-                  <span
-                    className={`transition-colors text-left flex-1 ${forceWebp ? "text-white font-medium" : "text-white/60"}`}
-                  >
-                    {dict.forceWebp}
-                  </span>
-                </label>
-              </div>
+                    <div className={`block w-11 h-6 rounded-full transition-colors ${forceWebp ? 'bg-[var(--c-neon-cyan)]/80' : 'bg-white/20'}`}></div>
+                    <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${forceWebp ? 'transform translate-x-5' : ''}`}></div>
+                  </label>
+                </div>
 
-              {tasks.length > 0 && (
-                <button
-                  onClick={recompressAll}
-                  title={dict.recompressHint}
-                  className="w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium"
-                >
-                  <RefreshCcw size={14} />
-                  <span>{dict.recompressHint}</span>
-                </button>
-              )}
+                {/* Recompress Button */}
+                {tasks.length > 0 && (
+                  <button
+                    onClick={recompressAll}
+                    title={dict.recompressHint}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-white/10 hover:bg-white/20 transition-colors text-sm font-medium border border-white/5 mt-1"
+                  >
+                    <RefreshCcw size={14} />
+                    <span>{dict.recompressHint}</span>
+                  </button>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
