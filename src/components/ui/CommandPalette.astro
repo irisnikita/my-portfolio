@@ -92,7 +92,7 @@ import { site } from "../../data/site";
     const list = document.getElementById('cmd-list');
     if (!backdrop || !input || !list) return;
 
-    let items = Array.from(list.querySelectorAll('.palette-item')) as HTMLElement[];
+    const items = Array.from(list.querySelectorAll('.palette-item')) as HTMLElement[];
     let selectedIndex = 0;
     let isOpen = false;
 
