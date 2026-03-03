@@ -257,26 +257,45 @@ body {
 }
 
 /* 
-  Custom View Transitions (Awwwards style pseudo-elements)
-  Replaces default crossfade with a circular wipe from the click position. 
+  Custom View Transitions — "Infinite Tunnel / Inception Zoom" (Premium)
+  Old page drops deep into the background (Z-space), 
+  New page flies in from behind the camera (huge scale down to normal).
 */
 ::view-transition-old(root) {
-  animation: none;
+  animation: tunnelZoomOut 0.7s cubic-bezier(0.76, 0, 0.24, 1) forwards;
   z-index: 1;
 }
 
 ::view-transition-new(root) {
-  animation: clipReveal 0.6s var(--ease-out) forwards;
+  animation: tunnelZoomIn 0.7s cubic-bezier(0.76, 0, 0.24, 1) forwards;
   z-index: 2;
 }
 
-@keyframes clipReveal {
-  from {
-    clip-path: circle(0% at var(--click-x, 50%) var(--click-y, 50%));
+@keyframes tunnelZoomOut {
+  0% {
+    transform: scale(1);
+    filter: brightness(1) blur(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.4);
+    filter: brightness(0.1) blur(10px);
     opacity: 0;
   }
-  to {
-    clip-path: circle(150% at var(--click-x, 50%) var(--click-y, 50%));
+}
+
+@keyframes tunnelZoomIn {
+  0% {
+    transform: scale(3.5);
+    filter: brightness(2) blur(15px);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1) blur(0px);
     opacity: 1;
   }
 }
