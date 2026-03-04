@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toPng } from "html-to-image";
 import {
@@ -217,7 +217,10 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
   const [aspectRatio, setAspectRatio] = useState("16/9");
   const [showCode, setShowCode] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [showDots, setShowDots] = useState(true);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const canvasWrapperRef = useRef<HTMLDivElement>(null);
 
   const cssCode = buildCSS(points, bgColor, blur, showNoise);
 
@@ -265,6 +268,10 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
 
   const handleDownloadPNG = useCallback(async () => {
     if (!canvasRef.current) return;
+    // Temporarily hide dots for clean export
+    setShowDots(false);
+    // Wait for next paint so dots are removed from DOM
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     try {
       const dataUrl = await toPng(canvasRef.current, { pixelRatio: 2, cacheBust: true });
       const link = document.createElement("a");
@@ -273,8 +280,51 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
       link.click();
     } catch (err) {
       console.error("Failed to export PNG:", err);
+    } finally {
+      setShowDots(true);
     }
   }, []);
+
+  // ─── Drag handlers ────────────────────────────────
+  const getPercentFromPointer = useCallback((clientX: number, clientY: number) => {
+    if (!canvasWrapperRef.current) return null;
+    const rect = canvasWrapperRef.current.getBoundingClientRect();
+    const x = Math.min(100, Math.max(0, Math.round(((clientX - rect.left) / rect.width) * 100)));
+    const y = Math.min(100, Math.max(0, Math.round(((clientY - rect.top) / rect.height) * 100)));
+    return { x, y };
+  }, []);
+
+  const handleDotPointerDown = useCallback((e: React.PointerEvent, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setDraggingId(id);
+  }, []);
+
+  const handleCanvasPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!draggingId) return;
+      const pos = getPercentFromPointer(e.clientX, e.clientY);
+      if (pos) {
+        setPoints((prev) =>
+          prev.map((p) => (p.id === draggingId ? { ...p, x: pos.x, y: pos.y } : p))
+        );
+      }
+    },
+    [draggingId, getPercentFromPointer]
+  );
+
+  const handleCanvasPointerUp = useCallback(() => {
+    setDraggingId(null);
+  }, []);
+
+  // Cancel drag if pointer leaves window
+  useEffect(() => {
+    if (!draggingId) return;
+    const handleUp = () => setDraggingId(null);
+    window.addEventListener("pointerup", handleUp);
+    return () => window.removeEventListener("pointerup", handleUp);
+  }, [draggingId]);
 
   const loadPreset = (preset: (typeof PRESETS)[number]) => {
     setPoints(
@@ -297,7 +347,8 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
     setPoints((prev) => [...prev, { id: uid(), color: randomHex(), x: randomBetween(10, 90), y: randomBetween(10, 90), size: randomBetween(35, 70), locked: false }]);
   };
 
-  // Canvas style
+  // Canvas style — remove transition during drag for instant feedback
+  const isDragging = draggingId !== null;
   const canvasStyle: React.CSSProperties = {
     aspectRatio,
     backgroundColor: bgColor,
@@ -309,7 +360,7 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
     width: "100%",
     position: "relative",
     overflow: "hidden",
-    transition: "background-image 0.4s ease, background-color 0.4s ease, filter 0.3s ease",
+    transition: isDragging ? "none" : "background-image 0.4s ease, background-color 0.4s ease, filter 0.3s ease",
   };
 
   // Tailwind version of the CSS
@@ -348,24 +399,81 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
         {/* Canvas Preview */}
         <div className="flex-1 min-w-0">
           <div
-            ref={canvasRef}
-            style={canvasStyle}
+            ref={canvasWrapperRef}
+            style={{ position: "relative", borderRadius: "16px", cursor: isDragging ? "grabbing" : undefined }}
+            onPointerMove={handleCanvasPointerMove}
+            onPointerUp={handleCanvasPointerUp}
           >
-            {/* Noise overlay */}
-            {showNoise && (
+            <div
+              ref={canvasRef}
+              style={canvasStyle}
+            >
+              {/* Noise overlay */}
+              {showNoise && (
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    borderRadius: "16px",
+                    opacity: 0.15,
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: "repeat",
+                    backgroundSize: "128px 128px",
+                    pointerEvents: "none",
+                    mixBlendMode: "overlay",
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Draggable dots overlay */}
+            {showDots && (
               <div
                 style={{
                   position: "absolute",
                   inset: 0,
                   borderRadius: "16px",
-                  opacity: 0.15,
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-                  backgroundRepeat: "repeat",
-                  backgroundSize: "128px 128px",
                   pointerEvents: "none",
-                  mixBlendMode: "overlay",
+                  zIndex: 10,
                 }}
-              />
+              >
+                {points.map((point) => (
+                  <div
+                    key={point.id}
+                    onPointerDown={(e) => handleDotPointerDown(e, point.id)}
+                    style={{
+                      position: "absolute",
+                      left: `${point.x}%`,
+                      top: `${point.y}%`,
+                      transform: "translate(-50%, -50%)",
+                      width: "20px",
+                      height: "20px",
+                      borderRadius: "50%",
+                      backgroundColor: point.color,
+                      border: draggingId === point.id ? "3px solid #fff" : "2px solid rgba(255,255,255,0.8)",
+                      boxShadow: draggingId === point.id
+                        ? `0 0 0 3px rgba(0,229,255,0.5), 0 0 16px ${point.color}, 0 2px 8px rgba(0,0,0,0.5)`
+                        : `0 0 8px ${point.color}80, 0 2px 6px rgba(0,0,0,0.4)`,
+                      cursor: isDragging ? "grabbing" : "grab",
+                      pointerEvents: "auto",
+                      touchAction: "none",
+                      transition: draggingId === point.id ? "none" : "left 0.3s ease, top 0.3s ease, box-shadow 0.15s ease",
+                      zIndex: draggingId === point.id ? 20 : 10,
+                    }}
+                  >
+                    {/* Inner glow ring */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: "-4px",
+                        borderRadius: "50%",
+                        border: "1px solid rgba(255,255,255,0.2)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 
