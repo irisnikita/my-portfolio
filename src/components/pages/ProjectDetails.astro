@@ -16,7 +16,6 @@ if (!entry) {
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const isVi = lang === 'vi';
 
 const { title, summary, githubUrl, liveUrl, tags } = entry.data;
 
@@ -24,7 +23,7 @@ const { title, summary, githubUrl, liveUrl, tags } = entry.data;
 // To keep things simple in Astro, we render the slot instead, since Content represents the component.
 ---
 
-<BaseLayout title={`${title} • ${isVi ? 'Dự án' : 'Project'}`} description={summary}>
+<BaseLayout title={`${title} • ${t('projectDetails.suffix')}`} description={summary}>
   <article class="wrap">
     <Container>
       <div class="mb-4">
@@ -32,13 +31,13 @@ const { title, summary, githubUrl, liveUrl, tags } = entry.data;
           <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          {isVi ? 'Trở về danh sách dự án' : 'Back to projects'}
+          {t('projectDetails.back')}
         </a>
       </div>
 
       <header class="head">
         <div class="tagRow">
-          <Tag tone="magenta">{isVi ? 'Nghiên cứu' : 'Case Study'}</Tag>
+          <Tag tone="magenta">{t('projectDetails.caseStudy')}</Tag>
           {tags?.slice(0, 3).map((tag: string, i: number) => (
             <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
           ))}

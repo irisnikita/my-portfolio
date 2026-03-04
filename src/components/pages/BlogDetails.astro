@@ -17,19 +17,16 @@ if (!entry) {
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const isVi = lang === 'vi';
 
-// Calculate reading time roughly
 function getReadingTime(text: string) {
   const wordsPerMinute = 200;
   const words = text.split(/\s+/).length;
   const minutes = Math.ceil(words / wordsPerMinute);
-  return isVi ? `${minutes} phút đọc` : `${minutes} min read`;
+  return t('blog.readTime').replace('{minutes}', String(minutes));
 }
 
-// Localized Date
 const formattedDate = entry.data.pubDate.toLocaleDateString(
-  isVi ? "vi-VN" : "en-US", 
+  lang === 'vi' ? "vi-VN" : "en-US",
   { year: "numeric", month: "short", day: "numeric" }
 );
 ---
@@ -75,10 +72,10 @@ const formattedDate = entry.data.pubDate.toLocaleDateString(
   <Section>
     <div class="flex justify-between items-center py-8">
       <a href={translatePath("/blog")} class="text-cyan-400 hover:text-cyan-300 transition-colors font-medium flex items-center gap-2">
-        <span>←</span> {isVi ? 'Trở về bài viết' : 'Back to all posts'}
+        <span>←</span> {t('blog.back')}
       </a>
       <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(entry.data.title)}&url=${encodeURIComponent(Astro.url.href)}`} target="_blank" rel="noopener noreferrer" class="text-white/50 hover:text-white/90 transition-colors text-sm">
-        {isVi ? 'Chia sẻ lên X' : 'Share on X'}
+        {t('blog.shareX')}
       </a>
     </div>
   </Section>

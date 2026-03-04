@@ -11,7 +11,6 @@ import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/u
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const isVi = lang === 'vi';
 
 // Fetch all non-draft blog posts, sorted by newest first
 const posts = (await getCollection('blog', ({ data }) => {
@@ -23,22 +22,16 @@ function getReadingTime(text: string) {
   const wordsPerMinute = 200;
   const words = text.split(/\s+/).length;
   const minutes = Math.ceil(words / wordsPerMinute);
-  return isVi ? `${minutes} phút đọc` : `${minutes} min read`;
+  return t('blog.readTime').replace('{minutes}', String(minutes));
 }
 ---
 
 <BaseLayout 
-  title={isVi ? `Góc Nhìn • ${site.name}` : `Blog • ${site.name}`} 
-  description={isVi 
-    ? "Những suy nghĩ về phát triển web, tối ưu hiệu suất và xây dựng sản phẩm chất lượng cao."
-    : "Thoughts on web development, performance, and building at scale."}
+  title={`${t('blog.metaTitle')} • ${site.name}`}
+  description={t('blog.metaDesc')}
 >
-  <Section eyebrow={isVi ? "Góc Nhìn" : "Writing"} title={isVi ? "Bài Viết" : "Blog"}>
-    <p class="intro">
-      {isVi 
-        ? "Những suy nghĩ về phát triển web, tối ưu hiệu suất và xây dựng sản phẩm chất lượng cao."
-        : "Thoughts on web development, performance, and building production apps at scale."}
-    </p>
+  <Section eyebrow={t('blog.sectionEyebrow')} title={t('blog.sectionTitle')}>
+    <p class="intro">{t('blog.metaDesc')}</p>
   </Section>
 
   <GlowDivider />
@@ -52,7 +45,7 @@ function getReadingTime(text: string) {
               <div class="postCard">
                 <div class="postMeta">
                   <time class="postDate">
-                    {post.data.pubDate.toLocaleDateString(isVi ? "vi-VN" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
+                    {post.data.pubDate.toLocaleDateString(lang === 'vi' ? "vi-VN" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
                   </time>
                   <span class="postRead">{post.data.readingTime || getReadingTime(post.body)}</span>
                 </div>
@@ -63,7 +56,7 @@ function getReadingTime(text: string) {
                     <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
                   ))}
                 </div>
-                <span class="readMore">{isVi ? "Đọc tiếp →" : "Read article →"}</span>
+                <span class="readMore">{t('blog.readMore')}</span>
               </div>
             </Card>
           </a>
@@ -77,9 +70,9 @@ function getReadingTime(text: string) {
   <Section>
     <div class="comingSoon" data-reveal>
       <p>
-        📝 {isVi ? "Sẽ có thêm nhiều bài viết sớm thôi. Trong lúc chờ đợi, " : "More articles coming soon. In the meantime, feel free to "}
-        <a href={translatePath("/#contact")}>{isVi ? "liên hệ với tôi" : "reach out"}</a>
-        {isVi ? " để thảo luận ý tưởng mới." : " to discuss ideas."}
+        {t('blog.moreComingPrefix')}
+        <a href={translatePath("/#contact")}>{t('blog.moreComingLink')}</a>
+        {t('blog.moreComingSuffix')}
       </p>
     </div>
   </Section>

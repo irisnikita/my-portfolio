@@ -7,77 +7,62 @@ import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/u
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const isVi = lang === 'vi';
 
 const tools = [
   {
     id: "image-compressor",
-    title: isVi ? "Nén Ảnh Thông Minh" : "Smart Image Compressor",
-    description: isVi 
-      ? "Nén kích thước ảnh trực tiếp trên trình duyệt bằng Web Worker mà không suy giảm chất lượng mắt thường."
-      : "Compress images directly in your browser using a Web Worker without visible quality loss.",
+    title: t("tools.card.imageCompressor.title"),
+    description: t("tools.card.imageCompressor.desc"),
     icon: ImageIcon,
     status: "ready", // ready, beta, planned
-    href: translatePath("/tools/image-compressor")
+    href: translatePath("/tools/image-compressor"),
   },
   {
     id: "svg-optimizer",
-    title: isVi ? "Tối ưu hóa SVG" : "Beautiful SVG Optimizer",
-    description: isVi
-      ? "Dọn dẹp mã SVG, format lại code sạch đẹp và hiển thị preview thu nhỏ tiện lợi."
-      : "Clean up SVG code, format it nicely, and preview it conveniently.",
+    title: t("tools.card.svgOptimizer.title"),
+    description: t("tools.card.svgOptimizer.desc"),
     icon: FileCode2,
     status: "planned",
-    href: translatePath("/tools#svg")
+    href: translatePath("/tools#svg"),
   },
   {
     id: "code-to-image",
-    title: isVi ? "Chuyển Code thành Ảnh" : "Code to Image Generator",
-    description: isVi
-      ? "Chuyển đoạn code thành ảnh chụp nền phong cách macOS đẹp mắt để chia sẻ."
-      : "Turn code snippets into beautiful macOS-style screenshots for sharing.",
+    title: t("tools.card.codeToImage.title"),
+    description: t("tools.card.codeToImage.desc"),
     icon: Link,
     status: "planned",
-    href: translatePath("/tools#code")
+    href: translatePath("/tools#code"),
   },
   {
     id: "mesh-gradient",
-    title: "CSS Mesh Gradient",
-    description: isVi
-      ? "Tạo các dải màu trộn lẫn ngẫu nhiên cực đẹp và copy CSS code ngay lập tức."
-      : "Generate beautiful randomized blended gradients and copy the CSS code instantly.",
+    title: t("tools.card.meshGradient.title"),
+    description: t("tools.card.meshGradient.desc"),
     icon: PaintBucket,
     status: "ready",
-    href: translatePath("/tools/css-mesh-gradient")
+    href: translatePath("/tools/css-mesh-gradient"),
   },
   {
     id: "json-formatter",
     title: "Smart JSON Formatter",
-    description: isVi
-      ? "Định dạng lại cấu trúc JSON lộn xộn, highlight cú pháp và kiểm tra lỗi thông minh."
-      : "Format messy JSON structures, highlight syntax and smartly check for errors.",
+    description: "Format messy JSON structures, highlight syntax and smartly check for errors.",
     icon: FileJson,
     status: "planned",
-    href: translatePath("/tools#json")
-  }
-]
+    href: translatePath("/tools#json"),
+  },
+];
 ---
 
 <BaseLayout 
-  title={isVi ? `Công cụ Tiện ích | ${site.title}` : `Developer Tools | ${site.title}`}
-  description={isVi 
-    ? "Bộ công cụ tiện ích miễn phí chạy 100% trên trình duyệt dành cho Developer và Designer." 
-    : "Free utility tools running 100% in your browser for Developers and Designers."}
+  title={`${t('tools.pageTitle')} | ${site.title}`}
+  description={t('tools.pageDescription')}
 >
   <main class="page-tools wrap pt-32 pb-24">
     <header class="mb-16">
       <h1 class="text-4xl md:text-5xl font-extrabold mb-4" style="background: linear-gradient(135deg, var(--c-neon-cyan), var(--c-neon-magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        {isVi ? "Công cụ Tiện ích (Developer)" : "Developer Utilities"}
+        {t('tools.heading')}
       </h1>
       <p class="text-xl opacity-70 max-w-2xl">
-        {isVi 
-          ? "Các công cụ miễn phí, tốc độ cao được xử lý 100% trên thiết bị của bạn (Client-side). Không tải dữ liệu lên server, bảo mật tuyệt đối."
-          : "Free, high-speed tools processed 100% on your device (Client-side). No data uploaded to external servers, ensuring absolute privacy."}
+        {t('tools.subheading')}
       </p>
     </header>
 
@@ -106,7 +91,7 @@ const tools = [
               
               {!isReady && (
                 <span class="text-xs font-mono font-bold tracking-wider uppercase px-2 py-1 rounded-md bg-white/10 text-white/50">
-                  {isVi ? "Sắp ra mắt" : "Coming Soon"}
+                  {t('tools.comingSoon')}
                 </span>
               )}
             </div>

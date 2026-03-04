@@ -9,7 +9,6 @@ import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/u
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
-const isVi = lang === 'vi';
 
 const projects = (await getCollection("projects")).sort(
   (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0)
@@ -17,10 +16,10 @@ const projects = (await getCollection("projects")).sort(
 ---
 
 <BaseLayout 
-  title={isVi ? `Dự Án • ${site.name}` : `Projects • ${site.name}`} 
+  title={`${t('projects.metaTitle')} • ${site.name}`}
   description={`${site.tagline} • ${site.location}`}
 >
-  <Section title={isVi ? "Dự Án Chọn Lọc" : "Selected Work"} eyebrow={isVi ? "Dự Án" : "Projects"}>
+  <Section title={t('projects.sectionTitle')} eyebrow={t('projects.sectionEyebrow')}>
     <div class="grid" data-reveal-container="projects" data-reveal-stagger="80">
       {projects.map((project, i) => (
         <div data-reveal data-reveal-group="project">
@@ -37,7 +36,7 @@ const projects = (await getCollection("projects")).sort(
 
     <div class="cta">
       <a class="ctaLink" href={translatePath("/#contact")}>
-        {isVi ? "Bạn sắp triển khai dự án? Hãy liên hệ ngay →" : "Have a project in mind? Get in touch →"}
+        {t('projects.cta')}
       </a>
     </div>
   </Section>
