@@ -6,17 +6,21 @@ import { services } from "../../data/services";
 
 <Section eyebrow="Services" title="What I Do">
   <div class="servicesGrid" data-reveal-container="services" data-reveal-stagger="100">
-    {services.map((svc, i) => (
-      <div data-reveal data-reveal-class="reveal-scale" data-reveal-group="svc">
-        <Card>
-          <div class="svcCard">
-            <span class="svcIcon" aria-hidden="true">{svc.icon}</span>
-            <h4 class="svcTitle">{svc.title}</h4>
-            <p class="svcDesc">{svc.description}</p>
-          </div>
-        </Card>
-      </div>
-    ))}
+    {
+      services.map((svc, i) => (
+        <div data-reveal data-reveal-class="reveal-scale" data-reveal-group="svc">
+          <Card>
+            <div class="svcCard">
+              <span class="svcIcon" aria-hidden="true">
+                {svc.icon}
+              </span>
+              <h4 class="svcTitle">{svc.title}</h4>
+              <p class="svcDesc">{svc.description}</p>
+            </div>
+          </Card>
+        </div>
+      ))
+    }
   </div>
 </Section>
 

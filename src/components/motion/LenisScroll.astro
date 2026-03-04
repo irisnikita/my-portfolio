@@ -4,14 +4,14 @@
 ---
 
 <script>
-  import Lenis from 'lenis';
+  import Lenis from "lenis";
 
   function initLenis() {
     // Avoid double init
     if ((window as any).lenis) return;
 
     // Check prefers-reduced-motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) return;
 
     const lenis = new Lenis({
@@ -42,7 +42,7 @@
   }
 
   // astro:page-load fires on initial load AND after every ViewTransition
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     if ((window as any)._cleanupLenis) (window as any)._cleanupLenis();
     initLenis();
   });
@@ -50,7 +50,8 @@
 
 <style is:global>
   /* Basic Lenis boilerplate styles to ensure smooth scrolling works */
-  html.lenis, html.lenis body {
+  html.lenis,
+  html.lenis body {
     height: auto;
   }
 

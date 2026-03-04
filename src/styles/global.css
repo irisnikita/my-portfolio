@@ -15,11 +15,11 @@
 :root {
   color-scheme: dark;
 
-/* Palette - Cyberpunk (Default) */
+  /* Palette - Cyberpunk (Default) */
   --c-bg0: #060812;
   --c-bg1: #0a0f24;
   --c-surface: rgba(255, 255, 255, 0.04);
-  --c-border: rgba(255, 255, 255, 0.10);
+  --c-border: rgba(255, 255, 255, 0.1);
 
   --c-text: rgba(255, 255, 255, 0.92);
   --c-muted: rgba(255, 255, 255, 0.68);
@@ -29,7 +29,9 @@
   --c-neon-violet: #7c3bff;
 
   /* Typography */
-  --font-sans: "Quicksand Variable", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  --font-sans:
+    "Quicksand Variable", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, sans-serif;
   --tracking-tight: -0.02em;
 
   /* Spacing + layout */
@@ -46,15 +48,34 @@
   --dur-slow: 600ms;
 
   /* Glow recipe (core hot + soft bloom) */
-  --shadow-glow-cyan: 0 0 8px rgba(0, 229, 255, 0.45), 0 0 28px rgba(124, 59, 255, 0.22), 0 0 52px rgba(255, 43, 214, 0.14);
-  --shadow-glow-magenta: 0 0 8px rgba(255, 43, 214, 0.35), 0 0 26px rgba(124, 59, 255, 0.20);
+  --shadow-glow-cyan:
+    0 0 8px rgba(0, 229, 255, 0.45), 0 0 28px rgba(124, 59, 255, 0.22),
+    0 0 52px rgba(255, 43, 214, 0.14);
+  --shadow-glow-magenta: 0 0 8px rgba(255, 43, 214, 0.35), 0 0 26px rgba(124, 59, 255, 0.2);
 
   /* Background gradients */
   --bg-base: linear-gradient(180deg, var(--c-bg1) 0%, var(--c-bg0) 55%, #04050b 100%);
-  --bg-ambient-1: radial-gradient(60% 50% at 20% 20%, rgba(var(--c-neon-cyan-rgb, 0, 229, 255), 0.14) 0%, rgba(var(--c-neon-cyan-rgb, 0, 229, 255), 0) 60%);
-  --bg-ambient-2: radial-gradient(55% 45% at 80% 30%, rgba(var(--c-neon-magenta-rgb, 255, 43, 214), 0.12) 0%, rgba(var(--c-neon-magenta-rgb, 255, 43, 214), 0) 62%);
-  --bg-ambient-3: radial-gradient(70% 60% at 60% 90%, rgba(var(--c-neon-violet-rgb, 124, 59, 255), 0.10) 0%, rgba(var(--c-neon-violet-rgb, 124, 59, 255), 0) 65%);
-  --vignette: radial-gradient(80% 65% at 50% 35%, rgba(6, 8, 18, 0) 0%, rgba(6, 8, 18, 0.55) 70%, rgba(6, 8, 18, 0.92) 100%);
+  --bg-ambient-1: radial-gradient(
+    60% 50% at 20% 20%,
+    rgba(var(--c-neon-cyan-rgb, 0, 229, 255), 0.14) 0%,
+    rgba(var(--c-neon-cyan-rgb, 0, 229, 255), 0) 60%
+  );
+  --bg-ambient-2: radial-gradient(
+    55% 45% at 80% 30%,
+    rgba(var(--c-neon-magenta-rgb, 255, 43, 214), 0.12) 0%,
+    rgba(var(--c-neon-magenta-rgb, 255, 43, 214), 0) 62%
+  );
+  --bg-ambient-3: radial-gradient(
+    70% 60% at 60% 90%,
+    rgba(var(--c-neon-violet-rgb, 124, 59, 255), 0.1) 0%,
+    rgba(var(--c-neon-violet-rgb, 124, 59, 255), 0) 65%
+  );
+  --vignette: radial-gradient(
+    80% 65% at 50% 35%,
+    rgba(6, 8, 18, 0) 0%,
+    rgba(6, 8, 18, 0.55) 70%,
+    rgba(6, 8, 18, 0.92) 100%
+  );
 }
 
 /* --- Theme Variants --- */
@@ -64,8 +85,8 @@ html[data-vibe="matrix"] {
   --c-bg0: #000500;
   --c-bg1: #001100;
   --c-surface: rgba(0, 255, 0, 0.05);
-  --c-border: rgba(0, 255, 0, 0.20);
-  
+  --c-border: rgba(0, 255, 0, 0.2);
+
   --c-text: rgba(0, 255, 0, 0.9);
   --c-muted: rgba(0, 255, 0, 0.5);
 
@@ -79,10 +100,15 @@ html[data-vibe="matrix"] {
 
   --shadow-glow-cyan: 0 0 8px rgba(0, 255, 0, 0.5), 0 0 28px rgba(0, 255, 0, 0.2);
   --shadow-glow-magenta: 0 0 8px rgba(0, 204, 0, 0.4), 0 0 26px rgba(0, 204, 0, 0.2);
-  
+
   --bg-base: linear-gradient(180deg, var(--c-bg1) 0%, var(--c-bg0) 100%);
-  --vignette: radial-gradient(80% 65% at 50% 35%, rgba(0, 5, 0, 0) 0%, rgba(0, 5, 0, 0.6) 70%, rgba(0, 5, 0, 0.95) 100%);
-  
+  --vignette: radial-gradient(
+    80% 65% at 50% 35%,
+    rgba(0, 5, 0, 0) 0%,
+    rgba(0, 5, 0, 0.6) 70%,
+    rgba(0, 5, 0, 0.95) 100%
+  );
+
   font-family: var(--f-mono); /* Force monospace for Matrix */
 }
 
@@ -108,7 +134,12 @@ html[data-vibe="vaporwave"] {
   --shadow-glow-magenta: 0 0 10px rgba(255, 113, 206, 0.6), 0 0 20px rgba(185, 103, 255, 0.4);
 
   --bg-base: linear-gradient(180deg, #ffb549 0%, #ff71ce 20%, #b967ff 50%, var(--c-bg0) 100%);
-  --vignette: radial-gradient(80% 65% at 50% 35%, rgba(26, 11, 46, 0) 0%, rgba(26, 11, 46, 0.4) 70%, rgba(26, 11, 46, 0.9) 100%);
+  --vignette: radial-gradient(
+    80% 65% at 50% 35%,
+    rgba(26, 11, 46, 0) 0%,
+    rgba(26, 11, 46, 0.4) 70%,
+    rgba(26, 11, 46, 0.9) 100%
+  );
 }
 
 /* 3. Monochrome Theme */
@@ -136,7 +167,12 @@ html[data-vibe="monochrome"] {
   --bg-ambient-1: none;
   --bg-ambient-2: none;
   --bg-ambient-3: none;
-  --vignette: radial-gradient(80% 65% at 50% 35%, rgba(10, 10, 10, 0) 0%, rgba(10, 10, 10, 0.6) 70%, rgba(10, 10, 10, 0.95) 100%);
+  --vignette: radial-gradient(
+    80% 65% at 50% 35%,
+    rgba(10, 10, 10, 0) 0%,
+    rgba(10, 10, 10, 0.6) 70%,
+    rgba(10, 10, 10, 0.95) 100%
+  );
 }
 
 html {

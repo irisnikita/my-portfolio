@@ -27,11 +27,11 @@ const classes = [
 
 <script>
   // Awwwards-level Cursor magnet + Inner parallax
-  const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
   if (!prefersReduced) {
-    for (const el of document.querySelectorAll('.magnet')) {
+    for (const el of document.querySelectorAll(".magnet")) {
       const htmlEl = el as HTMLElement;
-      const inner = htmlEl.querySelector('.btnInner') as HTMLElement | null;
+      const inner = htmlEl.querySelector(".btnInner") as HTMLElement | null;
       let raf = 0;
       const strength = 20; // stronger pull for awwwards feel
       const innerStrength = 8; // parallax amount for text
@@ -45,28 +45,28 @@ const classes = [
         const dy = (pointerEv.clientY - cy) / rect.height;
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(() => {
-          htmlEl.style.setProperty('--mx', String(dx * strength));
-          htmlEl.style.setProperty('--my', String(dy * strength));
+          htmlEl.style.setProperty("--mx", String(dx * strength));
+          htmlEl.style.setProperty("--my", String(dy * strength));
           if (inner) {
-            inner.style.setProperty('--ix', String(dx * innerStrength));
-            inner.style.setProperty('--iy', String(dy * innerStrength));
+            inner.style.setProperty("--ix", String(dx * innerStrength));
+            inner.style.setProperty("--iy", String(dy * innerStrength));
           }
         });
       };
       const onLeave = () => {
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(() => {
-          htmlEl.style.setProperty('--mx', '0');
-          htmlEl.style.setProperty('--my', '0');
+          htmlEl.style.setProperty("--mx", "0");
+          htmlEl.style.setProperty("--my", "0");
           if (inner) {
-            inner.style.setProperty('--ix', '0');
-            inner.style.setProperty('--iy', '0');
+            inner.style.setProperty("--ix", "0");
+            inner.style.setProperty("--iy", "0");
           }
         });
       };
 
-      htmlEl.addEventListener('pointermove', onMove);
-      htmlEl.addEventListener('pointerleave', onLeave);
+      htmlEl.addEventListener("pointermove", onMove);
+      htmlEl.addEventListener("pointerleave", onLeave);
     }
   }
 </script>
@@ -82,14 +82,17 @@ const classes = [
     gap: 10px;
     padding: 12px 16px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     text-decoration: none;
     color: var(--c-text);
     line-height: 1;
 
     transform: translate3d(calc(var(--mx) * 1px), calc(var(--my) * 1px), 0);
-    transition: transform var(--dur-quick) var(--ease-out), box-shadow var(--dur-med) var(--ease-out),
-      background-color var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
+    transition:
+      transform var(--dur-quick) var(--ease-out),
+      box-shadow var(--dur-med) var(--ease-out),
+      background-color var(--dur-med) var(--ease-out),
+      border-color var(--dur-med) var(--ease-out);
     will-change: transform;
   }
 
@@ -107,7 +110,8 @@ const classes = [
   }
 
   .btnPrimary {
-    background: radial-gradient(120% 220% at 20% 10%, rgba(50, 245, 255, 0.22), transparent 40%),
+    background:
+      radial-gradient(120% 220% at 20% 10%, rgba(50, 245, 255, 0.22), transparent 40%),
       radial-gradient(120% 220% at 90% 30%, rgba(255, 53, 213, 0.18), transparent 45%),
       rgba(255, 255, 255, 0.06);
     box-shadow: 0 0 0 rgba(0, 0, 0, 0);

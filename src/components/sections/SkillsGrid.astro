@@ -4,18 +4,20 @@ import { skills } from "../../data/skills";
 ---
 
 <div class="skillsGrid" data-reveal-container="skills" data-reveal-stagger="80">
-  {skills.map((group, gi) => (
-    <div class="group" data-reveal data-reveal-class="reveal-scale" data-reveal-group="skill">
-      <h4 class="catLabel">{group.category}</h4>
-      <div class="tags">
-        {group.items.map((item, i) => (
-          <span class="tagWrap" style={`--tag-delay: ${i * 50}ms`}>
-            <Tag tone={i % 3 === 0 ? "cyan" : i % 3 === 1 ? "neutral" : "magenta"}>{item}</Tag>
-          </span>
-        ))}
+  {
+    skills.map((group, gi) => (
+      <div class="group" data-reveal data-reveal-class="reveal-scale" data-reveal-group="skill">
+        <h4 class="catLabel">{group.category}</h4>
+        <div class="tags">
+          {group.items.map((item, i) => (
+            <span class="tagWrap" style={`--tag-delay: ${i * 50}ms`}>
+              <Tag tone={i % 3 === 0 ? "cyan" : i % 3 === 1 ? "neutral" : "magenta"}>{item}</Tag>
+            </span>
+          ))}
+        </div>
       </div>
-    </div>
-  ))}
+    ))
+  }
 </div>
 
 <style>
@@ -30,7 +32,9 @@ import { skills } from "../../data/skills";
     background: rgba(255, 255, 255, 0.02);
     border-radius: var(--radius);
     padding: 18px 16px;
-    transition: border-color 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+    transition:
+      border-color 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out);
   }
 
   .group:hover {

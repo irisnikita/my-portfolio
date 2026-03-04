@@ -1,67 +1,79 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Section from "../ui/Section.astro";
 import Card from "../ui/Card.astro";
 import Tag from "../ui/Tag.astro";
 import GlowDivider from "../ui/GlowDivider.astro";
 import { site } from "../../data/site";
-import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "../../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 
 // Fetch all non-draft blog posts, sorted by newest first
-const posts = (await getCollection('blog', ({ data }) => {
-  return import.meta.env.PROD ? data.draft !== true : true;
-})).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const posts = (
+  await getCollection("blog", ({ data }) => {
+    return import.meta.env.PROD ? data.draft !== true : true;
+  })
+).sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 // Calculate reading time roughly based on word count
 function getReadingTime(text: string) {
   const wordsPerMinute = 200;
   const words = text.split(/\s+/).length;
   const minutes = Math.ceil(words / wordsPerMinute);
-  return t('blog.readTime').replace('{minutes}', String(minutes));
+  return t("blog.readTime").replace("{minutes}", String(minutes));
 }
 ---
 
-<BaseLayout 
-  title={`${t('blog.metaTitle')} • ${site.name}`}
-  description={t('blog.metaDesc')}
->
-  <Section eyebrow={t('blog.sectionEyebrow')} title={t('blog.sectionTitle')}>
-    <p class="intro">{t('blog.metaDesc')}</p>
+<BaseLayout title={`${t("blog.metaTitle")} • ${site.name}`} description={t("blog.metaDesc")}>
+  <Section eyebrow={t("blog.sectionEyebrow")} title={t("blog.sectionTitle")}>
+    <p class="intro">{t("blog.metaDesc")}</p>
   </Section>
 
   <GlowDivider />
 
   <Section>
     <div class="postList" data-reveal-container="posts" data-reveal-stagger="120">
-      {posts.map((post) => (
-        <article class="postItem" data-reveal data-reveal-class="reveal-slide-right" data-reveal-group="post">
-          <a href={translatePath(`/blog/${post.slug}`)} class="block no-underline">
-            <Card>
-              <div class="postCard">
-                <div class="postMeta">
-                  <time class="postDate">
-                    {post.data.pubDate.toLocaleDateString(lang === 'vi' ? "vi-VN" : "en-US", { year: "numeric", month: "short", day: "numeric" })}
-                  </time>
-                  <span class="postRead">{post.data.readingTime || getReadingTime(post.body)}</span>
+      {
+        posts.map((post) => (
+          <article
+            class="postItem"
+            data-reveal
+            data-reveal-class="reveal-slide-right"
+            data-reveal-group="post"
+          >
+            <a href={translatePath(`/blog/${post.slug}`)} class="block no-underline">
+              <Card>
+                <div class="postCard">
+                  <div class="postMeta">
+                    <time class="postDate">
+                      {post.data.pubDate.toLocaleDateString(lang === "vi" ? "vi-VN" : "en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </time>
+                    <span class="postRead">
+                      {post.data.readingTime || getReadingTime(post.body)}
+                    </span>
+                  </div>
+                  <h3 class="postTitle">{post.data.title}</h3>
+                  <p class="postExcerpt">{post.data.description}</p>
+                  <div class="postTags">
+                    {post.data.tags.map((tag: string, i: number) => (
+                      <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
+                    ))}
+                  </div>
+                  <span class="readMore">{t("blog.readMore")}</span>
                 </div>
-                <h3 class="postTitle">{post.data.title}</h3>
-                <p class="postExcerpt">{post.data.description}</p>
-                <div class="postTags">
-                  {post.data.tags.map((tag: string, i: number) => (
-                    <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
-                  ))}
-                </div>
-                <span class="readMore">{t('blog.readMore')}</span>
-              </div>
-            </Card>
-          </a>
-        </article>
-      ))}
+              </Card>
+            </a>
+          </article>
+        ))
+      }
     </div>
   </Section>
 
@@ -70,9 +82,9 @@ function getReadingTime(text: string) {
   <Section>
     <div class="comingSoon" data-reveal>
       <p>
-        {t('blog.moreComingPrefix')}
-        <a href={translatePath("/#contact")}>{t('blog.moreComingLink')}</a>
-        {t('blog.moreComingSuffix')}
+        {t("blog.moreComingPrefix")}
+        <a href={translatePath("/#contact")}>{t("blog.moreComingLink")}</a>
+        {t("blog.moreComingSuffix")}
       </p>
     </div>
   </Section>

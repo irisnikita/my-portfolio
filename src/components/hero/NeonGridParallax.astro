@@ -9,57 +9,57 @@
 const { class: className } = Astro.props;
 ---
 
-<div class={['gridWrap', className].filter(Boolean).join(' ')} aria-hidden="true">
+<div class={["gridWrap", className].filter(Boolean).join(" ")} aria-hidden="true">
   <svg class="layer layerBack" viewBox="0 0 1200 600" preserveAspectRatio="none">
     <defs>
       <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stop-color="#00e5ff" stop-opacity="0.0" />
-        <stop offset="0.45" stop-color="#00e5ff" stop-opacity="0.18" />
-        <stop offset="1" stop-color="#ff2bd6" stop-opacity="0.08" />
+        <stop offset="0" stop-color="#00e5ff" stop-opacity="0.0"></stop>
+        <stop offset="0.45" stop-color="#00e5ff" stop-opacity="0.18"></stop>
+        <stop offset="1" stop-color="#ff2bd6" stop-opacity="0.08"></stop>
       </linearGradient>
       <pattern id="p1" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="url(#g1)" stroke-width="1" />
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="url(#g1)" stroke-width="1"></path>
       </pattern>
     </defs>
-    <rect width="1200" height="600" fill="url(#p1)" />
+    <rect width="1200" height="600" fill="url(#p1)"></rect>
   </svg>
 
   <svg class="layer layerFront" viewBox="0 0 1200 600" preserveAspectRatio="none">
     <defs>
       <linearGradient id="g2" x1="1" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#ff2bd6" stop-opacity="0.0" />
-        <stop offset="0.55" stop-color="#ff2bd6" stop-opacity="0.14" />
-        <stop offset="1" stop-color="#7c3bff" stop-opacity="0.10" />
+        <stop offset="0" stop-color="#ff2bd6" stop-opacity="0.0"></stop>
+        <stop offset="0.55" stop-color="#ff2bd6" stop-opacity="0.14"></stop>
+        <stop offset="1" stop-color="#7c3bff" stop-opacity="0.10"></stop>
       </linearGradient>
       <pattern id="p2" width="56" height="56" patternUnits="userSpaceOnUse">
-        <path d="M 56 0 L 0 0 0 56" fill="none" stroke="url(#g2)" stroke-width="1" />
+        <path d="M 56 0 L 0 0 0 56" fill="none" stroke="url(#g2)" stroke-width="1"></path>
       </pattern>
     </defs>
-    <rect width="1200" height="600" fill="url(#p2)" />
+    <rect width="1200" height="600" fill="url(#p2)"></rect>
   </svg>
 
   <!-- Light sweep: slow diagonal, low opacity -->
-  <div class="sweep" />
+  <div class="sweep"></div>
 
   <!-- Cursor hotspot: transform-only (no filters). JS updates CSS vars. -->
-  <div class="hotspot" />
+  <div class="hotspot"></div>
 
   <!-- Interference layer: scanlines + tiny drift -->
-  <div class="scan" />
+  <div class="scan"></div>
 
-  <div class="pulse" />
+  <div class="pulse"></div>
 </div>
 
 <script>
   const root = document.currentScript?.previousElementSibling;
-  const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
   // Reduced motion: do not attach listeners/loops.
   if (prefersReduced || !root) {
     // no-op
   } else {
-    const back = root.querySelector('.layerBack');
-    const front = root.querySelector('.layerFront');
+    const back = root.querySelector(".layerBack");
+    const front = root.querySelector(".layerFront");
 
     let active = !document.hidden;
 
@@ -76,11 +76,11 @@ const { class: className } = Astro.props;
       lastY = y;
 
       const s = Math.min(1.0, window.innerWidth / 900);
-      const backY = (y * 0.05) * s;
-      const frontY = (y * 0.09) * s;
+      const backY = y * 0.05 * s;
+      const frontY = y * 0.09 * s;
 
-      back?.style.setProperty('transform', `translate3d(0, ${backY}px, 0)`);
-      front?.style.setProperty('transform', `translate3d(0, ${frontY}px, 0)`);
+      back?.style.setProperty("transform", `translate3d(0, ${backY}px, 0)`);
+      front?.style.setProperty("transform", `translate3d(0, ${frontY}px, 0)`);
     };
 
     const onScroll = () => {
@@ -90,8 +90,8 @@ const { class: className } = Astro.props;
     };
 
     // Pointer-follow hotspot (fine pointer only)
-    const canHover = window.matchMedia?.('(hover: hover)')?.matches;
-    const finePointer = window.matchMedia?.('(pointer: fine)')?.matches;
+    const canHover = window.matchMedia?.("(hover: hover)")?.matches;
+    const finePointer = window.matchMedia?.("(pointer: fine)")?.matches;
 
     let pRaf = 0;
     let targetX = 0.5;
@@ -107,8 +107,8 @@ const { class: className } = Astro.props;
 
       curX += (targetX - curX) * 0.12;
       curY += (targetY - curY) * 0.12;
-      root.style.setProperty('--hx', String(curX));
-      root.style.setProperty('--hy', String(curY));
+      root.style.setProperty("--hx", String(curX));
+      root.style.setProperty("--hy", String(curY));
 
       if (Math.abs(targetX - curX) + Math.abs(targetY - curY) > 0.002) {
         pRaf = requestAnimationFrame(stepPointer);
@@ -126,13 +126,14 @@ const { class: className } = Astro.props;
     };
 
     const attach = () => {
-      window.addEventListener('scroll', onScroll, { passive: true });
-      if (canHover && finePointer) root.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener("scroll", onScroll, { passive: true });
+      if (canHover && finePointer)
+        root.addEventListener("pointermove", onPointerMove, { passive: true });
     };
 
     const detach = () => {
-      window.removeEventListener('scroll', onScroll);
-      root.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener("scroll", onScroll);
+      root.removeEventListener("pointermove", onPointerMove);
       if (sRaf) cancelAnimationFrame(sRaf);
       if (pRaf) cancelAnimationFrame(pRaf);
       sRaf = 0;
@@ -151,7 +152,7 @@ const { class: className } = Astro.props;
 
     attach();
     tickScroll();
-    document.addEventListener('visibilitychange', onVis);
+    document.addEventListener("visibilitychange", onVis);
   }
 </script>
 
@@ -165,8 +166,16 @@ const { class: className } = Astro.props;
     overflow: hidden;
     pointer-events: none;
     opacity: 0.86;
-    mask-image: radial-gradient(130% 120% at calc(var(--hx) * 100%) calc(var(--hy) * 100%), #000 10%, transparent 70%);
-    -webkit-mask-image: radial-gradient(130% 120% at calc(var(--hx) * 100%) calc(var(--hy) * 100%), #000 10%, transparent 70%);
+    mask-image: radial-gradient(
+      130% 120% at calc(var(--hx) * 100%) calc(var(--hy) * 100%),
+      #000 10%,
+      transparent 70%
+    );
+    -webkit-mask-image: radial-gradient(
+      130% 120% at calc(var(--hx) * 100%) calc(var(--hy) * 100%),
+      #000 10%,
+      transparent 70%
+    );
   }
 
   .layer {
@@ -192,7 +201,8 @@ const { class: className } = Astro.props;
   .pulse {
     position: absolute;
     inset: 0;
-    background: radial-gradient(700px 420px at 50% 20%, rgba(50, 245, 255, 0.07), transparent 60%),
+    background:
+      radial-gradient(700px 420px at 50% 20%, rgba(50, 245, 255, 0.07), transparent 60%),
       radial-gradient(900px 520px at 60% 25%, rgba(255, 53, 213, 0.05), transparent 62%);
     animation: pulse 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
   }
@@ -278,14 +288,14 @@ const { class: className } = Astro.props;
       animation: none;
     }
     .hotspot {
-      opacity: 0.0;
+      opacity: 0;
     }
   }
 
   /* Touch/coarse pointer: disable hotspot emphasis */
   @media (hover: none), (pointer: coarse) {
     .hotspot {
-      opacity: 0.0;
+      opacity: 0;
     }
   }
 </style>

@@ -38,7 +38,9 @@ const pathname = Astro.url?.pathname ?? "/";
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
 const ogImageAbs = Astro.site ? new URL(ogImage, Astro.site).toString() : ogImage;
 
-const personSameAs = [site.socials.githubUrl, site.socials.linkedinUrl, site.socials.xUrl].filter(Boolean);
+const personSameAs = [site.socials.githubUrl, site.socials.linkedinUrl, site.socials.xUrl].filter(
+  Boolean,
+);
 
 const jsonLd = [
   {
@@ -91,28 +93,28 @@ const jsonLd = [
     <ViewTransitions />
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-    
+
     <!-- Apply vibe theme from local storage before page render to prevent FOUC -->
     <script is:inline>
       try {
-        const theme = localStorage.getItem('theme-vibe');
-        if (theme && theme !== 'cyberpunk') {
-          document.documentElement.setAttribute('data-vibe', theme);
+        const theme = localStorage.getItem("theme-vibe");
+        if (theme && theme !== "cyberpunk") {
+          document.documentElement.setAttribute("data-vibe", theme);
         }
       } catch {
         // ignore (localStorage may be unavailable)
       }
     </script>
-    
+
     <!-- Track click coords for ViewTransitions Wipe Effect -->
     <script is:inline>
-      document.addEventListener('click', (e) => {
+      document.addEventListener("click", (e) => {
         // Find closest anchor
-        const a = e.target.closest('a');
+        const a = e.target.closest("a");
         if (a && a.href && a.hostname === location.hostname && !a.hash) {
           // Set CSS vars on html element
-          document.documentElement.style.setProperty('--click-x', e.clientX + 'px');
-          document.documentElement.style.setProperty('--click-y', e.clientY + 'px');
+          document.documentElement.style.setProperty("--click-x", e.clientX + "px");
+          document.documentElement.style.setProperty("--click-y", e.clientY + "px");
         }
       });
     </script>
@@ -120,17 +122,17 @@ const jsonLd = [
   <body>
     <!-- Smooth Scroll Init -->
     <LenisScroll />
-    
+
     <!-- 3D WebGL Fluid Canvas -->
     <FluidBackground />
     <CustomCursor />
-    <div class="scroll-progress-bar" aria-hidden="true" />
+    <div class="scroll-progress-bar" aria-hidden="true"></div>
     <RevealInit />
     <CommandPalette />
     <ScrollDistortion />
     <ScrambleText />
     <SoundManager />
-    <a href="#main" class="skip-link">{t('a11y.skipToContent')}</a>
+    <a href="#main" class="skip-link">{t("a11y.skipToContent")}</a>
 
     <Header client:load currentPath={pathname} lang={lang} />
 
@@ -142,13 +144,17 @@ const jsonLd = [
       <div class="wrap">
         <div class="footerInner">
           <p class="fine">© {new Date().getFullYear()} • {site.name}</p>
-          {footerSocials.length > 0 && (
-            <div class="footerSocials">
-              {footerSocials.map((s) => (
-                <a href={s.href} class="footerLink" target="_blank" rel="noreferrer">{s.label}</a>
-              ))}
-            </div>
-          )}
+          {
+            footerSocials.length > 0 && (
+              <div class="footerSocials">
+                {footerSocials.map((s) => (
+                  <a href={s.href} class="footerLink" target="_blank" rel="noreferrer">
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            )
+          }
         </div>
       </div>
     </footer>
@@ -163,7 +169,12 @@ const jsonLd = [
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--c-neon-cyan), var(--c-neon-magenta), var(--c-neon-violet));
+    background: linear-gradient(
+      90deg,
+      var(--c-neon-cyan),
+      var(--c-neon-magenta),
+      var(--c-neon-violet)
+    );
     transform-origin: left center;
     transform: scaleX(0);
     z-index: 50;
@@ -208,7 +219,12 @@ const jsonLd = [
     width: 12px;
     height: 12px;
     border-radius: 999px;
-    background: radial-gradient(circle at 30% 30%, #ffffff, rgba(50, 245, 255, 0.85) 35%, rgba(255, 53, 213, 0.6));
+    background: radial-gradient(
+      circle at 30% 30%,
+      #ffffff,
+      rgba(50, 245, 255, 0.85) 35%,
+      rgba(255, 53, 213, 0.6)
+    );
     box-shadow: var(--shadow-glow-cyan);
   }
 
@@ -222,7 +238,9 @@ const jsonLd = [
     color: var(--c-muted);
     padding: 8px 10px;
     border-radius: 10px;
-    transition: color var(--dur-quick) var(--ease-out), background-color var(--dur-quick) var(--ease-out);
+    transition:
+      color var(--dur-quick) var(--ease-out),
+      background-color var(--dur-quick) var(--ease-out);
   }
   .navLink:hover {
     color: var(--c-text);

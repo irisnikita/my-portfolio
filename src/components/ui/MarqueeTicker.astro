@@ -1,9 +1,20 @@
 ---
 // MarqueeTicker — infinite scrolling tech stack band
 const techItems = [
-  "React", "Next.js", "TypeScript", "NestJS", "Astro",
-  "Zalo Mini App", "CDP", "Tailwind CSS", "Node.js",
-  "PostgreSQL", "Redis", "GraphQL", "Docker", "Vercel",
+  "React",
+  "Next.js",
+  "TypeScript",
+  "NestJS",
+  "Astro",
+  "Zalo Mini App",
+  "CDP",
+  "Tailwind CSS",
+  "Node.js",
+  "PostgreSQL",
+  "Redis",
+  "GraphQL",
+  "Docker",
+  "Vercel",
 ];
 
 // Duplicate for seamless loop
@@ -12,14 +23,10 @@ const items = [...techItems, ...techItems];
 
 <div class="marqueeWrap" aria-hidden="true">
   <div class="marqueeTrack row1">
-    {items.map((item) => (
-      <span class="marqueeItem">{item}</span>
-    ))}
+    {items.map((item) => <span class="marqueeItem">{item}</span>)}
   </div>
   <div class="marqueeTrack row2">
-    {items.map((item) => (
-      <span class="marqueeItem">{item}</span>
-    ))}
+    {items.map((item) => <span class="marqueeItem">{item}</span>)}
   </div>
 </div>
 
@@ -50,13 +57,21 @@ const items = [...techItems, ...techItems];
   }
 
   @keyframes marqueeLeft {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-50%, 0, 0); }
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    100% {
+      transform: translate3d(-50%, 0, 0);
+    }
   }
 
   @keyframes marqueeRight {
-    0% { transform: translate3d(-50%, 0, 0); }
-    100% { transform: translate3d(0, 0, 0); }
+    0% {
+      transform: translate3d(-50%, 0, 0);
+    }
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
   }
 
   .marqueeWrap:hover .marqueeTrack {
@@ -73,7 +88,9 @@ const items = [...techItems, ...techItems];
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 999px;
     flex-shrink: 0;
-    transition: color 200ms var(--ease-out), border-color 200ms var(--ease-out);
+    transition:
+      color 200ms var(--ease-out),
+      border-color 200ms var(--ease-out);
   }
 
   .marqueeItem:hover {

@@ -7,14 +7,20 @@ import GitHubGraph from "../widgets/GitHubGraph";
 <section class="liveDataSection" data-reveal-container="liveData" data-reveal-stagger="100">
   <Container>
     <div class="grid">
-      
       <!-- Spotify Now Playing (React) -->
       <div class="widgetWrapper" data-reveal data-reveal-group="liveData">
         <SpotifyWidget client:only="react" />
       </div>
 
       <!-- GitHub Activity Graph -->
-      <a href="https://github.com/irisnikita" target="_blank" rel="noopener noreferrer" class="widget githubWidget magnet" data-reveal data-reveal-group="liveData">
+      <a
+        href="https://github.com/irisnikita"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="widget githubWidget magnet"
+        data-reveal
+        data-reveal-group="liveData"
+      >
         <div class="btnInner">
           <div class="widgetHeader flex-between">
             <div>
@@ -28,7 +34,6 @@ import GitHubGraph from "../widgets/GitHubGraph";
           </div>
         </div>
       </a>
-
     </div>
   </Container>
 </section>
@@ -59,7 +64,9 @@ import GitHubGraph from "../widgets/GitHubGraph";
     display: flex;
     flex-direction: column;
     gap: 20px;
-    transition: background var(--dur-med) var(--ease-out), border-color var(--dur-med) var(--ease-out);
+    transition:
+      background var(--dur-med) var(--ease-out),
+      border-color var(--dur-med) var(--ease-out);
     text-decoration: none;
     color: var(--c-text);
   }
@@ -78,7 +85,7 @@ import GitHubGraph from "../widgets/GitHubGraph";
     display: block;
     padding: 0; /* padding moves to btnInner */
   }
-  
+
   .githubWidget .btnInner {
     --ix: 0;
     --iy: 0;
@@ -110,12 +117,14 @@ import GitHubGraph from "../widgets/GitHubGraph";
     align-items: center;
     width: 100%;
   }
-  
+
   .arrow {
     opacity: 0.5;
-    transition: transform var(--dur-quick) var(--ease-out), opacity var(--dur-quick) var(--ease-out);
+    transition:
+      transform var(--dur-quick) var(--ease-out),
+      opacity var(--dur-quick) var(--ease-out);
   }
-  
+
   .githubWidget:hover .arrow {
     transform: translate3d(2px, -2px, 0);
     opacity: 1;
@@ -135,7 +144,7 @@ import GitHubGraph from "../widgets/GitHubGraph";
     overflow: hidden;
     position: relative;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-    background: rgba(255,255,255,0.05); /* Placeholder */
+    background: rgba(255, 255, 255, 0.05); /* Placeholder */
   }
 
   .artImg {
@@ -153,13 +162,15 @@ import GitHubGraph from "../widgets/GitHubGraph";
     box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.5);
     pointer-events: none;
   }
-  
+
   .albumArt {
     border-radius: 50%; /* vinyl look */
   }
 
   @keyframes spin {
-    100% { transform: rotate(360deg); }
+    100% {
+      transform: rotate(360deg);
+    }
   }
 
   .trackInfo {
@@ -201,14 +212,30 @@ import GitHubGraph from "../widgets/GitHubGraph";
     animation: bounce 1s ease-in-out infinite alternate;
   }
 
-  .bar:nth-child(1) { animation-delay: 0.1s; height: 60%; }
-  .bar:nth-child(2) { animation-delay: 0.4s; height: 100%; }
-  .bar:nth-child(3) { animation-delay: 0.2s; height: 80%; }
-  .bar:nth-child(4) { animation-delay: 0.5s; height: 40%; }
+  .bar:nth-child(1) {
+    animation-delay: 0.1s;
+    height: 60%;
+  }
+  .bar:nth-child(2) {
+    animation-delay: 0.4s;
+    height: 100%;
+  }
+  .bar:nth-child(3) {
+    animation-delay: 0.2s;
+    height: 80%;
+  }
+  .bar:nth-child(4) {
+    animation-delay: 0.5s;
+    height: 40%;
+  }
 
   @keyframes bounce {
-    0% { height: 20%; }
-    100% { height: 100%; }
+    0% {
+      height: 20%;
+    }
+    100% {
+      height: 100%;
+    }
   }
 
   /* Github Chart */
@@ -221,7 +248,7 @@ import GitHubGraph from "../widgets/GitHubGraph";
     margin-inline: -12px; /* Pull to edges slightly */
     padding-inline: 12px;
   }
-  
+
   .githubContent::-webkit-scrollbar {
     display: none;
   }
@@ -232,7 +259,7 @@ import GitHubGraph from "../widgets/GitHubGraph";
     height: auto;
     filter: drop-shadow(0 0 8px rgba(0, 229, 255, 0.1));
   }
-  
+
   @media (prefers-reduced-motion: reduce) {
     .artImg {
       animation: none;

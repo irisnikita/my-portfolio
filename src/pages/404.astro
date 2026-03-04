@@ -6,20 +6,12 @@ import Button from "../components/ui/Button.astro";
 // A playful 404 page featuring a simple Canvas Pong game.
 ---
 
-<BaseLayout
-  title="404 — Trang không tồn tại"
-  description="Lạc đường rồi? Chơi một ván Pong nhé."
->
-  <Section 
-    id="not-found" 
-    title="404" 
-    eyebrow="Oh no..."
-    class="page-404"
-  >
+<BaseLayout title="404 — Trang không tồn tại" description="Lạc đường rồi? Chơi một ván Pong nhé.">
+  <Section id="not-found" title="404" eyebrow="Oh no..." class="page-404">
     <div class="wrap content-center">
       <h1 class="h1">You look lost.</h1>
       <p class="p">The page you are looking for has been moved or doesn't exist.</p>
-      
+
       <div class="game-container" aria-label="A playable game of Pong">
         <canvas id="pong-canvas" width="600" height="300"></canvas>
         <div class="game-overlay" id="pong-overlay">
@@ -37,11 +29,11 @@ import Button from "../components/ui/Button.astro";
 
 <script>
   function initPong() {
-    const canvas = document.getElementById('pong-canvas') as HTMLCanvasElement;
-    const overlay = document.getElementById('pong-overlay');
+    const canvas = document.getElementById("pong-canvas") as HTMLCanvasElement;
+    const overlay = document.getElementById("pong-overlay");
     if (!canvas || !overlay) return;
-    
-    const ctx = canvas.getContext('2d');
+
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     // State
@@ -53,7 +45,7 @@ import Button from "../components/ui/Button.astro";
       scorePlayer: 0,
       scoreAI: 0,
       width: 600,
-      height: 300
+      height: 300,
     };
 
     const paddle1 = { x: 20, y: 110, w: 10, h: 80, speed: 400, dy: 0 };
@@ -106,22 +98,28 @@ import Button from "../components/ui/Button.astro";
 
       // Paddle collisions
       // Player (Left)
-      if (ball.x - ball.radius < paddle1.x + paddle1.w && 
-          ball.y > paddle1.y && ball.y < paddle1.y + paddle1.h &&
-          ball.dx < 0) {
+      if (
+        ball.x - ball.radius < paddle1.x + paddle1.w &&
+        ball.y > paddle1.y &&
+        ball.y < paddle1.y + paddle1.h &&
+        ball.dx < 0
+      ) {
         ball.dx *= -1.1; // speed up slightly
         // Add spin based on where it hit
-        const hitPoint = ball.y - (paddle1.y + paddle1.h/2);
+        const hitPoint = ball.y - (paddle1.y + paddle1.h / 2);
         ball.dy += hitPoint * 2;
         ball.x = paddle1.x + paddle1.w + ball.radius; // avoid getting stuck
       }
 
       // AI (Right)
-      if (ball.x + ball.radius > paddle2.x && 
-          ball.y > paddle2.y && ball.y < paddle2.y + paddle2.h &&
-          ball.dx > 0) {
+      if (
+        ball.x + ball.radius > paddle2.x &&
+        ball.y > paddle2.y &&
+        ball.y < paddle2.y + paddle2.h &&
+        ball.dx > 0
+      ) {
         ball.dx *= -1.1;
-        const hitPoint = ball.y - (paddle2.y + paddle2.h/2);
+        const hitPoint = ball.y - (paddle2.y + paddle2.h / 2);
         ball.dy += hitPoint * 2;
         ball.x = paddle2.x - ball.radius;
       }
@@ -139,11 +137,11 @@ import Button from "../components/ui/Button.astro";
     function draw() {
       // Fetch CSS variables for colors (so it matches current vibe)
       const rootStyles = getComputedStyle(document.documentElement);
-      const cyanHex = rootStyles.getPropertyValue('--c-neon-cyan').trim() || '#00e5ff';
-      const magHex = rootStyles.getPropertyValue('--c-neon-magenta').trim() || '#ff2bd6';
-      
+      const cyanHex = rootStyles.getPropertyValue("--c-neon-cyan").trim() || "#00e5ff";
+      const magHex = rootStyles.getPropertyValue("--c-neon-magenta").trim() || "#ff2bd6";
+
       // Clear
-      ctx!.fillStyle = 'rgba(0,0,0,0.5)';
+      ctx!.fillStyle = "rgba(0,0,0,0.5)";
       ctx!.fillRect(0, 0, game.width, game.height);
 
       // Draw middle dashed line
@@ -151,7 +149,7 @@ import Button from "../components/ui/Button.astro";
       ctx!.beginPath();
       ctx!.moveTo(game.width / 2, 0);
       ctx!.lineTo(game.width / 2, game.height);
-      ctx!.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx!.strokeStyle = "rgba(255,255,255,0.1)";
       ctx!.stroke();
       ctx!.setLineDash([]); // reset
 
@@ -164,16 +162,16 @@ import Button from "../components/ui/Button.astro";
       ctx!.fillRect(paddle2.x, paddle2.y, paddle2.w, paddle2.h);
 
       // Ball (White)
-      ctx!.fillStyle = '#ffffff';
+      ctx!.fillStyle = "#ffffff";
       ctx!.beginPath();
       ctx!.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
       ctx!.fill();
 
       // Scores
-      ctx!.font = '40px monospace';
-      ctx!.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx!.font = "40px monospace";
+      ctx!.fillStyle = "rgba(255,255,255,0.3)";
       ctx!.fillText(game.scorePlayer.toString(), game.width / 4, 60);
-      ctx!.fillText(game.scoreAI.toString(), game.width * 3 / 4, 60);
+      ctx!.fillText(game.scoreAI.toString(), (game.width * 3) / 4, 60);
     }
 
     function loop(time: number) {
@@ -194,7 +192,7 @@ import Button from "../components/ui/Button.astro";
     function startGame() {
       if (isPlaying) return;
       isPlaying = true;
-      overlay!.style.display = 'none';
+      overlay!.style.display = "none";
       if (!animationId) {
         lastTime = performance.now();
         loop(performance.now());
@@ -209,26 +207,26 @@ import Button from "../components/ui/Button.astro";
 
     // Keyboard & Mouse listeners
     const onKeydown = (e: KeyboardEvent) => {
-      if (e.code === 'Space' && !isPlaying) {
+      if (e.code === "Space" && !isPlaying) {
         e.preventDefault();
         startGame();
       }
-      if (e.key.toLowerCase() === 'w') keys.w = true;
-      if (e.key.toLowerCase() === 's') keys.s = true;
+      if (e.key.toLowerCase() === "w") keys.w = true;
+      if (e.key.toLowerCase() === "s") keys.s = true;
     };
 
     const onKeyup = (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'w') keys.w = false;
-      if (e.key.toLowerCase() === 's') keys.s = false;
+      if (e.key.toLowerCase() === "w") keys.w = false;
+      if (e.key.toLowerCase() === "s") keys.s = false;
     };
 
     const onMouseMove = (e: MouseEvent) => {
       if (!isPlaying) return;
-      
+
       const rect = canvas.getBoundingClientRect();
       const scaleY = game.height / rect.height;
       const yClick = (e.clientY - rect.top) * scaleY;
-      
+
       paddle1.y = yClick - paddle1.h / 2;
       paddle1.y = Math.max(0, Math.min(game.height - paddle1.h, paddle1.y));
     };
@@ -236,22 +234,22 @@ import Button from "../components/ui/Button.astro";
     const onTouchMove = (e: TouchEvent) => {
       if (!isPlaying || !e.touches[0]) return;
       e.preventDefault(); // Prevent scrolling while playing
-      
+
       const rect = canvas.getBoundingClientRect();
       const scaleY = game.height / rect.height;
       const yClick = (e.touches[0].clientY - rect.top) * scaleY;
-      
+
       paddle1.y = yClick - paddle1.h / 2;
       paddle1.y = Math.max(0, Math.min(game.height - paddle1.h, paddle1.y));
     };
 
-    window.addEventListener('keydown', onKeydown);
-    window.addEventListener('keyup', onKeyup);
-    canvas.addEventListener('mousemove', onMouseMove);
-    canvas.addEventListener('touchmove', onTouchMove, { passive: false });
-    
+    window.addEventListener("keydown", onKeydown);
+    window.addEventListener("keyup", onKeyup);
+    canvas.addEventListener("mousemove", onMouseMove);
+    canvas.addEventListener("touchmove", onTouchMove, { passive: false });
+
     // Allow clicking overlay to start
-    overlay.addEventListener('click', () => {
+    overlay.addEventListener("click", () => {
       if (!isPlaying) startGame();
     });
 
@@ -260,10 +258,10 @@ import Button from "../components/ui/Button.astro";
 
     (window as unknown as { _cleanupPong?: () => void })._cleanupPong = () => {
       stopGame();
-      window.removeEventListener('keydown', onKeydown);
-      window.removeEventListener('keyup', onKeyup);
-      canvas.removeEventListener('mousemove', onMouseMove);
-      canvas.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener("keydown", onKeydown);
+      window.removeEventListener("keyup", onKeyup);
+      canvas.removeEventListener("mousemove", onMouseMove);
+      canvas.removeEventListener("touchmove", onTouchMove);
     };
   }
 
@@ -273,10 +271,10 @@ import Button from "../components/ui/Button.astro";
     initPong();
   };
 
-  document.addEventListener('astro:page-load', runInit);
-  if (typeof window !== 'undefined') {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', runInit);
+  document.addEventListener("astro:page-load", runInit);
+  if (typeof window !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", runInit);
     } else {
       runInit();
     }
@@ -322,7 +320,7 @@ import Button from "../components/ui/Button.astro";
     overflow: hidden;
     border: 1px solid var(--c-border);
     background: #000;
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
     max-width: 100%;
   }
 
@@ -331,13 +329,13 @@ import Button from "../components/ui/Button.astro";
     max-width: 100%;
     height: auto;
     /* Maintain aspect ratio natively on responsive */
-    aspect-ratio: 2 / 1; 
+    aspect-ratio: 2 / 1;
   }
 
   .game-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
     display: flex;
     flex-direction: column;
@@ -361,8 +359,8 @@ import Button from "../components/ui/Button.astro";
   }
 
   kbd {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     padding: 2px 8px;
     font-family: ui-monospace, monospace;

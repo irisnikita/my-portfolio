@@ -22,20 +22,21 @@ const resolvedMailto = mailto ?? defaultMailto;
 
 const socials = [
   { label: "GitHub", href: site.socials.githubUrl ?? import.meta.env.PUBLIC_GITHUB_URL ?? null },
-  { label: "LinkedIn", href: site.socials.linkedinUrl ?? import.meta.env.PUBLIC_LINKEDIN_URL ?? null, todo: true },
+  {
+    label: "LinkedIn",
+    href: site.socials.linkedinUrl ?? import.meta.env.PUBLIC_LINKEDIN_URL ?? null,
+    todo: true,
+  },
   { label: "X", href: site.socials.xUrl ?? import.meta.env.PUBLIC_X_URL ?? null },
 ];
 
 const socialsReady = socials.filter((x) => typeof x.href === "string" && x.href.length > 0);
 ---
 
-<Section
-  title={title}
-  class={"contactSection" + (compact ? " isCompact" : "")}
->
+<Section title={title} class={"contactSection" + (compact ? " isCompact" : "")}>
   <div id={id} class="wrap">
     <LiquidText text="Let's Talk" />
-    
+
     <p class="p">{description}</p>
 
     <ul class="meta" aria-label="Availability">
@@ -58,13 +59,17 @@ const socialsReady = socials.filter((x) => typeof x.href === "string" && x.href.
       <Button href="/projects" variant="ghost" magnet={false}>View Projects</Button>
     </div>
 
-    {socialsReady.length > 0 && (
-      <div class="socials" aria-label="Social links">
-        {socialsReady.map((s) => (
-          <a class="socialLink" href={s.href} target="_blank" rel="noreferrer">{s.label}</a>
-        ))}
-      </div>
-    )}
+    {
+      socialsReady.length > 0 && (
+        <div class="socials" aria-label="Social links">
+          {socialsReady.map((s) => (
+            <a class="socialLink" href={s.href} target="_blank" rel="noreferrer">
+              {s.label}
+            </a>
+          ))}
+        </div>
+      )
+    }
   </div>
 </Section>
 
@@ -90,7 +95,7 @@ const socialsReady = socials.filter((x) => typeof x.href === "string" && x.href.
     list-style: none;
     display: grid;
     gap: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.03);
     border-radius: 14px;
   }

@@ -16,7 +16,7 @@ import TestimonialsSection from "../sections/TestimonialsSection.astro";
 import { site } from "../../data/site";
 import { getCollection } from "astro:content";
 
-import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "../../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
@@ -34,8 +34,8 @@ const featured = allProjects
   <section class="hero">
     <NeonGridParallax />
     <FloatingParticles count={24} />
-    <div class="vignette" />
-    <div class="grain" />
+    <div class="vignette"></div>
+    <div class="grain"></div>
 
     <Container>
       <div class="heroInner">
@@ -46,18 +46,23 @@ const featured = allProjects
           <h1 class="h1" data-reveal data-reveal-delay="80">
             <span class="typingWrap">
               <span class="typingText" data-scramble>{site.name}</span>
-              <span class="cursor" aria-hidden="true" />
+              <span class="cursor" aria-hidden="true"></span>
             </span>
           </h1>
-          <p class="sub" data-reveal data-reveal-delay="200">{t('hero.bio')}</p>
+          <p class="sub" data-reveal data-reveal-delay="200">{t("hero.bio")}</p>
           <p class="location" data-reveal data-reveal-delay="280">{site.location}</p>
 
           <div class="ctaRow" data-reveal data-reveal-delay="380">
-            <Button href={translatePath('/projects')} variant="primary">{t('hero.cta')}</Button>
-            <Button href={translatePath('/#contact')} variant="ghost">{t('hero.contact')}</Button>
+            <Button href={translatePath("/projects")} variant="primary">{t("hero.cta")}</Button>
+            <Button href={translatePath("/#contact")} variant="ghost">{t("hero.contact")}</Button>
           </div>
 
-          <ul class="proof" aria-label="Proof points" data-reveal-container="heroProof" data-reveal-stagger="90">
+          <ul
+            class="proof"
+            aria-label="Proof points"
+            data-reveal-container="heroProof"
+            data-reveal-stagger="90"
+          >
             <li data-reveal data-reveal-group="proof">{site.title}</li>
             <li data-reveal data-reveal-group="proof">{site.location}</li>
             <li data-reveal data-reveal-group="proof">Performance-first</li>
@@ -79,22 +84,24 @@ const featured = allProjects
   <GlowDivider />
 
   <!-- Featured Projects -->
-  <Section eyebrow={t('nav.projects')} title={t('stats.projects')}>
+  <Section eyebrow={t("nav.projects")} title={t("stats.projects")}>
     <div class="featuredGrid" data-reveal-container="featured" data-reveal-stagger="120">
-      {featured.map((project, i) => (
-        <div data-reveal data-reveal-group="feat">
-          <ProjectCard
-            title={project.data.title}
-            summary={project.data.summary}
-            slug={project.id}
-            tags={project.data.tags}
-            index={i}
-          />
-        </div>
-      ))}
+      {
+        featured.map((project, i) => (
+          <div data-reveal data-reveal-group="feat">
+            <ProjectCard
+              title={project.data.title}
+              summary={project.data.summary}
+              slug={project.id}
+              tags={project.data.tags}
+              index={i}
+            />
+          </div>
+        ))
+      }
     </div>
     <div class="viewAll" data-reveal>
-      <Button href={translatePath('/projects')} variant="ghost">{t('hero.viewAll')} →</Button>
+      <Button href={translatePath("/projects")} variant="ghost">{t("hero.viewAll")} →</Button>
     </div>
   </Section>
 
@@ -156,7 +163,9 @@ const featured = allProjects
   }
 
   @keyframes typingReveal {
-    to { max-width: 100%; }
+    to {
+      max-width: 100%;
+    }
   }
 
   .cursor {
@@ -170,8 +179,13 @@ const featured = allProjects
   }
 
   @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
   }
 
   .sub {
@@ -206,11 +220,13 @@ const featured = allProjects
   .proof li {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.03);
     padding: 7px 10px;
     border-radius: 999px;
-    transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+    transition:
+      border-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out);
   }
 
   .proof li:hover {

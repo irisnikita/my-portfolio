@@ -36,6 +36,7 @@
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-github-calendar": "^5.0.5",
+    "react-simple-code-editor": "^0.14.1",
     "tailwindcss": "^4.2.1",
     "three": "^0.183.1",
     "use-lanyard": "^1.7.0"
@@ -46,6 +47,7 @@
     "@eslint/js": "^9.39.3",
     "@tailwindcss/typography": "^0.5.19",
     "@types/matter-js": "^0.20.2",
+    "@types/prismjs": "^1.26.6",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-astro": "^1.6.0",

@@ -13,31 +13,31 @@
 </div>
 
 <script>
-  import * as THREE from 'three';
-  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+  import * as THREE from "three";
+  import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
   function initAvatar() {
-    const container = document.getElementById('avatar-container');
-    const canvas = document.getElementById('animeAvatarCanvas') as HTMLCanvasElement;
-    const loading = document.getElementById('avatar-loading');
+    const container = document.getElementById("avatar-container");
+    const canvas = document.getElementById("animeAvatarCanvas") as HTMLCanvasElement;
+    const loading = document.getElementById("avatar-loading");
     if (!container || !canvas) return;
 
     // Only init once (prevents double init on Astro view transitions)
-    if (container.hasAttribute('data-init')) return;
-    container.setAttribute('data-init', 'true');
+    if (container.hasAttribute("data-init")) return;
+    container.setAttribute("data-init", "true");
 
     // 1. Scene Setup
     const scene = new THREE.Scene();
-    
+
     // Transparent background
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     const rect = container.getBoundingClientRect();
     renderer.setSize(rect.width, rect.height);
-    
+
     const camera = new THREE.PerspectiveCamera(45, rect.width / rect.height, 0.1, 100);
     // Adjusted camera position depending on model height (will adjust after load)
-    camera.position.set(0, 1.5, 5); 
+    camera.position.set(0, 1.5, 5);
 
     // 2. Lighting (Neon/Cyberpunk vibe)
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -56,7 +56,7 @@
     let headBone: THREE.Object3D | null = null;
     let neckBone: THREE.Object3D | null = null;
     let mixer: THREE.AnimationMixer | null = null;
-    
+
     // Mouse coords targeting
     const target = new THREE.Vector2(0, 0);
     const current = new THREE.Vector2(0, 0);
@@ -64,48 +64,54 @@
     // 4. Load the GLTF/VRM Model
     const loader = new GLTFLoader();
     // Using the placeholder we downloaded, or the user's future file:
-    loader.load('/models/avatar.glb', (gltf) => {
-      model = gltf.scene;
-      
-      // Auto-scale and center the model
-      const box = new THREE.Box3().setFromObject(model);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-      
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const desiredHeight = 3.5; // fits well in the canvas
-      const scale = desiredHeight / maxDim;
-      model.scale.set(scale, scale, scale);
-      
-      // Center horizontally and match feet to bottom
-      model.position.set(-center.x * scale, -box.min.y * scale - 1.5, -center.z * scale);
-      
-      // Find head/neck bones exactly or partially matching common names
-      model.traverse((child) => {
-        if ((child as THREE.Bone).isBone) {
-          const name = child.name.toLowerCase();
-          if (name.includes('head')) headBone = child;
-          if (name.includes('neck')) neckBone = child;
-        }
-      });
+    loader.load(
+      "/models/avatar.glb",
+      (gltf) => {
+        model = gltf.scene;
 
-      // If there are animations (like Idle), play them
-      if (gltf.animations && gltf.animations.length > 0) {
-        mixer = new THREE.AnimationMixer(model);
-        // Find an 'idle' animation or just play the first one
-        const idleAnim = gltf.animations.find(a => a.name.toLowerCase().includes('idle')) || gltf.animations[0];
-        if (idleAnim) {
-          mixer.clipAction(idleAnim).play();
-        }
-      }
+        // Auto-scale and center the model
+        const box = new THREE.Box3().setFromObject(model);
+        const center = box.getCenter(new THREE.Vector3());
+        const size = box.getSize(new THREE.Vector3());
 
-      scene.add(model);
-      if (loading) loading.style.opacity = '0';
-      
-    }, undefined, (error) => {
-      console.error('Error loading avatar GLB:', error);
-      if (loading) loading.textContent = 'Model not found (needs /public/models/avatar.glb)';
-    });
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const desiredHeight = 3.5; // fits well in the canvas
+        const scale = desiredHeight / maxDim;
+        model.scale.set(scale, scale, scale);
+
+        // Center horizontally and match feet to bottom
+        model.position.set(-center.x * scale, -box.min.y * scale - 1.5, -center.z * scale);
+
+        // Find head/neck bones exactly or partially matching common names
+        model.traverse((child) => {
+          if ((child as THREE.Bone).isBone) {
+            const name = child.name.toLowerCase();
+            if (name.includes("head")) headBone = child;
+            if (name.includes("neck")) neckBone = child;
+          }
+        });
+
+        // If there are animations (like Idle), play them
+        if (gltf.animations && gltf.animations.length > 0) {
+          mixer = new THREE.AnimationMixer(model);
+          // Find an 'idle' animation or just play the first one
+          const idleAnim =
+            gltf.animations.find((a) => a.name.toLowerCase().includes("idle")) ||
+            gltf.animations[0];
+          if (idleAnim) {
+            mixer.clipAction(idleAnim).play();
+          }
+        }
+
+        scene.add(model);
+        if (loading) loading.style.opacity = "0";
+      },
+      undefined,
+      (error) => {
+        console.error("Error loading avatar GLB:", error);
+        if (loading) loading.textContent = "Model not found (needs /public/models/avatar.glb)";
+      },
+    );
 
     // 5. Mouse tracking
     const onMouseMove = (e: MouseEvent) => {
@@ -113,7 +119,7 @@
       target.x = (e.clientX / window.innerWidth) * 2 - 1;
       target.y = -(e.clientY / window.innerHeight) * 2 + 1;
     };
-    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener("mousemove", onMouseMove);
 
     // 6. Animation Loop
     const clock = new THREE.Clock();
@@ -135,7 +141,7 @@
           // Clamp the angles so it doesn't break its neck
           const headX = Math.max(-0.5, Math.min(0.5, current.y * 1.5));
           const headY = Math.max(-1.0, Math.min(1.0, -current.x * 1.5));
-          
+
           // Apply rotation (exact axes depend on rigging, but this works for most standard characters)
           headBone.rotation.x = headX;
           headBone.rotation.y = headY;
@@ -158,19 +164,19 @@
       camera.aspect = parentRect.width / parentRect.height;
       camera.updateProjectionMatrix();
     };
-    window.addEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
 
     // Cleanup on view transitions
     (window as any)._cleanupAvatar = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("resize", onResize);
       cancelAnimationFrame(rafId);
       renderer.dispose();
     };
   }
 
   // astro:page-load fires on initial load AND after every ViewTransition
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     if ((window as any)._cleanupAvatar) (window as any)._cleanupAvatar();
     initAvatar();
   });
@@ -184,7 +190,9 @@
     border-radius: 16px;
     background: radial-gradient(circle at center, rgba(0, 229, 255, 0.08), rgba(6, 8, 18, 0.8));
     border: 1px solid rgba(0, 229, 255, 0.2);
-    box-shadow: 0 0 30px rgba(0, 229, 255, 0.1), inset 0 0 20px rgba(255, 43, 214, 0.05);
+    box-shadow:
+      0 0 30px rgba(0, 229, 255, 0.1),
+      inset 0 0 20px rgba(255, 43, 214, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -195,7 +203,7 @@
 
   /* Add an inner glow ring */
   .animeAvatarContainer::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
     border-radius: 16px;
@@ -232,6 +240,8 @@
   }
 
   @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

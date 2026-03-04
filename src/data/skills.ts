@@ -19,35 +19,14 @@ export const skills: SkillCategory[] = [
   },
   {
     category: "Backend",
-    items: [
-      "Node.js",
-      "NestJS",
-      "Express",
-      "REST API",
-      "PostgreSQL",
-      "MongoDB",
-      "Redis",
-    ],
+    items: ["Node.js", "NestJS", "Express", "REST API", "PostgreSQL", "MongoDB", "Redis"],
   },
   {
     category: "Platforms",
-    items: [
-      "Zalo Mini App",
-      "Vercel",
-      "Docker",
-      "AWS (S3, EC2)",
-      "GitHub Actions",
-    ],
+    items: ["Zalo Mini App", "Vercel", "Docker", "AWS (S3, EC2)", "GitHub Actions"],
   },
   {
     category: "Tools & Practices",
-    items: [
-      "Git",
-      "Figma",
-      "Jest / Vitest",
-      "CI/CD",
-      "Agile / Scrum",
-      "Performance Budgeting",
-    ],
+    items: ["Git", "Figma", "Jest / Vitest", "CI/CD", "Agile / Scrum", "Performance Budgeting"],
   },
 ];

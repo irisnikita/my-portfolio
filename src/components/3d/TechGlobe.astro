@@ -1,9 +1,18 @@
 ---
 // TechGlobe — CSS 3D rotating sphere of tech icons
 const icons = [
-  "React", "Next.js", "TS", "NestJS",
-  "Astro", "Node", "Tailwind", "Zalo",
-  "Redis", "Docker", "GraphQL", "Git",
+  "React",
+  "Next.js",
+  "TS",
+  "NestJS",
+  "Astro",
+  "Node",
+  "Tailwind",
+  "Zalo",
+  "Redis",
+  "Docker",
+  "GraphQL",
+  "Git",
 ];
 
 const radius = 140;
@@ -12,31 +21,30 @@ const total = icons.length;
 
 <div class="globeWrap" data-reveal data-reveal-class="reveal-scale">
   <div class="globe" id="techGlobe">
-    {icons.map((icon, i) => {
-      // Fibonacci sphere distribution
-      const phi = Math.acos(1 - 2 * (i + 0.5) / total);
-      const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
+    {
+      icons.map((icon, i) => {
+        // Fibonacci sphere distribution
+        const phi = Math.acos(1 - (2 * (i + 0.5)) / total);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
 
-      const x = Math.round(radius * Math.sin(phi) * Math.cos(theta));
-      const y = Math.round(radius * Math.sin(phi) * Math.sin(theta));
-      const z = Math.round(radius * Math.cos(phi));
+        const x = Math.round(radius * Math.sin(phi) * Math.cos(theta));
+        const y = Math.round(radius * Math.sin(phi) * Math.sin(theta));
+        const z = Math.round(radius * Math.cos(phi));
 
-      return (
-        <span
-          class="globeNode"
-          style={`transform: translate3d(${x}px, ${y}px, ${z}px)`}
-        >
-          {icon}
-        </span>
-      );
-    })}
+        return (
+          <span class="globeNode" style={`transform: translate3d(${x}px, ${y}px, ${z}px)`}>
+            {icon}
+          </span>
+        );
+      })
+    }
   </div>
 </div>
 
 <script>
   function initTechGlobe() {
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-    const globe = document.getElementById('techGlobe');
+    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const globe = document.getElementById("techGlobe");
 
     // Clean up previous instance
     if ((window as any)._cleanupTechGlobe) {
@@ -53,7 +61,10 @@ const total = icons.length;
       let active = !document.hidden;
 
       const spin = () => {
-        if (!active) { raf = requestAnimationFrame(spin); return; }
+        if (!active) {
+          raf = requestAnimationFrame(spin);
+          return;
+        }
         if (!dragging) {
           angle += velocity;
         }
@@ -65,7 +76,7 @@ const total = icons.length;
         dragging = true;
         dragStartX = e.clientX;
         angleOffset = angle;
-        globe.style.cursor = 'grabbing';
+        globe.style.cursor = "grabbing";
       };
 
       const onPointerMove = (e: PointerEvent) => {
@@ -76,36 +87,42 @@ const total = icons.length;
 
       const onPointerUp = () => {
         dragging = false;
-        if (globe) globe.style.cursor = 'grab';
+        if (globe) globe.style.cursor = "grab";
       };
 
-      const onMouseEnter = () => { if (!dragging) velocity = 0.05; };
-      const onMouseLeave = () => { velocity = 0.15; };
-      const onVisChange = () => { active = !document.hidden; };
+      const onMouseEnter = () => {
+        if (!dragging) velocity = 0.05;
+      };
+      const onMouseLeave = () => {
+        velocity = 0.15;
+      };
+      const onVisChange = () => {
+        active = !document.hidden;
+      };
 
-      globe.addEventListener('pointerdown', onPointerDown);
-      window.addEventListener('pointermove', onPointerMove);
-      window.addEventListener('pointerup', onPointerUp);
-      globe.addEventListener('mouseenter', onMouseEnter);
-      globe.addEventListener('mouseleave', onMouseLeave);
-      document.addEventListener('visibilitychange', onVisChange);
+      globe.addEventListener("pointerdown", onPointerDown);
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerUp);
+      globe.addEventListener("mouseenter", onMouseEnter);
+      globe.addEventListener("mouseleave", onMouseLeave);
+      document.addEventListener("visibilitychange", onVisChange);
 
       raf = requestAnimationFrame(spin);
 
       (window as any)._cleanupTechGlobe = () => {
         cancelAnimationFrame(raf);
-        globe.removeEventListener('pointerdown', onPointerDown);
-        window.removeEventListener('pointermove', onPointerMove);
-        window.removeEventListener('pointerup', onPointerUp);
-        globe.removeEventListener('mouseenter', onMouseEnter);
-        globe.removeEventListener('mouseleave', onMouseLeave);
-        document.removeEventListener('visibilitychange', onVisChange);
+        globe.removeEventListener("pointerdown", onPointerDown);
+        window.removeEventListener("pointermove", onPointerMove);
+        window.removeEventListener("pointerup", onPointerUp);
+        globe.removeEventListener("mouseenter", onMouseEnter);
+        globe.removeEventListener("mouseleave", onMouseLeave);
+        document.removeEventListener("visibilitychange", onVisChange);
       };
     }
   }
 
   // astro:page-load fires on initial load AND after every ViewTransition
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     initTechGlobe();
   });
 </script>
@@ -144,7 +161,10 @@ const total = icons.length;
     border-radius: 8px;
     padding: 5px 4px;
     backface-visibility: hidden;
-    transition: color 150ms, border-color 150ms, box-shadow 150ms;
+    transition:
+      color 150ms,
+      border-color 150ms,
+      box-shadow 150ms;
   }
 
   .globeNode:hover {

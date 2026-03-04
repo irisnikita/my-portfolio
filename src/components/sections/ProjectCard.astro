@@ -15,10 +15,10 @@ const { title, summary, slug, tags = [], index = 0 } = Astro.props;
 
 // Placeholders until real images are added
 const images = [
-  'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop', // liquid
-  'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop', // neon
-  'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=400&auto=format&fit=crop', // matrix
-  'https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=400&auto=format&fit=crop', // space
+  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop", // liquid
+  "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=400&auto=format&fit=crop", // neon
+  "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=400&auto=format&fit=crop", // matrix
+  "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?q=80&w=400&auto=format&fit=crop", // space
 ];
 const posterSrc = images[index % images.length];
 ---
@@ -26,23 +26,21 @@ const posterSrc = images[index % images.length];
 <a href={`/projects/${slug}`} class="projectCardLink">
   <Card>
     <div class="projectCard">
-      <div
-        class="poster"
-        aria-hidden="true"
-        transition:name={`project-poster-${slug}`}
-      >
+      <div class="poster" aria-hidden="true" transition:name={`project-poster-${slug}`}>
         <WebGlHoverImage src={posterSrc} alt={title} />
       </div>
       <div class="body">
         <h3 class="title" transition:name={`project-title-${slug}`}>{title}</h3>
         <p class="summary">{summary}</p>
-        {tags.length > 0 && (
-          <div class="tags">
-            {tags.slice(0, 3).map((tag, i) => (
-              <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
-            ))}
-          </div>
-        )}
+        {
+          tags.length > 0 && (
+            <div class="tags">
+              {tags.slice(0, 3).map((tag, i) => (
+                <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
+              ))}
+            </div>
+          )
+        }
       </div>
     </div>
   </Card>
@@ -93,8 +91,12 @@ const posterSrc = images[index % images.length];
   }
 
   @keyframes posterSweep {
-    0% { transform: translate3d(-60%, -10%, 0); }
-    100% { transform: translate3d(60%, 10%, 0); }
+    0% {
+      transform: translate3d(-60%, -10%, 0);
+    }
+    100% {
+      transform: translate3d(60%, 10%, 0);
+    }
   }
 
   .body {

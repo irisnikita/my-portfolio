@@ -76,7 +76,7 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
   // Settings: Load from localStorage or use aggressive defaults
   const [maxSizeMB, setMaxSizeMB] = useState("1");
   const [maxWidthOrHeight, setMaxWidthOrHeight] = useState("1920");
-  const [outputFormat, setOutputFormat] = useState<'webp' | 'original' | 'jpeg'>('webp');
+  const [outputFormat, setOutputFormat] = useState<"webp" | "original" | "jpeg">("webp");
   const [renamePattern, setRenamePattern] = useState("");
 
   const [showSettings, setShowSettings] = useState(false);
@@ -86,7 +86,7 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
   useEffect(() => {
     const savedSize = localStorage.getItem("ic-maxSizeMB");
     const savedDim = localStorage.getItem("ic-maxWidthOrHeight");
-    const savedFormat = localStorage.getItem("ic-outputFormat") as 'webp' | 'original' | 'jpeg';
+    const savedFormat = localStorage.getItem("ic-outputFormat") as "webp" | "original" | "jpeg";
     const savedPattern = localStorage.getItem("ic-renamePattern");
     if (savedSize) setMaxSizeMB(savedSize);
     if (savedDim) setMaxWidthOrHeight(savedDim);
@@ -109,15 +109,14 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
           ...currentOpts,
           onProgress: (progress: number) => {
             setTasks((prev) =>
-              prev.map((t) =>
-                t.id === task.id ? { ...t, progress, status: "compressing" } : t,
-              ),
+              prev.map((t) => (t.id === task.id ? { ...t, progress, status: "compressing" } : t)),
             );
           },
         });
 
         const saved = (
-          ((task.originalFile.size - compressed.size) / task.originalFile.size) * 100
+          ((task.originalFile.size - compressed.size) / task.originalFile.size) *
+          100
         ).toFixed(1);
 
         setTasks((prev) =>
@@ -137,9 +136,7 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
         console.error(err);
         setTasks((prev) =>
           prev.map((t) =>
-            t.id === task.id
-              ? { ...t, status: "error", error: dict.errorCompress }
-              : t,
+            t.id === task.id ? { ...t, status: "error", error: dict.errorCompress } : t,
           ),
         );
       }
@@ -147,72 +144,89 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
     [dict.errorCompress],
   );
 
-  const processFiles = useCallback((filesList: FileList | File[] | { file: File; path?: string }[]) => {
-    const newTasks: CompressTask[] = [];
+  const processFiles = useCallback(
+    (filesList: FileList | File[] | { file: File; path?: string }[]) => {
+      const newTasks: CompressTask[] = [];
 
-    let itemsToProcess = [];
-    if (filesList instanceof FileList || (Array.isArray(filesList) && filesList[0] instanceof File)) {
-      itemsToProcess = Array.from(filesList as File[] | FileList).map((f) => ({ file: f, path: "" }));
-    } else {
-      itemsToProcess = filesList as { file: File; path?: string }[];
-    }
-
-    itemsToProcess.forEach(({ file, path }) => {
-      if (!file.type.startsWith("image/")) {
-        alert(dict.errorType + ": " + file.name);
-        return;
+      let itemsToProcess = [];
+      if (
+        filesList instanceof FileList ||
+        (Array.isArray(filesList) && filesList[0] instanceof File)
+      ) {
+        itemsToProcess = Array.from(filesList as File[] | FileList).map((f) => ({
+          file: f,
+          path: "",
+        }));
+      } else {
+        itemsToProcess = filesList as { file: File; path?: string }[];
       }
-      const id = Math.random().toString(36).substr(2, 9);
-      newTasks.push({
-        id,
-        originalFile: file,
-        originalUrl: URL.createObjectURL(file),
-        compressedFile: null,
-        compressedUrl: null,
-        status: "ready",
-        progress: 0,
-        relativePath: path,
+
+      itemsToProcess.forEach(({ file, path }) => {
+        if (!file.type.startsWith("image/")) {
+          alert(dict.errorType + ": " + file.name);
+          return;
+        }
+        const id = Math.random().toString(36).substr(2, 9);
+        newTasks.push({
+          id,
+          originalFile: file,
+          originalUrl: URL.createObjectURL(file),
+          compressedFile: null,
+          compressedUrl: null,
+          status: "ready",
+          progress: 0,
+          relativePath: path,
+        });
       });
-    });
 
-    if (newTasks.length > 0) {
-      setTasks((prev) => [...prev, ...newTasks]);
+      if (newTasks.length > 0) {
+        setTasks((prev) => [...prev, ...newTasks]);
 
-      const options = {
-        maxSizeMB: parseFloat(maxSizeMB) || 0.8,
-        maxWidthOrHeight: parseInt(maxWidthOrHeight) || 2560,
-        useWebWorker: true,
-        initialQuality: 0.8, // Aggressive high-quality reduction
-        alwaysKeepResolution: true, // Don't shrink dimensions unless absolutely forced by maxSizeMB
-        ...(outputFormat === 'webp' ? { fileType: "image/webp" } : outputFormat === 'jpeg' ? { fileType: "image/jpeg" } : {}),
-      };
+        const options = {
+          maxSizeMB: parseFloat(maxSizeMB) || 0.8,
+          maxWidthOrHeight: parseInt(maxWidthOrHeight) || 2560,
+          useWebWorker: true,
+          initialQuality: 0.8, // Aggressive high-quality reduction
+          alwaysKeepResolution: true, // Don't shrink dimensions unless absolutely forced by maxSizeMB
+          ...(outputFormat === "webp"
+            ? { fileType: "image/webp" }
+            : outputFormat === "jpeg"
+              ? { fileType: "image/jpeg" }
+              : {}),
+        };
 
-      newTasks.forEach((task) => {
-        handleCompress(task, options);
-      });
-    }
-  }, [outputFormat, maxSizeMB, maxWidthOrHeight, dict.errorType, handleCompress]);
+        newTasks.forEach((task) => {
+          handleCompress(task, options);
+        });
+      }
+    },
+    [outputFormat, maxSizeMB, maxWidthOrHeight, dict.errorType, handleCompress],
+  );
 
   // Global Paste Listener
   useEffect(() => {
     const handleGlobalPaste = (e: ClipboardEvent) => {
       // Don't intercept paste if user is typing in an input/textarea
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      
+
       if (!e.clipboardData) return;
-      
+
       const pastedFiles: File[] = [];
       for (const item of Array.from(e.clipboardData.items)) {
         if (item.type.startsWith("image/")) {
           const file = item.getAsFile();
           if (file) {
             // Give pasted images a default name since clipboard files often lack them
-            const newFile = new File([file], `Pasted Image ${new Date().getTime()}.${file.type.split('/')[1]}`, { type: file.type });
+            const newFile = new File(
+              [file],
+              `Pasted Image ${new Date().getTime()}.${file.type.split("/")[1]}`,
+              { type: file.type },
+            );
             pastedFiles.push(newFile);
           }
         }
       }
-      
+
       if (pastedFiles.length > 0) {
         processFiles(pastedFiles);
       }
@@ -244,8 +258,8 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
     setIsDragActive(false);
 
     if (e.dataTransfer.items) {
-      const items = Array.from(e.dataTransfer.items).filter(item => item.kind === 'file');
-      const filesWithPaths: { file: File, path?: string }[] = [];
+      const items = Array.from(e.dataTransfer.items).filter((item) => item.kind === "file");
+      const filesWithPaths: { file: File; path?: string }[] = [];
 
       const readEntry = async (entry: FileSystemEntry, path = ""): Promise<void> => {
         if (entry.isFile) {
@@ -259,7 +273,7 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
         } else if (entry.isDirectory) {
           const dirEntry = entry as FileSystemDirectoryEntry;
           const dirReader = dirEntry.createReader();
-          
+
           return new Promise<void>((resolve) => {
             const readEntries = () => {
               dirReader.readEntries(async (entries) => {
@@ -278,7 +292,7 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
         }
       };
 
-      const promises = items.map(item => {
+      const promises = items.map((item) => {
         const entry = item.webkitGetAsEntry();
         if (entry) return readEntry(entry);
         return Promise.resolve();
@@ -286,9 +300,8 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
 
       await Promise.all(promises);
       if (filesWithPaths.length > 0) processFiles(filesWithPaths);
-
     } else if (e.dataTransfer.files) {
-      processFiles(Array.from(e.dataTransfer.files).map(f => ({ file: f, path: "" })));
+      processFiles(Array.from(e.dataTransfer.files).map((f) => ({ file: f, path: "" })));
     }
   };
 
@@ -315,17 +328,24 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
     if (!task.compressedFile || !task.compressedUrl) return;
     const link = document.createElement("a");
     link.href = task.compressedUrl;
-    
+
     // Auto Rename Logic
     let baseName = task.originalFile.name.replace(/\.[^/.]+$/, "");
     if (renamePattern) {
-      const taskIndex = tasks.findIndex(t => t.id === task.id) + 1;
-      baseName = renamePattern.replace('{index}', taskIndex.toString());
+      const taskIndex = tasks.findIndex((t) => t.id === task.id) + 1;
+      baseName = renamePattern.replace("{index}", taskIndex.toString());
     } else {
       baseName = `${baseName}-compressed`;
     }
 
-    const extension = task.compressedFile.type === 'image/webp' ? 'webp' : task.compressedFile.type === 'image/jpeg' ? 'jpg' : task.compressedFile.type === 'image/png' ? 'png' : task.originalFile.name.split(".").pop() || "jpg";
+    const extension =
+      task.compressedFile.type === "image/webp"
+        ? "webp"
+        : task.compressedFile.type === "image/jpeg"
+          ? "jpg"
+          : task.compressedFile.type === "image/png"
+            ? "png"
+            : task.originalFile.name.split(".").pop() || "jpg";
     link.download = `${baseName}.${extension}`;
     document.body.appendChild(link);
     link.click();
@@ -340,13 +360,22 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
     doneTasks.forEach((task, index) => {
       let baseName = task.originalFile.name.replace(/\.[^/.]+$/, "");
       if (renamePattern) {
-        baseName = renamePattern.replace('{index}', (index + 1).toString());
+        baseName = renamePattern.replace("{index}", (index + 1).toString());
       } else {
         baseName = `${baseName}-compressed`;
       }
 
-      const extension = task.compressedFile!.type === 'image/webp' ? 'webp' : task.compressedFile!.type === 'image/jpeg' ? 'jpg' : task.compressedFile!.type === 'image/png' ? 'png' : task.originalFile.name.split(".").pop() || "jpg";
-      const zipPath = task.relativePath ? `${task.relativePath}${baseName}.${extension}` : `${baseName}.${extension}`;
+      const extension =
+        task.compressedFile!.type === "image/webp"
+          ? "webp"
+          : task.compressedFile!.type === "image/jpeg"
+            ? "jpg"
+            : task.compressedFile!.type === "image/png"
+              ? "png"
+              : task.originalFile.name.split(".").pop() || "jpg";
+      const zipPath = task.relativePath
+        ? `${task.relativePath}${baseName}.${extension}`
+        : `${baseName}.${extension}`;
       zip.file(zipPath, task.compressedFile!);
     });
 
@@ -369,7 +398,11 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
       useWebWorker: true,
       initialQuality: 0.8,
       alwaysKeepResolution: true,
-      ...(outputFormat === 'webp' ? { fileType: "image/webp" } : outputFormat === 'jpeg' ? { fileType: "image/jpeg" } : {}),
+      ...(outputFormat === "webp"
+        ? { fileType: "image/webp" }
+        : outputFormat === "jpeg"
+          ? { fileType: "image/jpeg" }
+          : {}),
     };
 
     setTasks((prev) =>
@@ -392,8 +425,10 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
   const totalOriginalSize = doneTasks.reduce((acc, t) => acc + t.originalFile.size, 0);
   const totalCompressedSize = doneTasks.reduce((acc, t) => acc + t.compressedFile!.size, 0);
   const totalSavedBytes = Math.max(0, totalOriginalSize - totalCompressedSize);
-  const totalSavingsPct = totalOriginalSize > 0 ? ((totalSavedBytes / totalOriginalSize) * 100).toFixed(1) : "0";
-  const isAllDone = tasks.length > 0 && tasks.every((t) => t.status === "done" || t.status === "error");
+  const totalSavingsPct =
+    totalOriginalSize > 0 ? ((totalSavedBytes / totalOriginalSize) * 100).toFixed(1) : "0";
+  const isAllDone =
+    tasks.length > 0 && tasks.every((t) => t.status === "done" || t.status === "error");
 
   return (
     <div
@@ -423,8 +458,20 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
             <span className="font-semibold text-sm">Settings &amp; Options</span>
           </div>
           <motion.div animate={{ rotate: showSettings ? 180 : 0 }} transition={{ duration: 0.2 }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M4 6L8 10L12 6"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </motion.div>
         </button>
@@ -452,7 +499,9 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
 
                 {/* Max Width/Height */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
-                  <label className="text-sm text-white/60 font-medium">Max width / height (px)</label>
+                  <label className="text-sm text-white/60 font-medium">
+                    Max width / height (px)
+                  </label>
                   <input
                     type="number"
                     value={maxWidthOrHeight}
@@ -465,7 +514,9 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
                   <div className="flex flex-col">
                     <label className="text-sm text-white/60 font-medium">Auto Rename Pattern</label>
-                    <span className="text-[10px] text-white/40 mt-1 uppercase font-mono tracking-wider">Use {'{index}'} for numbering</span>
+                    <span className="text-[10px] text-white/40 mt-1 uppercase font-mono tracking-wider">
+                      Use {"{index}"} for numbering
+                    </span>
                   </div>
                   <input
                     type="text"
@@ -481,25 +532,31 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
                   <label className="text-sm text-white/60 font-medium">Output Format</label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <button
-                      onClick={() => setOutputFormat('webp')}
-                      className={`p-3 rounded-xl text-xs font-semibold transition-all border text-left ${outputFormat === 'webp' ? 'bg-[var(--c-neon-cyan)]/10 border-[var(--c-neon-cyan)] text-[var(--c-neon-cyan)] shadow-[0_0_15px_rgba(0,229,255,0.15)]' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
+                      onClick={() => setOutputFormat("webp")}
+                      className={`p-3 rounded-xl text-xs font-semibold transition-all border text-left ${outputFormat === "webp" ? "bg-[var(--c-neon-cyan)]/10 border-[var(--c-neon-cyan)] text-[var(--c-neon-cyan)] shadow-[0_0_15px_rgba(0,229,255,0.15)]" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"}`}
                     >
                       <div className="mb-1 text-[13px]">Auto / WebP</div>
-                      <span className="font-normal opacity-70 text-[11px] leading-tight block">Smallest size, best for web.</span>
+                      <span className="font-normal opacity-70 text-[11px] leading-tight block">
+                        Smallest size, best for web.
+                      </span>
                     </button>
                     <button
-                      onClick={() => setOutputFormat('original')}
-                      className={`p-3 rounded-xl text-xs font-semibold transition-all border text-left ${outputFormat === 'original' ? 'bg-[var(--c-neon-purple)]/10 border-[var(--c-neon-purple)] text-[var(--c-neon-purple)] shadow-[0_0_15px_rgba(255,43,214,0.15)]' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
+                      onClick={() => setOutputFormat("original")}
+                      className={`p-3 rounded-xl text-xs font-semibold transition-all border text-left ${outputFormat === "original" ? "bg-[var(--c-neon-purple)]/10 border-[var(--c-neon-purple)] text-[var(--c-neon-purple)] shadow-[0_0_15px_rgba(255,43,214,0.15)]" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"}`}
                     >
                       <div className="mb-1 text-[13px]">Keep Original</div>
-                      <span className="font-normal opacity-70 text-[11px] leading-tight block">Format preserved (PNG/JPG).</span>
+                      <span className="font-normal opacity-70 text-[11px] leading-tight block">
+                        Format preserved (PNG/JPG).
+                      </span>
                     </button>
                     <button
-                      onClick={() => setOutputFormat('jpeg')}
-                      className={`p-3 rounded-xl text-xs font-semibold transition-all border text-left ${outputFormat === 'jpeg' ? 'bg-[#FF9B00]/10 border-[#FF9B00] text-[#FF9B00] shadow-[0_0_15px_rgba(255,155,0,0.15)]' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'}`}
+                      onClick={() => setOutputFormat("jpeg")}
+                      className={`p-3 rounded-xl text-xs font-semibold transition-all border text-left ${outputFormat === "jpeg" ? "bg-[#FF9B00]/10 border-[#FF9B00] text-[#FF9B00] shadow-[0_0_15px_rgba(255,155,0,0.15)]" : "bg-white/5 border-white/10 text-white/60 hover:bg-white/10"}`}
                     >
                       <div className="mb-1 text-[13px]">Force JPEG</div>
-                      <span className="font-normal opacity-70 text-[11px] leading-tight block">Legacy format support.</span>
+                      <span className="font-normal opacity-70 text-[11px] leading-tight block">
+                        Legacy format support.
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -531,26 +588,37 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
             className="bg-gradient-to-r from-[var(--c-neon-cyan)]/10 to-[var(--c-neon-purple)]/10 border border-[var(--c-neon-cyan)]/30 rounded-2xl p-6 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6"
           >
             <div className="absolute -right-10 -top-10 w-40 h-40 bg-[var(--c-neon-cyan)]/20 blur-[50px] rounded-full pointer-events-none" />
-            
+
             <div className="flex-1 relative z-10 w-full text-center sm:text-left">
-              <h4 className="text-[var(--c-neon-cyan)] text-xl font-bold mb-1">Session Complete 🎉</h4>
-              <p className="text-white/80 text-sm">You processed {doneTasks.length} {doneTasks.length === 1 ? 'image' : 'images'} and saved <strong className="text-white">{totalSavingsPct}%</strong> of storage space.</p>
-              
+              <h4 className="text-[var(--c-neon-cyan)] text-xl font-bold mb-1">
+                Session Complete 🎉
+              </h4>
+              <p className="text-white/80 text-sm">
+                You processed {doneTasks.length} {doneTasks.length === 1 ? "image" : "images"} and
+                saved <strong className="text-white">{totalSavingsPct}%</strong> of storage space.
+              </p>
+
               <div className="mt-5 flex flex-wrap items-center justify-center sm:justify-start gap-x-8 gap-y-3">
                 <div className="flex flex-col">
-                  <span className="text-xs text-white/50 uppercase tracking-wider font-semibold">Original</span>
+                  <span className="text-xs text-white/50 uppercase tracking-wider font-semibold">
+                    Original
+                  </span>
                   <span className="font-mono text-lg">{formatBytes(totalOriginalSize)}</span>
                 </div>
                 <div className="hidden sm:block w-[1px] h-8 bg-white/20" />
                 <div className="flex flex-col">
-                  <span className="text-xs text-white/50 uppercase tracking-wider font-semibold">Compressed</span>
+                  <span className="text-xs text-white/50 uppercase tracking-wider font-semibold">
+                    Compressed
+                  </span>
                   <span className="font-mono text-lg">{formatBytes(totalCompressedSize)}</span>
                 </div>
               </div>
             </div>
 
             <div className="w-full sm:w-auto shrink-0 bg-black/40 border border-white/10 rounded-xl p-5 flex flex-col items-center justify-center min-w-[150px] relative z-10 shadow-xl">
-              <span className="text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">Total Saved</span>
+              <span className="text-xs text-white/50 uppercase tracking-wider font-semibold mb-1">
+                Total Saved
+              </span>
               <span className="font-mono text-3xl font-extrabold text-[var(--c-neon-cyan)] drop-shadow-[0_0_10px_rgba(0,229,255,0.5)]">
                 {formatBytes(totalSavedBytes)}
               </span>
@@ -589,7 +657,20 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
               {dict.selectFile}
             </button>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-white/40 text-xs sm:text-sm mt-6 sm:mt-8 border border-white/10 w-fit mx-auto px-4 py-2 sm:py-1.5 rounded-2xl sm:rounded-full bg-black/40 text-center">
-              <svg className="hidden sm:block" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <svg
+                className="hidden sm:block"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
               <span>{dict.pasteInstruction}</span>
             </div>
             <p className="text-[10px] md:text-sm font-mono text-white/40 mt-4 md:mt-6 tracking-widest uppercase text-center">
@@ -608,7 +689,9 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
               <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
                 <div className="text-sm font-medium">
                   <span className="text-white/60">Processing: </span>
-                  <span className="font-mono ml-1">{tasks.length} {tasks.length === 1 ? 'file' : 'files'}</span>
+                  <span className="font-mono ml-1">
+                    {tasks.length} {tasks.length === 1 ? "file" : "files"}
+                  </span>
                 </div>
               </div>
 
@@ -765,7 +848,7 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
             task={compareTask}
             onClose={() => setCompareTask(null)}
             onApply={(tuned) => {
-              setTasks(prev => prev.map(t => t.id === tuned.id ? tuned : t));
+              setTasks((prev) => prev.map((t) => (t.id === tuned.id ? tuned : t)));
               setCompareTask(null);
             }}
             outputFormat={outputFormat}
@@ -790,17 +873,17 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
 }
 
 // Comparison Modal Component
-const ComparisonModal = ({ 
-  task, 
+const ComparisonModal = ({
+  task,
   onClose,
   onApply,
   outputFormat,
-  maxWH
-}: { 
-  task: CompressTask; 
+  maxWH,
+}: {
+  task: CompressTask;
   onClose: () => void;
   onApply: (t: CompressTask) => void;
-  outputFormat: 'webp' | 'original' | 'jpeg';
+  outputFormat: "webp" | "original" | "jpeg";
   maxWH: number;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -829,15 +912,22 @@ const ComparisonModal = ({
           useWebWorker: true,
           initialQuality: quality,
           alwaysKeepResolution: true,
-          ...(outputFormat === 'webp' ? { fileType: "image/webp" } : outputFormat === 'jpeg' ? { fileType: "image/jpeg" } : {}),
+          ...(outputFormat === "webp"
+            ? { fileType: "image/webp" }
+            : outputFormat === "jpeg"
+              ? { fileType: "image/jpeg" }
+              : {}),
         };
         const compressed = await imageCompression(task.originalFile, options);
         if (isCancelled) return;
-        
+
         const newUrl = URL.createObjectURL(compressed);
-        const saved = (((task.originalFile.size - compressed.size) / task.originalFile.size) * 100).toFixed(1);
-        
-        setTunedTask(prev => {
+        const saved = (
+          ((task.originalFile.size - compressed.size) / task.originalFile.size) *
+          100
+        ).toFixed(1);
+
+        setTunedTask((prev) => {
           if (prev.compressedUrl && prev.compressedUrl !== task.compressedUrl) {
             URL.revokeObjectURL(prev.compressedUrl); // Cleanup previous tuned preview
           }
@@ -845,7 +935,7 @@ const ComparisonModal = ({
             ...prev,
             compressedFile: compressed,
             compressedUrl: newUrl,
-            saving: saved
+            saving: saved,
           };
         });
       } catch (err) {
@@ -866,46 +956,51 @@ const ComparisonModal = ({
 
   const handleDrag = useCallback((e: MouseEvent | TouchEvent) => {
     if (!containerRef.current || !foregroundRef.current || !handleRef.current) return;
-    
+
     if (rafRef.current) cancelAnimationFrame(rafRef.current);
 
     rafRef.current = requestAnimationFrame(() => {
       const rect = containerRef.current!.getBoundingClientRect();
-      const x = 'touches' in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
+      const x = "touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
       const position = Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
-      
+
       // Update DOM directly
       foregroundRef.current!.style.clipPath = `inset(0 ${100 - position}% 0 0)`;
       handleRef.current!.style.left = `calc(${position}% - 1px)`;
     });
   }, []);
 
-  const startDrag = useCallback((e: React.MouseEvent | React.TouchEvent) => {
-    // Prevent default to stop scrolling while dragging on mobile
-    if (e.cancelable) e.preventDefault();
-    
-    const stopDrag = () => {
-      window.removeEventListener('mousemove', handleDrag);
-      window.removeEventListener('touchmove', handleDrag);
-      window.removeEventListener('mouseup', stopDrag);
-      window.removeEventListener('touchend', stopDrag);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-    
-    window.addEventListener('mousemove', handleDrag, { passive: true });
-    window.addEventListener('touchmove', handleDrag, { passive: false });
-    window.addEventListener('mouseup', stopDrag);
-    window.addEventListener('touchend', stopDrag);
-  }, [handleDrag]);
+  const startDrag = useCallback(
+    (e: React.MouseEvent | React.TouchEvent) => {
+      // Prevent default to stop scrolling while dragging on mobile
+      if (e.cancelable) e.preventDefault();
+
+      const stopDrag = () => {
+        window.removeEventListener("mousemove", handleDrag);
+        window.removeEventListener("touchmove", handleDrag);
+        window.removeEventListener("mouseup", stopDrag);
+        window.removeEventListener("touchend", stopDrag);
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      };
+
+      window.addEventListener("mousemove", handleDrag, { passive: true });
+      window.addEventListener("touchmove", handleDrag, { passive: false });
+      window.addEventListener("mouseup", stopDrag);
+      window.addEventListener("touchend", stopDrag);
+    },
+    [handleDrag],
+  );
 
   // Handle escape key
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  if (!task.originalUrl || !task.compressedUrl || typeof document === 'undefined') return null;
+  if (!task.originalUrl || !task.compressedUrl || typeof document === "undefined") return null;
 
   return createPortal(
     <motion.div
@@ -925,43 +1020,61 @@ const ComparisonModal = ({
         <div className="flex items-center justify-between p-4 sm:px-6 border-b border-white/10 bg-white/5 shrink-0">
           <div>
             <h3 className="font-bold text-lg">Before &amp; After Comparison</h3>
-            <p className="text-white/50 text-xs truncate max-w-[200px] sm:max-w-md">{task.originalFile.name}</p>
+            <p className="text-white/50 text-xs truncate max-w-[200px] sm:max-w-md">
+              {task.originalFile.name}
+            </p>
           </div>
-          <button onClick={onClose} className="p-2 -mr-2 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-colors bg-white/5">
+          <button
+            onClick={onClose}
+            className="p-2 -mr-2 rounded-full hover:bg-white/10 text-white/50 hover:text-white transition-colors bg-white/5"
+          >
             <X size={20} />
           </button>
         </div>
 
-        <div 
-          className="flex-1 relative w-full h-full select-none checkered-bg overflow-hidden touch-none" 
-          ref={containerRef} 
-          onMouseDown={startDrag} 
+        <div
+          className="flex-1 relative w-full h-full select-none checkered-bg overflow-hidden touch-none"
+          ref={containerRef}
+          onMouseDown={startDrag}
           onTouchStart={startDrag}
         >
           {/* Compressed Image (Background / After) */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none p-4 md:p-8">
-            <img src={tunedTask.compressedUrl!} alt="Compressed" className={`max-w-full max-h-full object-contain pointer-events-none transition-opacity duration-300 ${isTuning ? 'opacity-50' : 'opacity-100'}`} draggable={false} />
+            <img
+              src={tunedTask.compressedUrl!}
+              alt="Compressed"
+              className={`max-w-full max-h-full object-contain pointer-events-none transition-opacity duration-300 ${isTuning ? "opacity-50" : "opacity-100"}`}
+              draggable={false}
+            />
             {isTuning && (
               <div className="absolute inset-0 flex items-center justify-center z-10">
-                <RefreshCcw size={48} className="animate-spin text-[var(--c-neon-cyan)] opacity-80 drop-shadow-[0_0_15px_rgba(0,229,255,0.5)]" />
+                <RefreshCcw
+                  size={48}
+                  className="animate-spin text-[var(--c-neon-cyan)] opacity-80 drop-shadow-[0_0_15px_rgba(0,229,255,0.5)]"
+                />
               </div>
             )}
           </div>
 
           {/* Original Image (Foreground / Before) */}
-          <div 
+          <div
             ref={foregroundRef}
             className="absolute inset-0 flex items-center justify-center pointer-events-none p-4 md:p-8 select-none"
-            style={{ clipPath: `inset(0 50% 0 0)`, willChange: 'clip-path' }}
+            style={{ clipPath: `inset(0 50% 0 0)`, willChange: "clip-path" }}
           >
-            <img src={tunedTask.originalUrl} alt="Original" className="max-w-full max-h-full object-contain pointer-events-none shadow-[4px_0_15px_rgba(0,0,0,0.5)] select-none" draggable={false} />
+            <img
+              src={tunedTask.originalUrl}
+              alt="Original"
+              className="max-w-full max-h-full object-contain pointer-events-none shadow-[4px_0_15px_rgba(0,0,0,0.5)] select-none"
+              draggable={false}
+            />
           </div>
 
           {/* Slider Handle */}
-          <div 
+          <div
             ref={handleRef}
-            className="absolute top-0 bottom-0 w-[2px] bg-[var(--c-neon-cyan)] cursor-ew-resize hover:w-[4px] hover:-ml-[1px] transition-none z-20" 
-            style={{ left: `calc(50% - 1px)`, willChange: 'left' }}
+            className="absolute top-0 bottom-0 w-[2px] bg-[var(--c-neon-cyan)] cursor-ew-resize hover:w-[4px] hover:-ml-[1px] transition-none z-20"
+            style={{ left: `calc(50% - 1px)`, willChange: "left" }}
           >
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[var(--c-neon-cyan)] shadow-[0_0_20px_rgba(0,229,255,0.5)] flex items-center justify-center text-black border-2 border-white hover:scale-110 transition-transform">
               <ChevronsLeftRight size={20} className="text-black" />
@@ -970,12 +1083,20 @@ const ComparisonModal = ({
 
           {/* Labels */}
           <div className="absolute top-4 sm:top-6 left-4 sm:left-6 bg-black/60 backdrop-blur-md border border-white/20 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold pointer-events-none shadow-xl flex flex-col shadow-black/50">
-            Original <span className="text-[10px] sm:text-[11px] text-white/60 font-mono font-normal tracking-wide mt-0.5">{formatBytes(tunedTask.originalFile.size)}</span>
+            Original{" "}
+            <span className="text-[10px] sm:text-[11px] text-white/60 font-mono font-normal tracking-wide mt-0.5">
+              {formatBytes(tunedTask.originalFile.size)}
+            </span>
           </div>
-          <div className={`absolute top-4 sm:top-6 right-4 sm:right-6 bg-black/60 backdrop-blur-md border border-[var(--c-neon-cyan)]/30 text-[var(--c-neon-cyan)] px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold pointer-events-none shadow-xl flex flex-col items-end shadow-black/50 transition-opacity ${isTuning ? 'opacity-50' : 'opacity-100'}`}>
-            Compressed <span className="text-[10px] sm:text-[11px] opacity-70 font-mono font-normal tracking-wide mt-0.5">{formatBytes(tunedTask.compressedFile!.size)}</span>
+          <div
+            className={`absolute top-4 sm:top-6 right-4 sm:right-6 bg-black/60 backdrop-blur-md border border-[var(--c-neon-cyan)]/30 text-[var(--c-neon-cyan)] px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold pointer-events-none shadow-xl flex flex-col items-end shadow-black/50 transition-opacity ${isTuning ? "opacity-50" : "opacity-100"}`}
+          >
+            Compressed{" "}
+            <span className="text-[10px] sm:text-[11px] opacity-70 font-mono font-normal tracking-wide mt-0.5">
+              {formatBytes(tunedTask.compressedFile!.size)}
+            </span>
           </div>
-          
+
           {/* Tip hint */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white/60 text-[10px] sm:text-xs px-4 py-2 rounded-full pointer-events-none border border-white/10">
             Drag to compare
@@ -987,19 +1108,23 @@ const ComparisonModal = ({
           <div className="flex-1 w-full sm:max-w-sm">
             <div className="flex justify-between items-center mb-2">
               <label className="text-xs font-semibold text-white/70">Live Tuning Quality</label>
-              <span className="text-xs font-mono text-[var(--c-neon-cyan)]">{Math.round(quality * 100)}%</span>
+              <span className="text-xs font-mono text-[var(--c-neon-cyan)]">
+                {Math.round(quality * 100)}%
+              </span>
             </div>
-            <input 
-              type="range" 
-              min="0.1" max="1.0" step="0.05" 
-              value={quality} 
+            <input
+              type="range"
+              min="0.1"
+              max="1.0"
+              step="0.05"
+              value={quality}
               onChange={(e) => setQuality(parseFloat(e.target.value))}
               className="w-full accent-[var(--c-neon-cyan)] cursor-pointer"
             />
           </div>
-          
+
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button 
+            <button
               onClick={() => onApply(tunedTask)}
               disabled={isTuning}
               className="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-[var(--c-neon-cyan)] text-black font-bold text-sm hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_rgba(0,229,255,0.2)]"
@@ -1010,6 +1135,6 @@ const ComparisonModal = ({
         </div>
       </motion.div>
     </motion.div>,
-    document.body
+    document.body,
   );
 };

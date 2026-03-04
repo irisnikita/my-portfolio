@@ -6,37 +6,41 @@ import { stats } from "../../data/stats";
 
 <Section eyebrow="Numbers" title="At a Glance">
   <div class="statsGrid" data-reveal-container="stats" data-reveal-stagger="100">
-    {stats.map((stat) => (
-      <div data-reveal data-reveal-class="reveal-scale" data-reveal-group="stat">
-        <Card>
-          <div class="statCard">
-            <span class="statIcon" aria-hidden="true">{stat.icon}</span>
-            <div
-              class="statValue"
-              data-count-up
-              data-count-value={stat.numericValue}
-              data-count-suffix={stat.suffix}
-            >
-              {stat.value}
+    {
+      stats.map((stat) => (
+        <div data-reveal data-reveal-class="reveal-scale" data-reveal-group="stat">
+          <Card>
+            <div class="statCard">
+              <span class="statIcon" aria-hidden="true">
+                {stat.icon}
+              </span>
+              <div
+                class="statValue"
+                data-count-up
+                data-count-value={stat.numericValue}
+                data-count-suffix={stat.suffix}
+              >
+                {stat.value}
+              </div>
+              <p class="statLabel">{stat.label}</p>
             </div>
-            <p class="statLabel">{stat.label}</p>
-          </div>
-        </Card>
-      </div>
-    ))}
+          </Card>
+        </div>
+      ))
+    }
   </div>
 </Section>
 
 <script>
   // Count-up animation on scroll
-  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
 
   if (!reduced) {
-    const els = document.querySelectorAll<HTMLElement>('[data-count-up]');
+    const els = document.querySelectorAll<HTMLElement>("[data-count-up]");
 
     const animateCount = (el: HTMLElement) => {
-      const target = parseInt(el.getAttribute('data-count-value') ?? '0', 10);
-      const suffix = el.getAttribute('data-count-suffix') ?? '';
+      const target = parseInt(el.getAttribute("data-count-value") ?? "0", 10);
+      const suffix = el.getAttribute("data-count-suffix") ?? "";
       const duration = 1200;
       const start = performance.now();
 
@@ -56,13 +60,16 @@ import { stats } from "../../data/stats";
       requestAnimationFrame(step);
     };
 
-    const io = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
-        animateCount(entry.target as HTMLElement);
-        io.unobserve(entry.target);
-      }
-    }, { threshold: 0.3 });
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          animateCount(entry.target as HTMLElement);
+          io.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.3 },
+    );
 
     els.forEach((el) => io.observe(el));
   }

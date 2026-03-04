@@ -1,16 +1,16 @@
-import rss from '@astrojs/rss';
-import { getCollection } from 'astro:content';
-import { site } from '../data/site';
+import rss from "@astrojs/rss";
+import { getCollection } from "astro:content";
+import { site } from "../data/site";
 
 import type { APIContext } from "astro";
 
 export async function GET(context: APIContext) {
-  const blog = await getCollection('blog');
-  
+  const blog = await getCollection("blog");
+
   return rss({
     title: site.name,
     description: site.description,
-    site: context.site || 'https://irisnikita.com', // Replace with real domain when live
+    site: context.site || "https://irisnikita.com", // Replace with real domain when live
     items: blog
       .filter((post) => !post.data.draft)
       .map((post) => ({

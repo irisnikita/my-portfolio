@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Container from "../ui/Container.astro";
 import Tag from "../ui/Tag.astro";
-import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "../../i18n/utils";
 
 import type { CollectionEntry } from "astro:content";
 
@@ -25,45 +25,63 @@ const { title, summary, githubUrl, liveUrl, tags } = entry.data;
 // To keep things simple in Astro, we render the slot instead, since Content represents the component.
 ---
 
-<BaseLayout title={`${title} • ${t('projectDetails.suffix')}`} description={summary}>
+<BaseLayout title={`${title} • ${t("projectDetails.suffix")}`} description={summary}>
   <article class="wrap">
     <Container>
       <div class="mb-4">
-        <a href={translatePath("/projects")} class="inline-flex items-center text-sm font-medium opacity-60 hover:opacity-100 transition-opacity">
+        <a
+          href={translatePath("/projects")}
+          class="inline-flex items-center text-sm font-medium opacity-60 hover:opacity-100 transition-opacity"
+        >
           <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
-          {t('projectDetails.back')}
+          {t("projectDetails.back")}
         </a>
       </div>
 
       <header class="head">
         <div class="tagRow">
-          <Tag tone="magenta">{t('projectDetails.caseStudy')}</Tag>
-          {tags?.slice(0, 3).map((tag: string, i: number) => (
-            <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
-          ))}
+          <Tag tone="magenta">{t("projectDetails.caseStudy")}</Tag>
+          {
+            tags
+              ?.slice(0, 3)
+              .map((tag: string, i: number) => (
+                <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
+              ))
+          }
         </div>
 
         <h1 class="h1" transition:name={`project-title-${entry.slug}`}>{title}</h1>
         <p class="lede">{summary}</p>
 
-        <div class="detailPoster" aria-hidden="true" transition:name={`project-poster-${entry.slug}`}></div>
+        <div
+          class="detailPoster"
+          aria-hidden="true"
+          transition:name={`project-poster-${entry.slug}`}
+        >
+        </div>
 
-        {(githubUrl || liveUrl) && (
-          <div class="links" aria-label="Project links">
-            {githubUrl && (
-              <a href={githubUrl} rel="noreferrer" target="_blank">
-                GitHub
-              </a>
-            )}
-            {liveUrl && (
-              <a href={liveUrl} rel="noreferrer" target="_blank">
-                Live
-              </a>
-            )}
-          </div>
-        )}
+        {
+          (githubUrl || liveUrl) && (
+            <div class="links" aria-label="Project links">
+              {githubUrl && (
+                <a href={githubUrl} rel="noreferrer" target="_blank">
+                  GitHub
+                </a>
+              )}
+              {liveUrl && (
+                <a href={liveUrl} rel="noreferrer" target="_blank">
+                  Live
+                </a>
+              )}
+            </div>
+          )
+        }
       </header>
 
       <div class="content">
@@ -107,8 +125,9 @@ const { title, summary, githubUrl, liveUrl, tags } = entry.data;
     height: 160px;
     margin-top: 18px;
     border-radius: var(--radius);
-    border: 1px solid rgba(255, 255, 255, 0.10);
-    background: radial-gradient(240px 200px at 20% 20%, rgba(50, 245, 255, 0.22), transparent 62%),
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background:
+      radial-gradient(240px 200px at 20% 20%, rgba(50, 245, 255, 0.22), transparent 62%),
       radial-gradient(260px 220px at 75% 30%, rgba(255, 53, 213, 0.18), transparent 66%),
       radial-gradient(120% 160% at 30% 10%, rgba(124, 92, 255, 0.14), transparent 60%),
       rgba(255, 255, 255, 0.02);

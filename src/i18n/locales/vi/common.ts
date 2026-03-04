@@ -13,5 +13,6 @@ export default {
   "chatbot.suggestion1": "Bạn đang sử dụng tech stack nào?",
   "chatbot.suggestion2": "Bạn đã làm gì ở Zalo?",
   "chatbot.placeholder": "Nhập tin nhắn...",
-  "chatbot.error": "Đã xảy ra lỗi khi gọi AI. Vui lòng kiểm tra API key của bạn và khởi động lại dev server.",
+  "chatbot.error":
+    "Đã xảy ra lỗi khi gọi AI. Vui lòng kiểm tra API key của bạn và khởi động lại dev server.",
 } as const;

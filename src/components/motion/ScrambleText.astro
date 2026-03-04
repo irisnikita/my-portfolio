@@ -4,18 +4,18 @@
 
 <script>
   function initScramble() {
-    const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (prefersReduced) return;
 
-    const chars = '!<>-_\\/[]{}—=+*^?#_01';
-    
-    document.querySelectorAll('[data-scramble]').forEach((el) => {
+    const chars = "!<>-_\\/[]{}—=+*^?#_01";
+
+    document.querySelectorAll("[data-scramble]").forEach((el) => {
       // Avoid double init
-      if (el.hasAttribute('data-scramble-init')) return;
-      el.setAttribute('data-scramble-init', 'true');
+      if (el.hasAttribute("data-scramble-init")) return;
+      el.setAttribute("data-scramble-init", "true");
 
       // The original text to scramble to
-      const originalText = el.textContent?.trim() || '';
+      const originalText = el.textContent?.trim() || "";
       if (!originalText) return;
 
       let raf = 0;
@@ -26,10 +26,10 @@
 
         const loop = () => {
           el.textContent = originalText
-            .split('')
+            .split("")
             .map((char, index) => {
               // Preserve spaces
-              if (char === ' ') return ' ';
+              if (char === " ") return " ";
               // Once iteration passes index, lock in the correct character
               if (index < iteration) {
                 return originalText[index];
@@ -37,7 +37,7 @@
               // Otherwise, random character
               return chars[Math.floor(Math.random() * chars.length)];
             })
-            .join('');
+            .join("");
 
           if (iteration >= originalText.length) {
             cancelAnimationFrame(raf);
@@ -52,21 +52,24 @@
       };
 
       // Trigger on hover
-      el.addEventListener('pointerenter', scramble);
-      
+      el.addEventListener("pointerenter", scramble);
+
       // Also trigger once on first reveal intersection
-      const observer = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          // slight delay for effect
-          setTimeout(scramble, 300);
-          observer.disconnect();
-        }
-      }, { threshold: 0.5 });
-      
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting) {
+            // slight delay for effect
+            setTimeout(scramble, 300);
+            observer.disconnect();
+          }
+        },
+        { threshold: 0.5 },
+      );
+
       observer.observe(el);
     });
   }
 
   // astro:page-load fires on initial load AND after every ViewTransition
-  document.addEventListener('astro:page-load', initScramble);
+  document.addEventListener("astro:page-load", initScramble);
 </script>

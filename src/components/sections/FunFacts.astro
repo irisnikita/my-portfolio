@@ -14,15 +14,19 @@ const funFacts = [
 
 <Section eyebrow="Beyond Code" title="Fun Facts">
   <div class="funGrid" data-reveal-container="fun" data-reveal-stagger="80">
-    {funFacts.map((fact) => (
-      <div class="funItem" data-reveal data-reveal-class="reveal-scale" data-reveal-group="fun">
-        <span class="funIcon" aria-hidden="true">{fact.icon}</span>
-        <div>
-          <p class="funLabel">{fact.label}</p>
-          <p class="funValue">{fact.value}</p>
+    {
+      funFacts.map((fact) => (
+        <div class="funItem" data-reveal data-reveal-class="reveal-scale" data-reveal-group="fun">
+          <span class="funIcon" aria-hidden="true">
+            {fact.icon}
+          </span>
+          <div>
+            <p class="funLabel">{fact.label}</p>
+            <p class="funValue">{fact.value}</p>
+          </div>
         </div>
-      </div>
-    ))}
+      ))
+    }
   </div>
 </Section>
 
@@ -41,7 +45,10 @@ const funFacts = [
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: var(--radius);
     background: rgba(255, 255, 255, 0.02);
-    transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out), transform 200ms var(--ease-out);
+    transition:
+      border-color 200ms var(--ease-out),
+      box-shadow 200ms var(--ease-out),
+      transform 200ms var(--ease-out);
   }
 
   .funItem:hover {

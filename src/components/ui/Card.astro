@@ -10,31 +10,31 @@ const { class: className, reveal = true, ...rest } = Astro.props;
 
 <article
   {...rest}
-  class={['card card-tilt', className].filter(Boolean).join(' ')}
-  {...(reveal ? { 'data-reveal': '', 'data-reveal-group': 'card' } : {})}
+  class={["card card-tilt", className].filter(Boolean).join(" ")}
+  {...reveal ? { "data-reveal": "", "data-reveal-group": "card" } : {}}
 >
   <!-- Glow spotlight that follows cursor -->
-  <div class="card-glow" aria-hidden="true" />
+  <div class="card-glow" aria-hidden="true"></div>
   <!-- Glare effect -->
-  <div class="card-glare" aria-hidden="true" />
+  <div class="card-glare" aria-hidden="true"></div>
   <slot />
 </article>
 
 <script>
   function initHoverCards() {
     // Only init if not reduced motion and has pointer
-    const pmr = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const hasCoarse = window.matchMedia('(pointer: coarse)').matches;
+    const pmr = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const hasCoarse = window.matchMedia("(pointer: coarse)").matches;
     if (pmr || hasCoarse) return;
 
-    const cards = document.querySelectorAll('.card-tilt');
-    
+    const cards = document.querySelectorAll(".card-tilt");
+
     cards.forEach((cardFn) => {
       const card = cardFn as HTMLElement;
-      if (card.hasAttribute('data-tilt-init')) return;
-      card.setAttribute('data-tilt-init', 'true');
+      if (card.hasAttribute("data-tilt-init")) return;
+      card.setAttribute("data-tilt-init", "true");
 
-      card.addEventListener('mousemove', (e) => {
+      card.addEventListener("mousemove", (e) => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -43,37 +43,37 @@ const { class: className, reveal = true, ...rest } = Astro.props;
         // -1 to 1 multiplier
         const xPct = (x / rect.width - 0.5) * 2;
         const yPct = (y / rect.height - 0.5) * 2;
-        
+
         // Max rotation 8 degrees
         const rotX = yPct * -8;
         const rotY = xPct * 8;
 
-        card.style.setProperty('--rot-x', `${rotX}deg`);
-        card.style.setProperty('--rot-y', `${rotY}deg`);
-        card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
-        card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
-        
+        card.style.setProperty("--rot-x", `${rotX}deg`);
+        card.style.setProperty("--rot-y", `${rotY}deg`);
+        card.style.setProperty("--mouse-x", `${(x / rect.width) * 100}%`);
+        card.style.setProperty("--mouse-y", `${(y / rect.height) * 100}%`);
+
         // Keep standard glow synced too
-        card.style.setProperty('--glow-x', `${x}px`);
-        card.style.setProperty('--glow-y', `${y}px`);
+        card.style.setProperty("--glow-x", `${x}px`);
+        card.style.setProperty("--glow-y", `${y}px`);
       });
 
-      card.addEventListener('mouseleave', () => {
-        card.style.setProperty('--rot-x', '0deg');
-        card.style.setProperty('--rot-y', '0deg');
-        card.style.setProperty('--mouse-x', '50%');
-        card.style.setProperty('--mouse-y', '50%');
+      card.addEventListener("mouseleave", () => {
+        card.style.setProperty("--rot-x", "0deg");
+        card.style.setProperty("--rot-y", "0deg");
+        card.style.setProperty("--mouse-x", "50%");
+        card.style.setProperty("--mouse-y", "50%");
         // Reset glow slightly offset
-        card.style.setProperty('--glow-x', '50%');
-        card.style.setProperty('--glow-y', '50%');
+        card.style.setProperty("--glow-x", "50%");
+        card.style.setProperty("--glow-y", "50%");
       });
     });
   }
 
-  document.addEventListener('astro:page-load', initHoverCards);
-  if (typeof window !== 'undefined') {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initHoverCards);
+  document.addEventListener("astro:page-load", initHoverCards);
+  if (typeof window !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initHoverCards);
     } else {
       initHoverCards();
     }
@@ -90,7 +90,7 @@ const { class: className, reveal = true, ...rest } = Astro.props;
     --mouse-y: 50%;
 
     border-radius: var(--radius);
-    border: 1px solid rgba(234, 240, 255, 0.10);
+    border: 1px solid rgba(234, 240, 255, 0.1);
     background:
       radial-gradient(120% 160% at 20% 0%, rgba(124, 59, 255, 0.16), transparent 52%),
       rgba(255, 255, 255, 0.03);
@@ -137,13 +137,12 @@ const { class: className, reveal = true, ...rest } = Astro.props;
     pointer-events: none;
     opacity: 0;
     mix-blend-mode: soft-light;
-    background: 
-      radial-gradient(
-        farthest-corner circle at var(--mouse-x) var(--mouse-y),
-        rgba(255, 255, 255, 0.8) 0%,
-        rgba(255, 255, 255, 0.2) 20%,
-        rgba(255, 255, 255, 0) 100%
-      );
+    background: radial-gradient(
+      farthest-corner circle at var(--mouse-x) var(--mouse-y),
+      rgba(255, 255, 255, 0.8) 0%,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0) 100%
+    );
     transition: opacity 300ms var(--ease-out);
     z-index: 2;
     transform: translateZ(10px); /* float slightly above content */
@@ -161,10 +160,14 @@ const { class: className, reveal = true, ...rest } = Astro.props;
       135deg,
       rgba(0, 229, 255, 0.22),
       rgba(255, 43, 214, 0.14) 45%,
-      rgba(124, 59, 255, 0.10)
+      rgba(124, 59, 255, 0.1)
     );
-    mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
-    -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+    mask:
+      linear-gradient(#000, #000) content-box,
+      linear-gradient(#000, #000);
+    -webkit-mask:
+      linear-gradient(#000, #000) content-box,
+      linear-gradient(#000, #000);
     padding: 1px;
     -webkit-mask-composite: xor;
     mask-composite: exclude;
@@ -174,7 +177,7 @@ const { class: className, reveal = true, ...rest } = Astro.props;
 
   .card:hover {
     border-color: rgba(0, 229, 255, 0.22);
-    box-shadow: 
+    box-shadow:
       var(--shadow-glow-cyan),
       0 30px 60px -15px rgba(0, 0, 0, 0.6);
   }

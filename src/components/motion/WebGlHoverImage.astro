@@ -11,12 +11,19 @@ export interface Props {
 }
 
 const { src, alt, width, height, class: className, id } = Astro.props;
-// We assign a dynamic ID so multiple instances don't clash 
+// We assign a dynamic ID so multiple instances don't clash
 const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
 ---
 
-<div class={`gl-hover-wrapper ${className || ''}`} data-gl-id={uniqueId} aria-label={alt}>
-  <img src={src} alt={alt} width={width} height={height} class="gl-fallback-img" crossorigin="anonymous" />
+<div class={`gl-hover-wrapper ${className || ""}`} data-gl-id={uniqueId} aria-label={alt}>
+  <img
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    class="gl-fallback-img"
+    crossorigin="anonymous"
+  />
   <canvas id={uniqueId} class="gl-canvas"></canvas>
 </div>
 
@@ -24,24 +31,24 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
   // WebGL Hover Image Manager
   // We initialize shaders for all unique canvases
   function initGlHovers() {
-    const wrappers = document.querySelectorAll('.gl-hover-wrapper:not([data-init])');
-    
-    wrappers.forEach(wrapper => {
-      wrapper.setAttribute('data-init', 'true');
-      const canvas = wrapper.querySelector('canvas') as HTMLCanvasElement;
-      const img = wrapper.querySelector('.gl-fallback-img') as HTMLImageElement;
+    const wrappers = document.querySelectorAll(".gl-hover-wrapper:not([data-init])");
+
+    wrappers.forEach((wrapper) => {
+      wrapper.setAttribute("data-init", "true");
+      const canvas = wrapper.querySelector("canvas") as HTMLCanvasElement;
+      const img = wrapper.querySelector(".gl-fallback-img") as HTMLImageElement;
       if (!canvas || !img) return;
 
       // Make sure image is loaded before setting up WebGL texture
       if (img.complete) {
         setupWebGL(wrapper as HTMLElement, canvas, img);
       } else {
-        img.addEventListener('load', () => setupWebGL(wrapper as HTMLElement, canvas, img));
+        img.addEventListener("load", () => setupWebGL(wrapper as HTMLElement, canvas, img));
       }
     });
 
     function setupWebGL(wrapper: HTMLElement, canvas: HTMLCanvasElement, img: HTMLImageElement) {
-      const gl = canvas.getContext('webgl', { alpha: true, antialias: false });
+      const gl = canvas.getContext("webgl", { alpha: true, antialias: false });
       if (!gl) return; // Fallback to standard CSS hover if no WebGL
 
       // Vertex Shader
@@ -90,7 +97,7 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
 
       function compileShader(type: number, source: string) {
         const shader = gl!.createShader(type);
-        if(!shader) return null;
+        if (!shader) return null;
         gl!.shaderSource(shader, source);
         gl!.compileShader(shader);
         if (!gl!.getShaderParameter(shader, gl!.COMPILE_STATUS)) {
@@ -103,10 +110,10 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
 
       const vs = compileShader(gl.VERTEX_SHADER, vsSource);
       const fs = compileShader(gl.FRAGMENT_SHADER, fsSource);
-      if(!vs || !fs) return;
+      if (!vs || !fs) return;
 
       const program = gl.createProgram();
-      if(!program) return;
+      if (!program) return;
       gl.attachShader(program, vs);
       gl.attachShader(program, fs);
       gl.linkProgram(program);
@@ -115,24 +122,26 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
       // Geometry: standard quad
       const posBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        -1, -1,  1, -1,  -1, 1,
-        -1,  1,  1, -1,   1, 1
-      ]), gl.STATIC_DRAW);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]),
+        gl.STATIC_DRAW,
+      );
 
-      const posLoc = gl.getAttribLocation(program, 'aPosition');
+      const posLoc = gl.getAttribLocation(program, "aPosition");
       gl.enableVertexAttribArray(posLoc);
       gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
       // UVs
       const uvBuffer = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-         0, 1,   1,  1,   0, 0,
-         0, 0,   1,  1,   1, 0
-      ]), gl.STATIC_DRAW);
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0]),
+        gl.STATIC_DRAW,
+      );
 
-      const uvLoc = gl.getAttribLocation(program, 'aTexCoord');
+      const uvLoc = gl.getAttribLocation(program, "aTexCoord");
       gl.enableVertexAttribArray(uvLoc);
       gl.vertexAttribPointer(uvLoc, 2, gl.FLOAT, false, 0, 0);
 
@@ -147,13 +156,13 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
       // Hide real img, show canvas
-      img.style.opacity = '0';
-      canvas.style.opacity = '1';
+      img.style.opacity = "0";
+      canvas.style.opacity = "1";
 
       // Uniforms
-      const uImageLoc = gl.getUniformLocation(program, 'uImage');
-      const uHoverPulseLoc = gl.getUniformLocation(program, 'uHoverPulse');
-      const uTimeLoc = gl.getUniformLocation(program, 'uTime');
+      const uImageLoc = gl.getUniformLocation(program, "uImage");
+      const uHoverPulseLoc = gl.getUniformLocation(program, "uHoverPulse");
+      const uTimeLoc = gl.getUniformLocation(program, "uTime");
 
       let targetHover = 0;
       let currentHover = 0;
@@ -162,7 +171,7 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
 
       function resize() {
         const rect = wrapper.getBoundingClientRect();
-        // Use device pixel ratio for sharp rendering if performance allows, 
+        // Use device pixel ratio for sharp rendering if performance allows,
         // but for distortion effects 1.0 or 0.5 is fine and vastly faster.
         const dpr = Math.min(window.devicePixelRatio, 1.5);
         canvas.width = rect.width * dpr;
@@ -170,27 +179,27 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
         gl!.viewport(0, 0, canvas.width, canvas.height);
       }
       // Re-upload texture if needed on resize, but clamping handles most
-      
+
       const resObs = new ResizeObserver(() => resize());
       resObs.observe(wrapper);
 
-      wrapper.addEventListener('mouseenter', () => targetHover = 1);
-      wrapper.addEventListener('mouseleave', () => targetHover = 0);
+      wrapper.addEventListener("mouseenter", () => (targetHover = 1));
+      wrapper.addEventListener("mouseleave", () => (targetHover = 0));
 
       function render() {
         time += 0.02;
-        
-        // Lerp hover state 
+
+        // Lerp hover state
         currentHover += (targetHover - currentHover) * 0.1;
 
         // Optimization: Only render if we are animating or hovering, or settling back down
         if (currentHover > 0.001 || targetHover > 0) {
-          gl!.clearColor(0,0,0,0);
+          gl!.clearColor(0, 0, 0, 0);
           gl!.clear(gl!.COLOR_BUFFER_BIT);
-          
+
           gl!.uniform1f(uHoverPulseLoc, currentHover);
           gl!.uniform1f(uTimeLoc, time);
-          
+
           gl!.drawArrays(gl!.TRIANGLES, 0, 6);
         } else if (currentHover > 0 && currentHover < 0.001) {
           // snap and draw one last clean frame
@@ -206,7 +215,7 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
       resize();
       gl!.uniform1f(uHoverPulseLoc, 0);
       gl!.drawArrays(gl!.TRIANGLES, 0, 6);
-      
+
       // Start loop
       render();
 
@@ -219,16 +228,16 @@ const uniqueId = id || `gl-img-${Math.random().toString(36).substring(2, 9)}`;
     }
   }
 
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     // Basic cleanup logic could go here if we were entirely remounting
     initGlHovers();
   });
 
-  if (typeof window !== 'undefined') {
-    const pmr = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (typeof window !== "undefined") {
+    const pmr = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (!pmr.matches) {
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initGlHovers);
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initGlHovers);
       } else {
         initGlHovers();
       }

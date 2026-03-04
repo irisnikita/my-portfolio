@@ -13,13 +13,27 @@ const navKeys: Array<{ href: string; labelKey: I18nKey; hasDropdown?: boolean }>
   { href: "/#contact", labelKey: "nav.contact" },
 ];
 
-const toolsSubItems: Array<{ href: string; labelKey: I18nKey; descKey: I18nKey; icon: React.ReactNode }> = [
+const toolsSubItems: Array<{
+  href: string;
+  labelKey: I18nKey;
+  descKey: I18nKey;
+  icon: React.ReactNode;
+}> = [
   {
     href: "/tools/image-compressor",
     labelKey: "tools.imageCompressor.title",
     descKey: "tools.imageCompressor.desc",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
         <circle cx="8.5" cy="8.5" r="1.5" />
         <polyline points="21 15 16 10 5 21" />
@@ -31,8 +45,37 @@ const toolsSubItems: Array<{ href: string; labelKey: I18nKey; descKey: I18nKey; 
     labelKey: "tools.meshGradient.title",
     descKey: "tools.meshGradient.desc",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+      </svg>
+    ),
+  },
+  {
+    href: "/tools/code-to-image",
+    labelKey: "tools.card.codeToImage.title",
+    descKey: "tools.card.codeToImage.desc",
+    icon: (
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <polyline points="16 18 22 12 16 6"></polyline>
+        <polyline points="8 6 2 12 8 18"></polyline>
       </svg>
     ),
   },
@@ -280,8 +323,24 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                     style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}
                   >
                     {t(item.labelKey)}
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.5, transition: "transform 0.2s", transform: toolsHover ? "rotate(180deg)" : "rotate(0deg)" }}>
-                      <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      style={{
+                        opacity: 0.5,
+                        transition: "transform 0.2s",
+                        transform: toolsHover ? "rotate(180deg)" : "rotate(0deg)",
+                      }}
+                    >
+                      <path
+                        d="M4 6L8 10L12 6"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </a>
 
@@ -309,19 +368,21 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                         }}
                       >
                         {/* Caret arrow */}
-                        <div style={{
-                          position: "absolute",
-                          top: "-6px",
-                          left: "50%",
-                          transform: "translateX(-50%) rotate(45deg)",
-                          width: "12px",
-                          height: "12px",
-                          background: "rgba(10, 10, 20, 0.95)",
-                          border: "1px solid rgba(255,255,255,0.1)",
-                          borderBottom: "none",
-                          borderRight: "none",
-                          borderRadius: "2px",
-                        }} />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "-6px",
+                            left: "50%",
+                            transform: "translateX(-50%) rotate(45deg)",
+                            width: "12px",
+                            height: "12px",
+                            background: "rgba(10, 10, 20, 0.95)",
+                            border: "1px solid rgba(255,255,255,0.1)",
+                            borderBottom: "none",
+                            borderRight: "none",
+                            borderRadius: "2px",
+                          }}
+                        />
 
                         {/* "All Tools" link */}
                         <a
@@ -348,7 +409,16 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                             e.currentTarget.style.color = "rgba(255,255,255,0.5)";
                           }}
                         >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
                             <rect x="3" y="3" width="7" height="7" />
                             <rect x="14" y="3" width="7" height="7" />
                             <rect x="14" y="14" width="7" height="7" />
@@ -357,7 +427,13 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                           {t("header.tools.allTools")}
                         </a>
 
-                        <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "0 8px 4px" }} />
+                        <div
+                          style={{
+                            height: "1px",
+                            background: "rgba(255,255,255,0.08)",
+                            margin: "0 8px 4px",
+                          }}
+                        />
 
                         {toolsSubItems.map((sub) => (
                           <a
@@ -375,13 +451,21 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.background = "rgba(0, 229, 255, 0.08)";
-                              (e.currentTarget.querySelector(".tool-icon") as HTMLElement).style.background = "rgba(0, 229, 255, 0.15)";
-                              (e.currentTarget.querySelector(".tool-icon") as HTMLElement).style.color = "var(--c-neon-cyan)";
+                              (
+                                e.currentTarget.querySelector(".tool-icon") as HTMLElement
+                              ).style.background = "rgba(0, 229, 255, 0.15)";
+                              (
+                                e.currentTarget.querySelector(".tool-icon") as HTMLElement
+                              ).style.color = "var(--c-neon-cyan)";
                             }}
                             onMouseLeave={(e) => {
                               e.currentTarget.style.background = "transparent";
-                              (e.currentTarget.querySelector(".tool-icon") as HTMLElement).style.background = "rgba(255,255,255,0.06)";
-                              (e.currentTarget.querySelector(".tool-icon") as HTMLElement).style.color = "rgba(255,255,255,0.7)";
+                              (
+                                e.currentTarget.querySelector(".tool-icon") as HTMLElement
+                              ).style.background = "rgba(255,255,255,0.06)";
+                              (
+                                e.currentTarget.querySelector(".tool-icon") as HTMLElement
+                              ).style.color = "rgba(255,255,255,0.7)";
                             }}
                           >
                             <div
@@ -405,7 +489,14 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                               <div style={{ fontSize: "14px", fontWeight: 600, lineHeight: 1.3 }}>
                                 {t(sub.labelKey)}
                               </div>
-                              <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: 1.4, marginTop: "2px" }}>
+                              <div
+                                style={{
+                                  fontSize: "12px",
+                                  color: "rgba(255,255,255,0.4)",
+                                  lineHeight: 1.4,
+                                  marginTop: "2px",
+                                }}
+                              >
                                 {t(sub.descKey)}
                               </div>
                             </div>
@@ -578,10 +669,19 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                         <motion.svg
                           animate={{ rotate: toolsExpanded ? 180 : 0 }}
                           transition={{ duration: 0.2 }}
-                          width="16" height="16" viewBox="0 0 16 16" fill="none"
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
                           style={{ opacity: 0.5 }}
                         >
-                          <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          <path
+                            d="M4 6L8 10L12 6"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
                         </motion.svg>
                       </button>
 
@@ -594,7 +694,14 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                             transition={{ duration: 0.2, ease: "easeInOut" }}
                             style={{ overflow: "hidden" }}
                           >
-                            <div style={{ padding: "8px 0 8px 16px", display: "flex", flexDirection: "column", gap: "4px" }}>
+                            <div
+                              style={{
+                                padding: "8px 0 8px 16px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "4px",
+                              }}
+                            >
                               {/* All Tools link */}
                               <a
                                 href={translatedHref}
@@ -612,7 +719,16 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                                   background: "rgba(255,255,255,0.03)",
                                 }}
                               >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg
+                                  width="16"
+                                  height="16"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
                                   <rect x="3" y="3" width="7" height="7" />
                                   <rect x="14" y="3" width="7" height="7" />
                                   <rect x="14" y="14" width="7" height="7" />
@@ -653,10 +769,19 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
                                     {sub.icon}
                                   </div>
                                   <div>
-                                    <div style={{ fontSize: "15px", fontWeight: 600, lineHeight: 1.3 }}>
+                                    <div
+                                      style={{ fontSize: "15px", fontWeight: 600, lineHeight: 1.3 }}
+                                    >
                                       {t(sub.labelKey)}
                                     </div>
-                                    <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: 1.4, marginTop: "2px" }}>
+                                    <div
+                                      style={{
+                                        fontSize: "12px",
+                                        color: "rgba(255,255,255,0.4)",
+                                        lineHeight: 1.4,
+                                        marginTop: "2px",
+                                      }}
+                                    >
                                       {t(sub.descKey)}
                                     </div>
                                   </div>
@@ -710,4 +835,3 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
     </motion.header>
   );
 }
-

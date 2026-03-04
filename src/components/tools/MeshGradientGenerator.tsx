@@ -175,8 +175,13 @@ const PRESETS: { name: string; bg: string; points: Omit<GradientPoint, "id" | "l
 ];
 
 // ─── Helpers ────────────────────────────────────────
-const randomHex = () => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
-const randomBetween = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+const randomHex = () =>
+  "#" +
+  Math.floor(Math.random() * 16777215)
+    .toString(16)
+    .padStart(6, "0");
+const randomBetween = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 const uid = () => Math.random().toString(36).substring(2, 9);
 
 const generateRandomPoints = (count = 4): GradientPoint[] =>
@@ -235,36 +240,35 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
               x: randomBetween(10, 90),
               y: randomBetween(10, 90),
               size: randomBetween(35, 70),
-            }
-      )
+            },
+      ),
     );
     setBgColor((prev) => {
       // Only randomize bg if nothing is locked
       const hasLocked = points.some((p) => p.locked);
-      return hasLocked ? prev : randomHex().replace(/[89a-f]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 6));
+      return hasLocked
+        ? prev
+        : randomHex().replace(/[89a-f]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 6));
     });
   }, [points]);
 
-  const handleCopy = useCallback(
-    async (text: string, label: string) => {
-      try {
-        await navigator.clipboard.writeText(text);
-        setCopied(label);
-        setTimeout(() => setCopied(null), 2000);
-      } catch {
-        // fallback
-        const ta = document.createElement("textarea");
-        ta.value = text;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
-        setCopied(label);
-        setTimeout(() => setCopied(null), 2000);
-      }
-    },
-    []
-  );
+  const handleCopy = useCallback(async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(label);
+      setTimeout(() => setCopied(null), 2000);
+    } catch {
+      // fallback
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      setCopied(label);
+      setTimeout(() => setCopied(null), 2000);
+    }
+  }, []);
 
   const handleDownloadPNG = useCallback(async () => {
     if (!canvasRef.current) return;
@@ -307,11 +311,11 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
       const pos = getPercentFromPointer(e.clientX, e.clientY);
       if (pos) {
         setPoints((prev) =>
-          prev.map((p) => (p.id === draggingId ? { ...p, x: pos.x, y: pos.y } : p))
+          prev.map((p) => (p.id === draggingId ? { ...p, x: pos.x, y: pos.y } : p)),
         );
       }
     },
-    [draggingId, getPercentFromPointer]
+    [draggingId, getPercentFromPointer],
   );
 
   const handleCanvasPointerUp = useCallback(() => {
@@ -327,9 +331,7 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
   }, [draggingId]);
 
   const loadPreset = (preset: (typeof PRESETS)[number]) => {
-    setPoints(
-      preset.points.map((p) => ({ ...p, id: uid(), locked: false }))
-    );
+    setPoints(preset.points.map((p) => ({ ...p, id: uid(), locked: false })));
     setBgColor(preset.bg);
   };
 
@@ -344,7 +346,17 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
 
   const addPoint = () => {
     if (points.length >= 6) return;
-    setPoints((prev) => [...prev, { id: uid(), color: randomHex(), x: randomBetween(10, 90), y: randomBetween(10, 90), size: randomBetween(35, 70), locked: false }]);
+    setPoints((prev) => [
+      ...prev,
+      {
+        id: uid(),
+        color: randomHex(),
+        x: randomBetween(10, 90),
+        y: randomBetween(10, 90),
+        size: randomBetween(35, 70),
+        locked: false,
+      },
+    ]);
   };
 
   // Canvas style — remove transition during drag for instant feedback
@@ -360,7 +372,9 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
     width: "100%",
     position: "relative",
     overflow: "hidden",
-    transition: isDragging ? "none" : "background-image 0.4s ease, background-color 0.4s ease, filter 0.3s ease",
+    transition: isDragging
+      ? "none"
+      : "background-image 0.4s ease, background-color 0.4s ease, filter 0.3s ease",
   };
 
   // Tailwind version of the CSS
@@ -370,7 +384,9 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
     <div className="flex flex-col gap-6 relative z-10">
       {/* Presets Gallery */}
       <div>
-        <h3 className="text-sm font-semibold text-white/50 mb-3 uppercase tracking-wider">{dict.presets}</h3>
+        <h3 className="text-sm font-semibold text-white/50 mb-3 uppercase tracking-wider">
+          {dict.presets}
+        </h3>
         <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide">
           {PRESETS.map((preset) => (
             <button
@@ -384,11 +400,16 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
                 style={{
                   backgroundColor: preset.bg,
                   backgroundImage: preset.points
-                    .map((p) => `radial-gradient(at ${p.x}% ${p.y}%, ${p.color} 0px, transparent ${p.size}%)`)
+                    .map(
+                      (p) =>
+                        `radial-gradient(at ${p.x}% ${p.y}%, ${p.color} 0px, transparent ${p.size}%)`,
+                    )
                     .join(", "),
                 }}
               />
-              <span className="text-[10px] text-white/40 group-hover:text-white/70 transition-colors font-medium">{preset.name}</span>
+              <span className="text-[10px] text-white/40 group-hover:text-white/70 transition-colors font-medium">
+                {preset.name}
+              </span>
             </button>
           ))}
         </div>
@@ -400,14 +421,15 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
         <div className="flex-1 min-w-0">
           <div
             ref={canvasWrapperRef}
-            style={{ position: "relative", borderRadius: "16px", cursor: isDragging ? "grabbing" : undefined }}
+            style={{
+              position: "relative",
+              borderRadius: "16px",
+              cursor: isDragging ? "grabbing" : undefined,
+            }}
             onPointerMove={handleCanvasPointerMove}
             onPointerUp={handleCanvasPointerUp}
           >
-            <div
-              ref={canvasRef}
-              style={canvasStyle}
-            >
+            <div ref={canvasRef} style={canvasStyle}>
               {/* Noise overlay */}
               {showNoise && (
                 <div
@@ -450,14 +472,21 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
                       height: "20px",
                       borderRadius: "50%",
                       backgroundColor: point.color,
-                      border: draggingId === point.id ? "3px solid #fff" : "2px solid rgba(255,255,255,0.8)",
-                      boxShadow: draggingId === point.id
-                        ? `0 0 0 3px rgba(0,229,255,0.5), 0 0 16px ${point.color}, 0 2px 8px rgba(0,0,0,0.5)`
-                        : `0 0 8px ${point.color}80, 0 2px 6px rgba(0,0,0,0.4)`,
+                      border:
+                        draggingId === point.id
+                          ? "3px solid #fff"
+                          : "2px solid rgba(255,255,255,0.8)",
+                      boxShadow:
+                        draggingId === point.id
+                          ? `0 0 0 3px rgba(0,229,255,0.5), 0 0 16px ${point.color}, 0 2px 8px rgba(0,0,0,0.5)`
+                          : `0 0 8px ${point.color}80, 0 2px 6px rgba(0,0,0,0.4)`,
                       cursor: isDragging ? "grabbing" : "grab",
                       pointerEvents: "auto",
                       touchAction: "none",
-                      transition: draggingId === point.id ? "none" : "left 0.3s ease, top 0.3s ease, box-shadow 0.15s ease",
+                      transition:
+                        draggingId === point.id
+                          ? "none"
+                          : "left 0.3s ease, top 0.3s ease, box-shadow 0.15s ease",
                       zIndex: draggingId === point.id ? 20 : 10,
                     }}
                   >
@@ -546,13 +575,12 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
         <div className="w-full lg:w-80 xl:w-96 shrink-0 flex flex-col gap-5">
           {/* Colors Section */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-            <h3 className="text-sm font-semibold text-white/50 mb-4 uppercase tracking-wider">{dict.colors}</h3>
+            <h3 className="text-sm font-semibold text-white/50 mb-4 uppercase tracking-wider">
+              {dict.colors}
+            </h3>
             <div className="flex flex-col gap-3">
               {points.map((point) => (
-                <div
-                  key={point.id}
-                  className="bg-black/30 rounded-xl p-3 border border-white/5"
-                >
+                <div key={point.id} className="bg-black/30 rounded-xl p-3 border border-white/5">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="relative">
                       <input
@@ -563,7 +591,9 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
                         style={{ padding: 0 }}
                       />
                     </div>
-                    <span className="font-mono text-xs text-white/60 flex-1 uppercase">{point.color}</span>
+                    <span className="font-mono text-xs text-white/60 flex-1 uppercase">
+                      {point.color}
+                    </span>
                     <button
                       onClick={() => updatePoint(point.id, { locked: !point.locked })}
                       className={`p-1.5 rounded-lg transition-colors ${point.locked ? "bg-[var(--c-neon-cyan)]/20 text-[var(--c-neon-cyan)]" : "text-white/30 hover:text-white/60 hover:bg-white/5"}`}
@@ -583,16 +613,43 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
                   {/* Position & Size sliders */}
                   <div className="grid grid-cols-3 gap-2">
                     <div>
-                      <label className="text-[10px] text-white/40 uppercase tracking-wider font-medium block mb-1">X</label>
-                      <input type="range" min="0" max="100" value={point.x} onChange={(e) => updatePoint(point.id, { x: parseInt(e.target.value) })} className="w-full accent-[var(--c-neon-cyan)] cursor-pointer" />
+                      <label className="text-[10px] text-white/40 uppercase tracking-wider font-medium block mb-1">
+                        X
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={point.x}
+                        onChange={(e) => updatePoint(point.id, { x: parseInt(e.target.value) })}
+                        className="w-full accent-[var(--c-neon-cyan)] cursor-pointer"
+                      />
                     </div>
                     <div>
-                      <label className="text-[10px] text-white/40 uppercase tracking-wider font-medium block mb-1">Y</label>
-                      <input type="range" min="0" max="100" value={point.y} onChange={(e) => updatePoint(point.id, { y: parseInt(e.target.value) })} className="w-full accent-[var(--c-neon-cyan)] cursor-pointer" />
+                      <label className="text-[10px] text-white/40 uppercase tracking-wider font-medium block mb-1">
+                        Y
+                      </label>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={point.y}
+                        onChange={(e) => updatePoint(point.id, { y: parseInt(e.target.value) })}
+                        className="w-full accent-[var(--c-neon-cyan)] cursor-pointer"
+                      />
                     </div>
                     <div>
-                      <label className="text-[10px] text-white/40 uppercase tracking-wider font-medium block mb-1">{dict.size}</label>
-                      <input type="range" min="20" max="80" value={point.size} onChange={(e) => updatePoint(point.id, { size: parseInt(e.target.value) })} className="w-full accent-[var(--c-neon-cyan)] cursor-pointer" />
+                      <label className="text-[10px] text-white/40 uppercase tracking-wider font-medium block mb-1">
+                        {dict.size}
+                      </label>
+                      <input
+                        type="range"
+                        min="20"
+                        max="80"
+                        value={point.size}
+                        onChange={(e) => updatePoint(point.id, { size: parseInt(e.target.value) })}
+                        className="w-full accent-[var(--c-neon-cyan)] cursor-pointer"
+                      />
                     </div>
                   </div>
                 </div>
@@ -612,7 +669,9 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
 
           {/* Settings Section */}
           <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
-            <h3 className="text-sm font-semibold text-white/50 mb-4 uppercase tracking-wider">{dict.settings}</h3>
+            <h3 className="text-sm font-semibold text-white/50 mb-4 uppercase tracking-wider">
+              {dict.settings}
+            </h3>
             <div className="flex flex-col gap-4">
               {/* Background Color */}
               <div className="flex items-center justify-between">
@@ -631,7 +690,9 @@ export default function MeshGradientClient({ dict: userDict }: { dict?: MeshDict
 
               {/* Aspect Ratio */}
               <div>
-                <label className="text-sm text-white/60 font-medium block mb-2">{dict.aspectRatio}</label>
+                <label className="text-sm text-white/60 font-medium block mb-2">
+                  {dict.aspectRatio}
+                </label>
                 <div className="grid grid-cols-4 gap-1.5">
                   {RATIOS.map((r) => (
                     <button

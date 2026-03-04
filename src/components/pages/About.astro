@@ -9,25 +9,30 @@ import TechGlobe from "../3d/TechGlobe.astro";
 import FunFacts from "../sections/FunFacts.astro";
 import LiveData from "../sections/LiveData.astro";
 import { site } from "../../data/site";
-import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+import { getLangFromUrl, useTranslations } from "../../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 ---
 
-<BaseLayout 
-  title={`${t('nav.about')} • ${site.name}`}
+<BaseLayout
+  title={`${t("nav.about")} • ${site.name}`}
   description={`${site.tagline} • ${site.location}`}
 >
-  <Section title={t('nav.about')} eyebrow={site.title}>
+  <Section title={t("nav.about")} eyebrow={site.title}>
     <div class="intro">
-      <div class="avatarWrap" data-reveal data-reveal-class="reveal-scale" data-reveal-group="aboutHead">
+      <div
+        class="avatarWrap"
+        data-reveal
+        data-reveal-class="reveal-scale"
+        data-reveal-group="aboutHead"
+      >
         <!-- 3D Avatar (Interactive) -->
         <AnimeAvatar />
       </div>
       <div class="bio" data-reveal data-reveal-group="aboutHead">
-        <p class="lead">{t('about.lead')}</p>
-        <p class="sub">{t('about.sub')}</p>
+        <p class="lead">{t("about.lead")}</p>
+        <p class="sub">{t("about.sub")}</p>
       </div>
     </div>
   </Section>
@@ -35,31 +40,39 @@ const t = useTranslations(lang);
   <GlowDivider />
 
   <!-- 3D Tech Globe -->
-  <Section title={t('about.techUniverse.title')} eyebrow={t('about.techUniverse.eyebrow')}>
+  <Section title={t("about.techUniverse.title")} eyebrow={t("about.techUniverse.eyebrow")}>
     <TechGlobe />
   </Section>
 
   <GlowDivider />
 
-  <Section title={t('about.techStack.title')} eyebrow={t('about.techStack.eyebrow')}>
+  <Section title={t("about.techStack.title")} eyebrow={t("about.techStack.eyebrow")}>
     <SkillsGrid />
   </Section>
 
   <GlowDivider />
 
-  <Section title={t('about.experience.title')} eyebrow={t('about.experience.eyebrow')}>
+  <Section title={t("about.experience.title")} eyebrow={t("about.experience.eyebrow")}>
     <ExperienceTimeline />
   </Section>
 
   <GlowDivider />
 
-  <Section title={t('about.principles.title')} eyebrow={t('about.principles.eyebrow')}>
+  <Section title={t("about.principles.title")} eyebrow={t("about.principles.eyebrow")}>
     <div class="prose" data-reveal-container="principles" data-reveal-stagger="100">
       <ul>
-        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">{t('about.principles.p1')}</li>
-        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">{t('about.principles.p2')}</li>
-        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">{t('about.principles.p3')}</li>
-        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">{t('about.principles.p4')}</li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">
+          {t("about.principles.p1")}
+        </li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">
+          {t("about.principles.p2")}
+        </li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">
+          {t("about.principles.p3")}
+        </li>
+        <li data-reveal data-reveal-class="reveal-slide-left" data-reveal-group="principle">
+          {t("about.principles.p4")}
+        </li>
       </ul>
     </div>
   </Section>
@@ -128,7 +141,11 @@ const t = useTranslations(lang);
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .avatarGlow { animation: none; }
-    .avatar { animation: none; }
+    .avatarGlow {
+      animation: none;
+    }
+    .avatar {
+      animation: none;
+    }
   }
 </style>

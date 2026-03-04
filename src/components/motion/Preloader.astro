@@ -9,14 +9,14 @@ import { site } from "../../data/site";
     <div class="preloaderName">{site.name}</div>
     <div class="preloaderTitle">{site.title}</div>
     <div class="preloaderBar">
-      <div class="preloaderFill" />
+      <div class="preloaderFill"></div>
     </div>
   </div>
 </div>
 
 <script is:inline>
-  (function() {
-    const p = document.getElementById('preloader');
+  (function () {
+    const p = document.getElementById("preloader");
     if (!p) return;
 
     // Client-side nav (ViewTransitions) — don't show, just remove
@@ -27,14 +27,14 @@ import { site } from "../../data/site";
 
     // Full page load — show preloader
     window.__preloaderShown = true;
-    p.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    p.style.display = "flex";
+    document.body.style.overflow = "hidden";
 
     function dismiss() {
-      if (p.classList.contains('is-done')) return;
-      p.classList.add('is-done');
-      document.body.style.overflow = '';
-      setTimeout(function() {
+      if (p.classList.contains("is-done")) return;
+      p.classList.add("is-done");
+      document.body.style.overflow = "";
+      setTimeout(function () {
         try {
           p.remove();
         } catch {
@@ -43,11 +43,15 @@ import { site } from "../../data/site";
       }, 800);
     }
 
-    const fill = p.querySelector('.preloaderFill');
+    const fill = p.querySelector(".preloaderFill");
     if (fill) {
-      fill.addEventListener('animationend', function() {
-        setTimeout(dismiss, 200);
-      }, { once: true });
+      fill.addEventListener(
+        "animationend",
+        function () {
+          setTimeout(dismiss, 200);
+        },
+        { once: true },
+      );
     }
 
     // Safety fallback
@@ -55,8 +59,8 @@ import { site } from "../../data/site";
   })();
 
   // Prevent preloader from appearing in incoming pages during ViewTransitions
-  document.addEventListener('astro:before-swap', function(e) {
-    const incoming = e.newDocument.getElementById('preloader');
+  document.addEventListener("astro:before-swap", function (e) {
+    const incoming = e.newDocument.getElementById("preloader");
     if (incoming) incoming.remove();
   });
 </script>
@@ -70,7 +74,9 @@ import { site } from "../../data/site";
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out);
+    transition:
+      opacity 600ms var(--ease-out),
+      transform 600ms var(--ease-out);
   }
 
   .preloader.is-done {
@@ -85,8 +91,14 @@ import { site } from "../../data/site";
   }
 
   @keyframes preloaderFadeIn {
-    from { opacity: 0; transform: translate3d(0, 20px, 0); }
-    to { opacity: 1; transform: translate3d(0, 0, 0); }
+    from {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
   }
 
   .preloaderName {
@@ -125,7 +137,9 @@ import { site } from "../../data/site";
   }
 
   @keyframes preloaderProgress {
-    to { width: 100%; }
+    to {
+      width: 100%;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {

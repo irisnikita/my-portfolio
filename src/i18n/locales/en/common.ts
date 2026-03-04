@@ -13,5 +13,6 @@ export default {
   "chatbot.suggestion1": "Tell me about your tech stack",
   "chatbot.suggestion2": "What did you build at Zalo?",
   "chatbot.placeholder": "Type your message...",
-  "chatbot.error": "An error occurred fetching the AI response. Please check your API key and restart the dev server.",
+  "chatbot.error":
+    "An error occurred fetching the AI response. Please check your API key and restart the dev server.",
 } as const;

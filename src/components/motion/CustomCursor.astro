@@ -2,22 +2,24 @@
 // CustomCursor — branded dot + ring cursor for desktop only
 ---
 
-<div class="cursor-dot" aria-hidden="true" />
-<div class="cursor-ring" aria-hidden="true" />
+<div class="cursor-dot" aria-hidden="true"></div>
+<div class="cursor-ring" aria-hidden="true"></div>
 
 <script>
   function initCustomCursor() {
-    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
-    const canHover = window.matchMedia?.('(hover: hover)')?.matches;
-    const finePointer = window.matchMedia?.('(pointer: fine)')?.matches;
+    const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const canHover = window.matchMedia?.("(hover: hover)")?.matches;
+    const finePointer = window.matchMedia?.("(pointer: fine)")?.matches;
 
     if (!reducedMotion && canHover && finePointer) {
-      const dot = document.querySelector<HTMLElement>('.cursor-dot');
-      const ring = document.querySelector<HTMLElement>('.cursor-ring');
+      const dot = document.querySelector<HTMLElement>(".cursor-dot");
+      const ring = document.querySelector<HTMLElement>(".cursor-ring");
 
       if (dot && ring) {
-        let mouseX = -100, mouseY = -100;
-        let ringX = -100, ringY = -100;
+        let mouseX = -100,
+          mouseY = -100;
+        let ringX = -100,
+          ringY = -100;
         let raf = 0;
         let isHover = false;
 
@@ -44,8 +46,8 @@
           const target = e.target as HTMLElement;
           if (target.closest(hoverTargets)) {
             isHover = true;
-            dot.classList.add('is-hover');
-            ring.classList.add('is-hover');
+            dot.classList.add("is-hover");
+            ring.classList.add("is-hover");
           }
         };
 
@@ -53,24 +55,25 @@
           const target = e.target as HTMLElement;
           if (target.closest(hoverTargets)) {
             isHover = false;
-            dot.classList.remove('is-hover');
-            ring.classList.remove('is-hover');
+            dot.classList.remove("is-hover");
+            ring.classList.remove("is-hover");
           }
         };
 
-        document.addEventListener('mousemove', onMouseMove, { passive: true });
-        document.addEventListener('mouseover', onMouseOver);
-        document.addEventListener('mouseout', onMouseOut);
+        document.addEventListener("mousemove", onMouseMove, { passive: true });
+        document.addEventListener("mouseover", onMouseOver);
+        document.addEventListener("mouseout", onMouseOut);
 
-        dot.style.opacity = '1';
-        ring.style.opacity = '1';
-        document.documentElement.style.cursor = 'none';
+        dot.style.opacity = "1";
+        ring.style.opacity = "1";
+        document.documentElement.style.cursor = "none";
 
         // Restore cursors for inputs
-        if (!document.getElementById('cursor-input-style')) {
-          const style = document.createElement('style');
-          style.id = 'cursor-input-style';
-          style.textContent = 'input, textarea, select, [contenteditable] { cursor: text !important; }';
+        if (!document.getElementById("cursor-input-style")) {
+          const style = document.createElement("style");
+          style.id = "cursor-input-style";
+          style.textContent =
+            "input, textarea, select, [contenteditable] { cursor: text !important; }";
           document.head.appendChild(style);
         }
       }
@@ -78,7 +81,7 @@
   }
 
   // astro:page-load fires on initial load AND after every ViewTransition
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     initCustomCursor();
   });
 </script>
@@ -102,7 +105,10 @@
     background: rgba(0, 229, 255, 0.9);
     box-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
     mix-blend-mode: screen;
-    transition: background 200ms, width 200ms, height 200ms;
+    transition:
+      background 200ms,
+      width 200ms,
+      height 200ms;
   }
 
   .cursor-ring {
@@ -110,7 +116,9 @@
     height: 32px;
     border-radius: 999px;
     border: 1.5px solid rgba(0, 229, 255, 0.35);
-    transition: border-color 200ms, transform 200ms var(--ease-out);
+    transition:
+      border-color 200ms,
+      transform 200ms var(--ease-out);
   }
 
   .cursor-dot.is-hover {

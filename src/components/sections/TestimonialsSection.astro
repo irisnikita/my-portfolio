@@ -6,25 +6,37 @@ import { testimonials } from "../../data/testimonials";
 
 <Section title="What People Say" eyebrow="Testimonials">
   <div class="grid" data-reveal-container="testimonials" data-reveal-stagger="120">
-    {testimonials.map((t, i) => (
-      <div class="cardWrap" style={`--float-delay: ${i * 1.2}s`} data-reveal data-reveal-class="reveal-scale" data-reveal-group="tCard">
-        <Card>
-          <div class="testimonial">
-            <span class="quote-mark" aria-hidden="true">"</span>
-            <blockquote class="quote">{t.quote}</blockquote>
-            <div class="author">
-              <div class="avatar-placeholder" aria-hidden="true">
-                {t.author.charAt(0)}
-              </div>
-              <div>
-                <p class="name">{t.author}</p>
-                <p class="meta">{t.role} · {t.company}</p>
+    {
+      testimonials.map((t, i) => (
+        <div
+          class="cardWrap"
+          style={`--float-delay: ${i * 1.2}s`}
+          data-reveal
+          data-reveal-class="reveal-scale"
+          data-reveal-group="tCard"
+        >
+          <Card>
+            <div class="testimonial">
+              <span class="quote-mark" aria-hidden="true">
+                "
+              </span>
+              <blockquote class="quote">{t.quote}</blockquote>
+              <div class="author">
+                <div class="avatar-placeholder" aria-hidden="true">
+                  {t.author.charAt(0)}
+                </div>
+                <div>
+                  <p class="name">{t.author}</p>
+                  <p class="meta">
+                    {t.role} · {t.company}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
-      </div>
-    ))}
+          </Card>
+        </div>
+      ))
+    }
   </div>
 </Section>
 
@@ -46,8 +58,13 @@ import { testimonials } from "../../data/testimonials";
   }
 
   @keyframes cardFloat {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    50% { transform: translate3d(0, -6px, 0); }
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -6px, 0);
+    }
   }
 
   .testimonial {
@@ -66,7 +83,9 @@ import { testimonials } from "../../data/testimonials";
     pointer-events: none;
     opacity: 0;
     transform: scale(0.5);
-    transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-spring);
+    transition:
+      opacity 500ms var(--ease-out),
+      transform 500ms var(--ease-spring);
   }
 
   .cardWrap.is-revealed .quote-mark {

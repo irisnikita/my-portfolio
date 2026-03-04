@@ -1,24 +1,31 @@
 ---
 import Container from "./Container.astro";
 
-const {
-  title,
-  eyebrow,
-  class: className,
-  headingLevel = 2,
-} = Astro.props;
+const { title, eyebrow, class: className, headingLevel = 2 } = Astro.props;
 
-const HeadingTag = (`h${headingLevel}` as const);
+const HeadingTag = `h${headingLevel}` as const;
 ---
 
 <section
-  class={['section', className].filter(Boolean).join(' ')}
+  class={["section", className].filter(Boolean).join(" ")}
   data-reveal-container="section"
   data-reveal-stagger="70"
 >
   <Container>
-    {eyebrow ? <p class="eyebrow" data-reveal data-reveal-group="sectionHead">{eyebrow}</p> : null}
-    {title ? <HeadingTag class="title" data-scramble data-reveal data-reveal-group="sectionHead">{title}</HeadingTag> : null}
+    {
+      eyebrow ? (
+        <p class="eyebrow" data-reveal data-reveal-group="sectionHead">
+          {eyebrow}
+        </p>
+      ) : null
+    }
+    {
+      title ? (
+        <HeadingTag class="title" data-scramble data-reveal data-reveal-group="sectionHead">
+          {title}
+        </HeadingTag>
+      ) : null
+    }
     <div class="body">
       <slot />
     </div>

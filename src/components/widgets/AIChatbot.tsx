@@ -89,17 +89,13 @@ export default function AIChatbot({ lang = "en" }: { lang?: Lang }) {
                   <p>{t("chatbot.empty")}</p>
                   <div className="mt-4 flex flex-col gap-2">
                     <button
-                      onClick={() =>
-                        setInputValue(t("chatbot.suggestion1"))
-                      }
+                      onClick={() => setInputValue(t("chatbot.suggestion1"))}
                       className="text-xs bg-white/5 border border-white/10 rounded px-2 py-1.5 hover:bg-white/10 text-left"
                     >
                       {t("chatbot.suggestion1")}
                     </button>
                     <button
-                      onClick={() =>
-                        setInputValue(t("chatbot.suggestion2"))
-                      }
+                      onClick={() => setInputValue(t("chatbot.suggestion2"))}
                       className="text-xs bg-white/5 border border-white/10 rounded px-2 py-1.5 hover:bg-white/10 text-left"
                     >
                       {t("chatbot.suggestion2")}
@@ -146,9 +142,7 @@ export default function AIChatbot({ lang = "en" }: { lang?: Lang }) {
               {error && (
                 <div className="flex justify-start">
                   <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-red-500/20 text-red-200 border border-red-500/30 rounded-bl-sm text-sm">
-                    ⚠️{" "}
-                    {error.message ||
-                      t("chatbot.error")}
+                    ⚠️ {error.message || t("chatbot.error")}
                   </div>
                 </div>
               )}

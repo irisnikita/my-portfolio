@@ -11,10 +11,9 @@ export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
   if (!import.meta.env.GOOGLE_GENERATIVE_AI_API_KEY) {
-    return new Response(
-      JSON.stringify({ error: "No Google Gemini API key configured." }),
-      { status: 500 },
-    );
+    return new Response(JSON.stringify({ error: "No Google Gemini API key configured." }), {
+      status: 500,
+    });
   }
 
   try {

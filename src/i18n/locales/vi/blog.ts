@@ -1,6 +1,7 @@
 export default {
   "blog.metaTitle": "Góc Nhìn",
-  "blog.metaDesc": "Chia sẻ về web development, performance và kinh nghiệm xây dựng ứng dụng production.",
+  "blog.metaDesc":
+    "Chia sẻ về web development, performance và kinh nghiệm xây dựng ứng dụng production.",
   "blog.sectionEyebrow": "Góc Nhìn",
   "blog.sectionTitle": "Bài Viết",
   "blog.readMore": "Đọc tiếp →",

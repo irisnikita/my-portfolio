@@ -3,8 +3,8 @@
 ---
 
 <div class="glowDivider" aria-hidden="true">
-  <div class="glowLine" />
-  <div class="glowPulse" />
+  <div class="glowLine"></div>
+  <div class="glowPulse"></div>
 </div>
 
 <style>
@@ -44,17 +44,33 @@
   }
 
   @keyframes glowSlide {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
   }
 
   @keyframes glowPulseAnim {
-    0%, 100% { opacity: 0.3; transform: translateX(-50%) scaleX(1); }
-    50% { opacity: 0.8; transform: translateX(-50%) scaleX(1.5); }
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: translateX(-50%) scaleX(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: translateX(-50%) scaleX(1.5);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .glowLine { animation: none; }
-    .glowPulse { animation: none; opacity: 0.4; }
+    .glowLine {
+      animation: none;
+    }
+    .glowPulse {
+      animation: none;
+      opacity: 0.4;
+    }
   }
 </style>

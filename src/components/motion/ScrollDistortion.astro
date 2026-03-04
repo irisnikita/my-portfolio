@@ -8,17 +8,17 @@
     <defs>
       <filter id="rgb-split">
         <!-- R offset -->
-        <feOffset id="offsetR" dx="0" dy="0" in="SourceGraphic" result="R" />
+        <feOffset id="offsetR" dx="0" dy="0" in="SourceGraphic" result="R"></feOffset>
         <!-- G offset -->
-        <feOffset id="offsetG" dx="0" dy="0" in="SourceGraphic" result="G" />
+        <feOffset id="offsetG" dx="0" dy="0" in="SourceGraphic" result="G"></feOffset>
         <!-- B offset -->
-        <feOffset id="offsetB" dx="0" dy="0" in="SourceGraphic" result="B" />
-        
+        <feOffset id="offsetB" dx="0" dy="0" in="SourceGraphic" result="B"></feOffset>
+
         <!-- Reconstruct -->
         <feMerge>
-          <feMergeNode in="R" />
-          <feMergeNode in="G" />
-          <feMergeNode in="B" />
+          <feMergeNode in="R"></feMergeNode>
+          <feMergeNode in="G"></feMergeNode>
+          <feMergeNode in="B"></feMergeNode>
         </feMerge>
       </filter>
     </defs>
@@ -27,11 +27,11 @@
 
 <script>
   function initScrollDistortion() {
-    const overlay = document.getElementById('crt-overlay');
+    const overlay = document.getElementById("crt-overlay");
     if (!overlay) return;
 
-    if (overlay.hasAttribute('data-init')) return;
-    overlay.setAttribute('data-init', 'true');
+    if (overlay.hasAttribute("data-init")) return;
+    overlay.setAttribute("data-init", "true");
 
     let lastScrollY = window.scrollY;
     let velocity = 0;
@@ -40,7 +40,7 @@
     const onScroll = () => {
       const currentScrollY = window.scrollY;
       const delta = currentScrollY - lastScrollY;
-      
+
       // Calculate raw velocity
       velocity = delta;
       lastScrollY = currentScrollY;
@@ -49,9 +49,9 @@
     const render = () => {
       // Smooth decay of velocity
       velocity *= 0.9;
-      
+
       const absVelocity = Math.abs(velocity);
-      
+
       // Map velocity to distortion intensity
       // Below 5 velocity = no distortion. Cap at 50.
       let intensity = 0;
@@ -61,36 +61,36 @@
 
       if (intensity > 0.01) {
         // Activate overlay
-        overlay.style.opacity = (intensity * 0.4).toString(); 
+        overlay.style.opacity = (intensity * 0.4).toString();
         overlay.style.backdropFilter = `blur(${intensity * 2}px)`;
         // If we want real RGB split via SVG filter on the BODY, it's very expensive.
         // Instead, we fake it by translating multiple transparent overlays or just using backdrop-filter.
         // For performance, we just add horizontal scanline jitter.
         overlay.style.transform = `translateY(${velocity * 0.1}px) scale(1.02)`;
-        overlay.classList.add('is-distorting');
+        overlay.classList.add("is-distorting");
       } else {
-        overlay.style.opacity = '0';
-        overlay.style.backdropFilter = 'blur(0px)';
-        overlay.style.transform = 'translateY(0) scale(1)';
-        overlay.classList.remove('is-distorting');
+        overlay.style.opacity = "0";
+        overlay.style.backdropFilter = "blur(0px)";
+        overlay.style.transform = "translateY(0) scale(1)";
+        overlay.classList.remove("is-distorting");
       }
 
       rafId = requestAnimationFrame(render);
     };
 
-    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     render();
 
     (window as any)._cleanupCrt = () => {
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(rafId);
     };
   }
 
   // astro:page-load fires on initial load AND after every ViewTransition
-  document.addEventListener('astro:page-load', () => {
+  document.addEventListener("astro:page-load", () => {
     if ((window as any)._cleanupCrt) (window as any)._cleanupCrt();
-    const pmr = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const pmr = window.matchMedia?.("(prefers-reduced-motion: reduce)");
     if (!pmr?.matches) initScrollDistortion();
   });
 </script>
@@ -106,7 +106,7 @@
     opacity: 0;
     will-change: opacity, transform, backdrop-filter;
     transition: opacity 0.1s ease-out; /* fast decay */
-    
+
     /* CRT Scanline pattern */
     background: linear-gradient(
       transparent 50%,
@@ -114,9 +114,11 @@
       rgba(255, 43, 214, 0.02) 100%
     );
     background-size: 100% 4px;
-    
+
     /* Subtle RGB separation illusion on edges */
-    box-shadow: inset 0 0 100px rgba(0, 229, 255, 0.1), inset 0 0 100px rgba(255, 43, 214, 0.1);
+    box-shadow:
+      inset 0 0 100px rgba(0, 229, 255, 0.1),
+      inset 0 0 100px rgba(255, 43, 214, 0.1);
   }
 
   /* When distorting heavily, add glitch animation */
@@ -125,8 +127,14 @@
   }
 
   @keyframes jitter {
-    0% { background-position: 0 0; }
-    50% { background-position: 0 4px; }
-    100% { background-position: 0 0; }
+    0% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 0 4px;
+    }
+    100% {
+      background-position: 0 0;
+    }
   }
 </style>

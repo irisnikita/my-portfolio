@@ -23,12 +23,12 @@ Brands needed a unified view of customer behavior across web, app, and in-store 
 
 ## Architecture
 
-| Layer | Tech | Purpose |
-|---|---|---|
-| Dashboard | React + TypeScript | Campaign management, segmentation UI |
-| API | NestJS + TypeORM | Event ingestion, data processing |
-| Data | PostgreSQL + Redis | Unified profiles, real-time cache |
-| Integrations | REST + Webhooks | POS, CRM, social platform connectors |
+| Layer        | Tech               | Purpose                              |
+| ------------ | ------------------ | ------------------------------------ |
+| Dashboard    | React + TypeScript | Campaign management, segmentation UI |
+| API          | NestJS + TypeORM   | Event ingestion, data processing     |
+| Data         | PostgreSQL + Redis | Unified profiles, real-time cache    |
+| Integrations | REST + Webhooks    | POS, CRM, social platform connectors |
 
 ## Approach
 
@@ -40,12 +40,12 @@ Brands needed a unified view of customer behavior across web, app, and in-store 
 
 ## Key Metrics
 
-| Metric | Result |
-|---|---|
-| Data sources unified | 3+ per brand |
-| Segmentation latency | < 500ms real-time |
-| Dashboard adoption | Daily use by marketing teams |
-| API uptime | 99.9% over 6 months |
+| Metric               | Result                       |
+| -------------------- | ---------------------------- |
+| Data sources unified | 3+ per brand                 |
+| Segmentation latency | < 500ms real-time            |
+| Dashboard adoption   | Daily use by marketing teams |
+| API uptime           | 99.9% over 6 months          |
 
 ## Result
 

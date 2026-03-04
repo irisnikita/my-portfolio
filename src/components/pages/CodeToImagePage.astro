@@ -1,20 +1,20 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { site } from "../../data/site";
-import ImageCompressorClient from "../tools/ImageCompressor";
+import CodeToImageClient from "../tools/CodeToImageGenerator";
 import { getLangFromUrl, useTranslatedPath, useTranslations } from "../../i18n/utils";
-import { imageCompressorDict } from "../../i18n/dicts/imageCompressor";
+import { codeToImageDict } from "../../i18n/dicts/codeToImage";
 
 const lang = getLangFromUrl(Astro.url);
 const translatePath = useTranslatedPath(lang);
 const t = useTranslations(lang);
 
-const dict = imageCompressorDict[lang];
+const dict = codeToImageDict[lang];
 ---
 
 <BaseLayout
-  title={`${t("tools.imageCompressor.metaTitle")} | ${site.title}`}
-  description={t("tools.imageCompressor.metaDesc")}
+  title={`${t("tools.codeToImage.metaTitle")} | ${site.title}`}
+  description={t("tools.codeToImage.metaDesc")}
 >
   <main class="page-tool wrap pt-32 pb-24">
     <header class="mb-12">
@@ -26,7 +26,7 @@ const dict = imageCompressorDict[lang];
         </a>
         <span class="opacity-40">/</span>
         <span class="text-[color:var(--c-neon-cyan)]">
-          {t("tools.breadcrumb.imageCompressor")}
+          {t("tools.breadcrumb.codeToImage")}
         </span>
       </div>
 
@@ -34,28 +34,26 @@ const dict = imageCompressorDict[lang];
         class="text-4xl md:text-5xl font-extrabold mb-4"
         style="background: linear-gradient(135deg, var(--c-neon-cyan), var(--c-neon-magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
       >
-        {t("tools.imageCompressor.h1")}
+        {t("tools.codeToImage.h1")}
       </h1>
       <p class="text-xl opacity-70 max-w-2xl">
-        {t("tools.imageCompressor.lead")}
+        {t("tools.codeToImage.lead")}
       </p>
     </header>
 
     <div
-      class="tool-container bg-[#0a0a10] border border-white/10 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden"
+      class="tool-container bg-[#0a0a10] border border-white/10 rounded-3xl p-4 md:p-8 shadow-2xl relative overflow-hidden"
     >
-      <!-- Glow ambient background -->
       <div
-        class="absolute -top-40 -left-40 w-96 h-96 bg-[var(--c-neon-cyan)] rounded-full blur-[120px] opacity-[0.15] mix-blend-screen pointer-events-none"
+        class="absolute -top-40 -left-40 w-96 h-96 bg-[var(--c-neon-cyan)] rounded-full blur-[120px] opacity-[0.08] mix-blend-screen pointer-events-none"
       >
       </div>
       <div
-        class="absolute -bottom-40 -right-40 w-96 h-96 bg-[var(--c-neon-magenta)] rounded-full blur-[120px] opacity-[0.15] mix-blend-screen pointer-events-none"
+        class="absolute -bottom-40 -right-40 w-96 h-96 bg-[var(--c-neon-magenta)] rounded-full blur-[120px] opacity-[0.08] mix-blend-screen pointer-events-none"
       >
       </div>
 
-      <!-- Core Client Component -->
-      <ImageCompressorClient client:load dict={dict} />
+      <CodeToImageClient client:load dict={dict} />
     </div>
   </main>
 </BaseLayout>

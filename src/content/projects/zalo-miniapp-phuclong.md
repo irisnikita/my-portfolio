@@ -23,12 +23,12 @@ Phúc Long wanted to reduce queue times and increase order frequency. They neede
 
 ## Architecture
 
-| Layer | Tech | Purpose |
-|---|---|---|
-| UI | React + Zalo SDK | Menu, cart, checkout, loyalty |
+| Layer    | Tech             | Purpose                          |
+| -------- | ---------------- | -------------------------------- |
+| UI       | React + Zalo SDK | Menu, cart, checkout, loyalty    |
 | Back-end | NestJS + TypeORM | Order management, voucher engine |
-| Payments | ZaloPay API | In-app payment processing |
-| Cache | Redis | Session, cart persistence |
+| Payments | ZaloPay API      | In-app payment processing        |
+| Cache    | Redis            | Session, cart persistence        |
 
 ## Approach
 
@@ -41,13 +41,13 @@ Phúc Long wanted to reduce queue times and increase order frequency. They neede
 
 ## Key Metrics
 
-| Metric | Result |
-|---|---|
-| App load time | < 2s on mid-range devices |
-| Order completion rate | 85%+ (above industry avg) |
-| Payment success rate | 98.5% (with retry logic) |
-| Daily active users | Thousands of orders daily |
-| Bundle size | Optimized for Zalo constraints |
+| Metric                | Result                         |
+| --------------------- | ------------------------------ |
+| App load time         | < 2s on mid-range devices      |
+| Order completion rate | 85%+ (above industry avg)      |
+| Payment success rate  | 98.5% (with retry logic)       |
+| Daily active users    | Thousands of orders daily      |
+| Bundle size           | Optimized for Zalo constraints |
 
 ## Result
 

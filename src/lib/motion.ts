@@ -71,10 +71,7 @@ export function observeReveal(opts: ObserveRevealOpts = {}) {
   };
 
   const getStaggerMs = (container: HTMLElement | null) => {
-    return (
-      parseMs(container?.getAttribute("data-reveal-stagger") ?? null) ??
-      defaultStaggerMs
-    );
+    return parseMs(container?.getAttribute("data-reveal-stagger") ?? null) ?? defaultStaggerMs;
   };
 
   const isGridLayout = (container: HTMLElement | null) =>
@@ -143,7 +140,7 @@ export function observeReveal(opts: ObserveRevealOpts = {}) {
         if (once) io.unobserve(el);
       }
     },
-    { threshold }
+    { threshold },
   );
 
   for (const el of els) io.observe(el);
@@ -197,14 +194,23 @@ export function observeParallax(selector = "[data-parallax]") {
       const center = rect.top + rect.height / 2;
       const progress = (center - vh / 2) / vh; // -0.5 to 0.5 when in view
 
-      let tx = 0, ty = 0;
+      let tx = 0,
+        ty = 0;
       const offset = progress * item.speed * 100;
 
       switch (item.direction) {
-        case "up": ty = -offset; break;
-        case "down": ty = offset; break;
-        case "left": tx = -offset; break;
-        case "right": tx = offset; break;
+        case "up":
+          ty = -offset;
+          break;
+        case "down":
+          ty = offset;
+          break;
+        case "left":
+          tx = -offset;
+          break;
+        case "right":
+          tx = offset;
+          break;
       }
 
       const s = 1 + (1 - item.scale) * progress;
@@ -292,7 +298,7 @@ export function initCardTilt(selector = ".card-tilt") {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         const rotateY = (x - 0.5) * 12; // ±6deg
-        const rotateX = (0.5 - y) * 8;  // ±4deg
+        const rotateX = (0.5 - y) * 8; // ±4deg
         el.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translate3d(0, -2px, 0)`;
         el.style.setProperty("--glow-x", `${x * 100}%`);
         el.style.setProperty("--glow-y", `${y * 100}%`);

@@ -6,7 +6,7 @@ const { as = "div", class: className, ...rest } = Astro.props;
 const Tag = as;
 ---
 
-<Tag {...rest} class={['container', className].filter(Boolean).join(' ')}>
+<Tag {...rest} class={["container", className].filter(Boolean).join(" ")}>
   <slot />
 </Tag>
 

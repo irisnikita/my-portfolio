@@ -10,52 +10,52 @@ const { class: className, text, ...rest } = Astro.props;
 const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
-<div class={['liquid-text-container', className].filter(Boolean).join(' ')} {...rest}>
+<div class={["liquid-text-container", className].filter(Boolean).join(" ")} {...rest}>
   <!-- SVG Filter definition (hidden) -->
-  <svg class="liquid-svg" aria-hidden="true" width="0" height="0" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    class="liquid-svg"
+    aria-hidden="true"
+    width="0"
+    height="0"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <filter id={filterId}>
-      <feTurbulence 
-        type="fractalNoise" 
-        baseFrequency="0.01 0.01" 
-        numOctaves="1" 
-        result="noise" 
-        class="turbulence"
-      />
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.01 0.01"
+        numOctaves="1"
+        result="noise"
+        class="turbulence"></feTurbulence>
       <!-- Higher scale = stronger melting effect -->
-      <feDisplacementMap 
-        in="SourceGraphic" 
-        in2="noise" 
-        scale="0" 
-        xChannelSelector="R" 
-        yChannelSelector="G" 
-        class="displacement"
-      />
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="noise"
+        scale="0"
+        xChannelSelector="R"
+        yChannelSelector="G"
+        class="displacement"></feDisplacementMap>
     </filter>
   </svg>
 
-  <h2 
-    class="liquid-heading" 
-    style={`filter: url(#${filterId});`}
-    data-liquid-text
-  >
+  <h2 class="liquid-heading" style={`filter: url(#${filterId});`} data-liquid-text>
     {text}
   </h2>
 </div>
 
 <script>
   function initLiquidText() {
-    const pmr = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const pmr = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (pmr) return;
 
-    const containers = document.querySelectorAll('.liquid-text-container');
-    
+    const containers = document.querySelectorAll(".liquid-text-container");
+
     containers.forEach((containerFn) => {
       const container = containerFn as HTMLElement;
-      if (container.hasAttribute('data-liquid-init')) return;
-      container.setAttribute('data-liquid-init', 'true');
+      if (container.hasAttribute("data-liquid-init")) return;
+      container.setAttribute("data-liquid-init", "true");
 
-      const filter = container.querySelector('.displacement') as SVGFEDisplacementMapElement;
-      const turbulence = container.querySelector('.turbulence') as SVGFETurbulenceElement;
+      const filter = container.querySelector(".displacement") as SVGFEDisplacementMapElement;
+      const turbulence = container.querySelector(".turbulence") as SVGFETurbulenceElement;
       if (!filter || !turbulence) return;
 
       let targetScale = 0;
@@ -66,47 +66,47 @@ const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
       let baseFreqX = 0.01;
       let baseFreqY = 0.01;
 
-      container.addEventListener('mousemove', (e) => {
+      container.addEventListener("mousemove", (e) => {
         const rect = container.getBoundingClientRect();
         // Calculate distance from center of bounding box to cursor
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
         const dx = e.clientX - cx;
         const dy = e.clientY - cy;
-        
+
         // Intensity based on proximity
-        const dist = Math.sqrt(dx*dx + dy*dy);
+        const dist = Math.sqrt(dx * dx + dy * dy);
         const maxDist = Math.max(rect.width, rect.height);
-        
+
         // Closer = higher scale (more distortion) up to max 120
-        const intensity = Math.max(0, 1 - (dist / (maxDist * 0.8)));
+        const intensity = Math.max(0, 1 - dist / (maxDist * 0.8));
         targetScale = intensity * 120;
-        
+
         // Slightly tweak frequency based on x/y for dynamic rippling
         baseFreqX = 0.01 + (dx / rect.width) * 0.02;
         baseFreqY = 0.01 + (dy / rect.height) * 0.02;
       });
 
-      container.addEventListener('mouseleave', () => {
+      container.addEventListener("mouseleave", () => {
         targetScale = 0;
       });
 
       function animate() {
         // Lerp the scale for smooth transition
         currentScale += (targetScale - currentScale) * 0.1;
-        
+
         // Only update DOM if there's a meaningful change
         if (Math.abs(currentScale - targetScale) > 0.1 || currentScale > 0.5) {
-          filter.setAttribute('scale', currentScale.toString());
-          turbulence.setAttribute('baseFrequency', `${Math.abs(baseFreqX)} ${Math.abs(baseFreqY)}`);
+          filter.setAttribute("scale", currentScale.toString());
+          turbulence.setAttribute("baseFrequency", `${Math.abs(baseFreqX)} ${Math.abs(baseFreqY)}`);
         } else if (currentScale <= 0.5 && targetScale === 0) {
           // Snap to 0 to stop rendering filter
-          filter.setAttribute('scale', '0');
+          filter.setAttribute("scale", "0");
         }
 
         rafId = requestAnimationFrame(animate);
       }
-      
+
       animate();
 
       (window as any)[`_cleanupLiquid_${container.id}`] = () => {
@@ -115,10 +115,10 @@ const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
     });
   }
 
-  document.addEventListener('astro:page-load', initLiquidText);
-  if (typeof window !== 'undefined') {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initLiquidText);
+  document.addEventListener("astro:page-load", initLiquidText);
+  if (typeof window !== "undefined") {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initLiquidText);
     } else {
       initLiquidText();
     }
@@ -130,7 +130,7 @@ const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
     position: relative;
     width: 100%;
     /* Create a large hit area for tracking */
-    padding: 60px 0; 
+    padding: 60px 0;
     cursor: crosshair;
     overflow: hidden;
   }

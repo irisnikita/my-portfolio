@@ -4,27 +4,29 @@ import { experience } from "../../data/experience";
 ---
 
 <div class="timeline" data-reveal-container="experience" data-reveal-stagger="120">
-  <div class="timelineLine" aria-hidden="true" />
+  <div class="timelineLine" aria-hidden="true"></div>
 
-  {experience.map((entry, idx) => (
-    <div class="entry" data-reveal data-reveal-class="reveal-slide-right" data-reveal-group="exp">
-      <div class="marker" aria-hidden="true">
-        <div class="markerDot" />
-        <div class="markerPulse" />
-      </div>
-      <div class="content">
-        <p class="period">{entry.period}</p>
-        <h4 class="role">{entry.role}</h4>
-        <p class="company">{entry.company}</p>
-        <p class="desc">{entry.description}</p>
-        <div class="tags">
-          {entry.tags.map((tag, i) => (
-            <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
-          ))}
+  {
+    experience.map((entry, idx) => (
+      <div class="entry" data-reveal data-reveal-class="reveal-slide-right" data-reveal-group="exp">
+        <div class="marker" aria-hidden="true">
+          <div class="markerDot" />
+          <div class="markerPulse" />
+        </div>
+        <div class="content">
+          <p class="period">{entry.period}</p>
+          <h4 class="role">{entry.role}</h4>
+          <p class="company">{entry.company}</p>
+          <p class="desc">{entry.description}</p>
+          <div class="tags">
+            {entry.tags.map((tag, i) => (
+              <Tag tone={i % 2 === 0 ? "cyan" : "neutral"}>{tag}</Tag>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  ))}
+    ))
+  }
 </div>
 
 <style>
@@ -39,14 +41,21 @@ import { experience } from "../../data/experience";
     top: 0;
     bottom: 0;
     width: 2px;
-    background: linear-gradient(180deg, rgba(0, 229, 255, 0.35), rgba(124, 59, 255, 0.2), transparent);
+    background: linear-gradient(
+      180deg,
+      rgba(0, 229, 255, 0.35),
+      rgba(124, 59, 255, 0.2),
+      transparent
+    );
     transform-origin: top center;
     transform: scaleY(0);
     animation: lineGrow 1.2s var(--ease-out) 0.3s forwards;
   }
 
   @keyframes lineGrow {
-    to { transform: scaleY(1); }
+    to {
+      transform: scaleY(1);
+    }
   }
 
   .entry {
@@ -89,9 +98,18 @@ import { experience } from "../../data/experience";
   }
 
   @keyframes dotPulse {
-    0% { transform: scale(0.5); opacity: 0.8; }
-    70% { transform: scale(2); opacity: 0; }
-    100% { transform: scale(2); opacity: 0; }
+    0% {
+      transform: scale(0.5);
+      opacity: 0.8;
+    }
+    70% {
+      transform: scale(2);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
   }
 
   .period {

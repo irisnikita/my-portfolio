@@ -23,13 +23,13 @@ PNJ's customer base is primarily mobile-first but reluctant to install multiple 
 
 ## Architecture
 
-| Layer | Tech | Purpose |
-|---|---|---|
-| UI | React + Zalo SDK | Product catalog, booking, membership |
-| Rendering | Next.js (SSR) | SEO-friendly product pages |
-| Back-end | NestJS | Catalog API, booking system |
-| CDP | Antsomi CDP | Personalized recommendations |
-| Hosting | Vercel + AWS | Edge deployment |
+| Layer     | Tech             | Purpose                              |
+| --------- | ---------------- | ------------------------------------ |
+| UI        | React + Zalo SDK | Product catalog, booking, membership |
+| Rendering | Next.js (SSR)    | SEO-friendly product pages           |
+| Back-end  | NestJS           | Catalog API, booking system          |
+| CDP       | Antsomi CDP      | Personalized recommendations         |
+| Hosting   | Vercel + AWS     | Edge deployment                      |
 
 ## Approach
 
@@ -42,13 +42,13 @@ PNJ's customer base is primarily mobile-first but reluctant to install multiple 
 
 ## Key Metrics
 
-| Metric | Result |
-|---|---|
-| Lighthouse performance | 90+ consistently |
-| Potential reach | 70M+ Zalo users |
-| Store foot traffic | Increased via in-app bookings |
-| Image load strategy | Progressive + lazy loading |
-| Membership engagement | Real-time point tracking |
+| Metric                 | Result                        |
+| ---------------------- | ----------------------------- |
+| Lighthouse performance | 90+ consistently              |
+| Potential reach        | 70M+ Zalo users               |
+| Store foot traffic     | Increased via in-app bookings |
+| Image load strategy    | Progressive + lazy loading    |
+| Membership engagement  | Real-time point tracking      |
 
 ## Result
 

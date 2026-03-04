@@ -4,39 +4,41 @@ import Section from "../ui/Section.astro";
 import ProjectCard from "../sections/ProjectCard.astro";
 import { getCollection } from "astro:content";
 import { site } from "../../data/site";
-import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "../../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
 const translatePath = useTranslatedPath(lang);
 
 const projects = (await getCollection("projects")).sort(
-  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0)
+  (a, b) => (b.data.date?.getTime() ?? 0) - (a.data.date?.getTime() ?? 0),
 );
 ---
 
-<BaseLayout 
-  title={`${t('projects.metaTitle')} • ${site.name}`}
+<BaseLayout
+  title={`${t("projects.metaTitle")} • ${site.name}`}
   description={`${site.tagline} • ${site.location}`}
 >
-  <Section title={t('projects.sectionTitle')} eyebrow={t('projects.sectionEyebrow')}>
+  <Section title={t("projects.sectionTitle")} eyebrow={t("projects.sectionEyebrow")}>
     <div class="grid" data-reveal-container="projects" data-reveal-stagger="80">
-      {projects.map((project, i) => (
-        <div data-reveal data-reveal-group="project">
-          <ProjectCard
-            title={project.data.title}
-            summary={project.data.summary}
-            slug={project.slug}
-            tags={project.data.tags}
-            index={i}
-          />
-        </div>
-      ))}
+      {
+        projects.map((project, i) => (
+          <div data-reveal data-reveal-group="project">
+            <ProjectCard
+              title={project.data.title}
+              summary={project.data.summary}
+              slug={project.slug}
+              tags={project.data.tags}
+              index={i}
+            />
+          </div>
+        ))
+      }
     </div>
 
     <div class="cta">
       <a class="ctaLink" href={translatePath("/#contact")}>
-        {t('projects.cta')}
+        {t("projects.cta")}
       </a>
     </div>
   </Section>

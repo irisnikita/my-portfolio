@@ -5,7 +5,7 @@ type Props = HTMLAttributes<"span"> & { tone?: "cyan" | "magenta" | "neutral" };
 const { tone = "neutral", class: className, ...rest } = Astro.props;
 ---
 
-<span {...rest} class={['tag', `tone-${tone}`, className].filter(Boolean).join(' ')}>
+<span {...rest} class={["tag", `tone-${tone}`, className].filter(Boolean).join(" ")}>
   <slot />
 </span>
 
@@ -15,7 +15,7 @@ const { tone = "neutral", class: className, ...rest } = Astro.props;
     align-items: center;
     padding: 6px 10px;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(255, 255, 255, 0.03);
     color: rgba(255, 255, 255, 0.78);
     font-size: 13px;
@@ -26,7 +26,7 @@ const { tone = "neutral", class: className, ...rest } = Astro.props;
     box-shadow: 0 0 0.8rem rgba(50, 245, 255, 0.12);
   }
   .tone-magenta {
-    border-color: rgba(255, 53, 213, 0.20);
-    box-shadow: 0 0 0.8rem rgba(255, 53, 213, 0.10);
+    border-color: rgba(255, 53, 213, 0.2);
+    box-shadow: 0 0 0.8rem rgba(255, 53, 213, 0.1);
   }
 </style>

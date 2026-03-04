@@ -3,7 +3,8 @@ export const imageCompressorDict = {
     errorType: "Please upload an image file (JPG, PNG, WebP).",
     errorCompress: "Something went wrong while compressing. Please try another image.",
     dragDrop: "Drag & drop your images here",
-    supported: "Supports JPG, PNG, WebP. Compression runs fully on your device — files are never uploaded.",
+    supported:
+      "Supports JPG, PNG, WebP. Compression runs fully on your device — files are never uploaded.",
     selectFile: "Select files",
     unlimited: "No max size limit",
     originalTitle: "Original",
@@ -29,7 +30,8 @@ export const imageCompressorDict = {
     errorType: "Vui lòng chỉ upload file ảnh (JPG, PNG, WebP).",
     errorCompress: "Đã xảy ra lỗi khi nén ảnh. Vui lòng thử lại với ảnh khác.",
     dragDrop: "Drag & drop hình ảnh của bạn vào đây",
-    supported: "Hỗ trợ JPG, PNG, WebP. Nén hoàn toàn trên thiết bị của bạn, cấu trúc file không bao giờ bị lộ ra ngoài.",
+    supported:
+      "Hỗ trợ JPG, PNG, WebP. Nén hoàn toàn trên thiết bị của bạn, cấu trúc file không bao giờ bị lộ ra ngoài.",
     selectFile: "Chọn tập tin",
     unlimited: "Kích thước tối đa không giới hạn",
     originalTitle: "Ảnh gốc",
