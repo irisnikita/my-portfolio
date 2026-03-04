@@ -9,7 +9,7 @@ import mdx from '@astrojs/mdx';
 
 import react from '@astrojs/react';
 
-import typography from '@tailwindcss/typography';
+// import typography from '@tailwindcss/typography'; // unused
 
 const site =
   process.env.SITE_URL ? process.env.SITE_URL :

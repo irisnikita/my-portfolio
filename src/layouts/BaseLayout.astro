@@ -24,12 +24,7 @@ const {
   ogType = "website",
 } = Astro.props;
 
-const nav = [
-  { href: "/projects", label: "Projects" },
-  { href: "/about", label: "About" },
-  { href: "/blog", label: "Blog" },
-  { href: "/#contact", label: "Contact" },
-];
+// (nav config moved to Header component)
 
 const footerSocials = [
   { label: "GitHub", href: site.socials.githubUrl },
@@ -38,7 +33,7 @@ const footerSocials = [
 ].filter((s) => typeof s.href === "string" && s.href.length > 0);
 
 const pathname = Astro.url?.pathname ?? "/";
-const isContactActive = pathname === "/" && Astro.url?.hash === "#contact";
+// const isContactActive = pathname === "/" && Astro.url?.hash === "#contact";
 
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).toString() : undefined;
 const ogImageAbs = Astro.site ? new URL(ogImage, Astro.site).toString() : ogImage;
@@ -104,7 +99,9 @@ const jsonLd = [
         if (theme && theme !== 'cyberpunk') {
           document.documentElement.setAttribute('data-vibe', theme);
         }
-      } catch (e) {}
+      } catch {
+        // ignore (localStorage may be unavailable)
+      }
     </script>
     
     <!-- Track click coords for ViewTransitions Wipe Effect -->

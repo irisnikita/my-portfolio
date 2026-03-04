@@ -158,7 +158,8 @@ import { site } from "../../data/site";
       // Toggle on Cmd+K or Ctrl+K
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        isOpen ? close() : open();
+        if (isOpen) close();
+        else open();
         return;
       }
 
@@ -270,7 +271,7 @@ import { site } from "../../data/site";
     // Copy email specific
     const copyBtn = document.getElementById('cmd-copy-email');
     if (copyBtn) {
-      copyBtn.addEventListener('click', (e) => {
+      copyBtn.addEventListener('click', () => {
         const email = copyBtn.getAttribute('data-email');
         if (email) {
           navigator.clipboard.writeText(email).then(() => {

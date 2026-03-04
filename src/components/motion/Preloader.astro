@@ -34,7 +34,13 @@ import { site } from "../../data/site";
       if (p.classList.contains('is-done')) return;
       p.classList.add('is-done');
       document.body.style.overflow = '';
-      setTimeout(function() { try { p.remove(); } catch(e) {} }, 800);
+      setTimeout(function() {
+        try {
+          p.remove();
+        } catch {
+          // ignore (node might already be removed)
+        }
+      }, 800);
     }
 
     const fill = p.querySelector('.preloaderFill');
