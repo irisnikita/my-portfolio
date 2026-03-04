@@ -61,14 +61,41 @@ export default tseslint.config(
     },
   },
 
-  // ── Project-wide overrides ──
+  // ── Project-wide defaults ──
   {
     rules: {
+      // Default: allow `any` as WARN to avoid massive churn in graphics/motion code.
+      // We enable a strict ban only in "app" layers below.
       "@typescript-eslint/no-explicit-any": "warn",
+
+      // Unused vars are usually cosmetic; keep as warning.
       "@typescript-eslint/no-unused-vars": [
         "warn",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
+    },
+  },
+
+  // ── App layers: `any` is a smell → ERROR ──
+  {
+    files: [
+      "src/i18n/**/*.{ts,tsx}",
+      "src/pages/**/*.{ts,tsx,astro}",
+      "src/components/pages/**/*.{ts,tsx,astro}",
+      "src/components/widgets/**/*.{ts,tsx}",
+      "src/components/ui/Header.{ts,tsx}",
+      "src/components/ui/Header.tsx",
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
+
+  // ── React hooks: treat dependency issues as errors (real bugs) ──
+  {
+    files: ["**/*.{tsx,jsx}"],
+    rules: {
+      "react-hooks/exhaustive-deps": "error",
     },
   },
 

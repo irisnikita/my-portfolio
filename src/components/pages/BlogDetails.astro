@@ -5,8 +5,10 @@ import Tag from "../ui/Tag.astro";
 import GlowDivider from "../ui/GlowDivider.astro";
 import { getLangFromUrl, useTranslations, useTranslatedPath } from '../../i18n/utils';
 
+import type { CollectionEntry } from "astro:content";
+
 interface Props {
-  entry: any;
+  entry: CollectionEntry<"blog">;
 }
 
 const { entry } = Astro.props;

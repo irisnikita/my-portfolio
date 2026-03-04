@@ -107,7 +107,7 @@ export default function AIChatbot({ lang = "en" }: { lang?: Lang }) {
                   </div>
                 </div>
               )}
-              {messages.map((m: any) => (
+              {messages.map((m) => (
                 <div
                   key={m.id}
                   className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}

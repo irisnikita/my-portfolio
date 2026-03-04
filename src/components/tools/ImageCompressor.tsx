@@ -102,44 +102,50 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
     localStorage.setItem("ic-renamePattern", renamePattern);
   }, [maxSizeMB, maxWidthOrHeight, outputFormat, renamePattern]);
 
-  const handleCompress = async (task: CompressTask, currentOpts: any) => {
-    try {
-      const compressed = await imageCompression(task.originalFile, {
-        ...currentOpts,
-        onProgress: (progress: number) => {
-          setTasks((prev) =>
-            prev.map((t) => (t.id === task.id ? { ...t, progress, status: "compressing" } : t)),
-          );
-        },
-      });
+  const handleCompress = useCallback(
+    async (task: CompressTask, currentOpts: Record<string, unknown>) => {
+      try {
+        const compressed = await imageCompression(task.originalFile, {
+          ...currentOpts,
+          onProgress: (progress: number) => {
+            setTasks((prev) =>
+              prev.map((t) =>
+                t.id === task.id ? { ...t, progress, status: "compressing" } : t,
+              ),
+            );
+          },
+        });
 
-      const saved = (
-        ((task.originalFile.size - compressed.size) / task.originalFile.size) *
-        100
-      ).toFixed(1);
+        const saved = (
+          ((task.originalFile.size - compressed.size) / task.originalFile.size) * 100
+        ).toFixed(1);
 
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === task.id
-            ? {
-                ...t,
-                compressedFile: compressed,
-                compressedUrl: URL.createObjectURL(compressed),
-                status: "done",
-                saving: saved,
-              }
-            : t,
-        ),
-      );
-    } catch (err) {
-      console.error(err);
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === task.id ? { ...t, status: "error", error: dict.errorCompress } : t,
-        ),
-      );
-    }
-  };
+        setTasks((prev) =>
+          prev.map((t) =>
+            t.id === task.id
+              ? {
+                  ...t,
+                  compressedFile: compressed,
+                  compressedUrl: URL.createObjectURL(compressed),
+                  status: "done",
+                  saving: saved,
+                }
+              : t,
+          ),
+        );
+      } catch (err) {
+        console.error(err);
+        setTasks((prev) =>
+          prev.map((t) =>
+            t.id === task.id
+              ? { ...t, status: "error", error: dict.errorCompress }
+              : t,
+          ),
+        );
+      }
+    },
+    [dict.errorCompress],
+  );
 
   const processFiles = useCallback((filesList: FileList | File[] | { file: File; path?: string }[]) => {
     const newTasks: CompressTask[] = [];
@@ -185,7 +191,7 @@ export default function ImageCompressorClient({ dict = defaultDict }: ImageCompr
         handleCompress(task, options);
       });
     }
-  }, [outputFormat, maxSizeMB, maxWidthOrHeight, dict.errorType]);
+  }, [outputFormat, maxSizeMB, maxWidthOrHeight, dict.errorType, handleCompress]);
 
   // Global Paste Listener
   useEffect(() => {

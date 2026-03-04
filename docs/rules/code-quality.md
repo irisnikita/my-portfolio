@@ -26,4 +26,4 @@
 - Avoid logging raw user messages / PII.
 
 ## Quick checklist before commit
-- `./skills.sh check`
+- `./skills.sh check` (runs **strict lint**, prettier check, and build)

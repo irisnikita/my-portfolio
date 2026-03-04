@@ -8,6 +8,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint .",
+    "lint:strict": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,astro,css,md,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,astro,css,md,json}\""

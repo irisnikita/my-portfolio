@@ -33,12 +33,12 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     return result.toUIMessageStreamResponse();
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Chat API Error:", error);
     return new Response(
       JSON.stringify({
         error: "Failed to process chat request.",
-        details: error.message || String(error),
+        details: error instanceof Error ? error.message : String(error),
       }),
       { status: 500 },
     );

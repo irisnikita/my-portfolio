@@ -258,7 +258,7 @@ import Button from "../components/ui/Button.astro";
     // Initial render without physics
     setTimeout(draw, 100);
 
-    (window as any)._cleanupPong = () => {
+    (window as unknown as { _cleanupPong?: () => void })._cleanupPong = () => {
       stopGame();
       window.removeEventListener('keydown', onKeydown);
       window.removeEventListener('keyup', onKeyup);
@@ -268,7 +268,8 @@ import Button from "../components/ui/Button.astro";
   }
 
   const runInit = () => {
-    if ((window as any)._cleanupPong) (window as any)._cleanupPong();
+    const w = window as unknown as { _cleanupPong?: () => void };
+    if (w._cleanupPong) w._cleanupPong();
     initPong();
   };
 

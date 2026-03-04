@@ -10,7 +10,7 @@ run() {
 
 case "$cmd" in
   check)
-    run npm run lint
+    run npm run lint:strict
     run npm run format:check
     run npm run build
     ;;
