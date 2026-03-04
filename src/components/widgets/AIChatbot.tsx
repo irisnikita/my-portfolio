@@ -2,8 +2,11 @@ import { useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { motion, AnimatePresence, useDragControls } from "framer-motion";
 
-export default function AIChatbot({ lang = "en" }: { lang?: string }) {
-  const isVi = lang === "vi";
+import { useTranslations } from "../../i18n/utils";
+import type { Lang } from "../../i18n/messages";
+
+export default function AIChatbot({ lang = "en" }: { lang?: Lang }) {
+  const t = useTranslations(lang);
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const dragControls = useDragControls();
@@ -75,7 +78,7 @@ export default function AIChatbot({ lang = "en" }: { lang?: string }) {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75"></span>
                   <span className="relative inline-flex h-3 w-3 rounded-full bg-cyan-500"></span>
                 </span>
-                <h3 className="text-sm font-semibold text-white">Iris AI Assistant</h3>
+                <h3 className="text-sm font-semibold text-white">{t("chatbot.title")}</h3>
               </div>
             </div>
 
@@ -83,34 +86,23 @@ export default function AIChatbot({ lang = "en" }: { lang?: string }) {
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar flex flex-col gap-4">
               {messages.length === 0 && (
                 <div className="text-center text-sm text-white/50 mt-10">
-                  <p>
-                    {isVi
-                      ? "Hãy hỏi tôi bất cứ điều gì về kinh nghiệm hay dự án của Vĩ!"
-                      : "Ask me anything about Vi's experience, skills, or projects!"}
-                  </p>
+                  <p>{t("chatbot.empty")}</p>
                   <div className="mt-4 flex flex-col gap-2">
                     <button
                       onClick={() =>
-                        setInputValue(
-                          isVi
-                            ? "Bạn đang sử dụng tech stack nào?"
-                            : "Tell me about your tech stack",
-                        )
+                        setInputValue(t("chatbot.suggestion1"))
                       }
                       className="text-xs bg-white/5 border border-white/10 rounded px-2 py-1.5 hover:bg-white/10 text-left"
                     >
-                      "{isVi ? "Bạn đang sử dụng tech stack nào?" : "Tell me about your tech stack"}
-                      "
+                      {t("chatbot.suggestion1")}
                     </button>
                     <button
                       onClick={() =>
-                        setInputValue(
-                          isVi ? "Bạn đã làm gì ở Zalo?" : "What did you build at Zalo?",
-                        )
+                        setInputValue(t("chatbot.suggestion2"))
                       }
                       className="text-xs bg-white/5 border border-white/10 rounded px-2 py-1.5 hover:bg-white/10 text-left"
                     >
-                      "{isVi ? "Bạn đã làm gì ở Zalo?" : "What did you build at Zalo?"}"
+                      {t("chatbot.suggestion2")}
                     </button>
                   </div>
                 </div>
@@ -156,9 +148,7 @@ export default function AIChatbot({ lang = "en" }: { lang?: string }) {
                   <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-red-500/20 text-red-200 border border-red-500/30 rounded-bl-sm text-sm">
                     ⚠️{" "}
                     {error.message ||
-                      (isVi
-                        ? "Đã xảy ra lỗi khi gọi AI. Vui lòng kiểm tra API key của bạn và khởi động lại dev server."
-                        : "An error occurred fetching the AI response. Please check your API key and restart the dev server.")}
+                      t("chatbot.error")}
                   </div>
                 </div>
               )}
@@ -170,7 +160,7 @@ export default function AIChatbot({ lang = "en" }: { lang?: string }) {
                 <input
                   value={inputValue || ""}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder={isVi ? "Nhập tin nhắn..." : "Type your message..."}
+                  placeholder={t("chatbot.placeholder")}
                   className="flex-1 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
                 />
                 <button

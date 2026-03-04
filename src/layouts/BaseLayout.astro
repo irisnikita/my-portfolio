@@ -12,9 +12,10 @@ import LenisScroll from "../components/motion/LenisScroll.astro";
 import AIChatbot from "../components/widgets/AIChatbot";
 import Header from "../components/ui/Header";
 import { site } from "../data/site";
-import { getLangFromUrl } from "../i18n/utils";
+import { getLangFromUrl, useTranslations } from "../i18n/utils";
 
 const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
 
 const {
   title = `${site.name} — ${site.title}`,
@@ -132,9 +133,9 @@ const jsonLd = [
     <ScrollDistortion />
     <ScrambleText />
     <SoundManager />
-    <a href="#main" class="skip-link">{lang === 'vi' ? 'Chuyển đến nội dung chính' : 'Skip to content'}</a>
+    <a href="#main" class="skip-link">{t('a11y.skipToContent')}</a>
 
-    <Header client:load currentPath={pathname} />
+    <Header client:load currentPath={pathname} lang={lang} />
 
     <main id="main">
       <slot />

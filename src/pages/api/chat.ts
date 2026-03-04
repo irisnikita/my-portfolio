@@ -21,7 +21,6 @@ export const POST: APIRoute = async ({ request }) => {
     const rawBody = await request.text();
     const { messages } = rawBody ? JSON.parse(rawBody) : { messages: [] };
 
-    console.log({ messages: JSON.stringify(messages) });
     const result = await streamText({
       model: google("gemini-2.5-flash"),
       messages,

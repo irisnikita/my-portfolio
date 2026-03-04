@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import { site } from "../../data/site";
 
-import { ui } from "../../i18n/ui";
+import { useTranslations, useTranslatedPath } from "../../i18n/utils";
+import type { Lang, I18nKey } from "../../i18n/messages";
 
-const navKeys: Array<{ href: string; labelKey: keyof (typeof ui)["en"]; hasDropdown?: boolean }> = [
+const navKeys: Array<{ href: string; labelKey: I18nKey; hasDropdown?: boolean }> = [
   { href: "/projects", labelKey: "nav.projects" },
   { href: "/tools", labelKey: "nav.tools", hasDropdown: true },
   { href: "/about", labelKey: "nav.about" },
@@ -12,11 +13,11 @@ const navKeys: Array<{ href: string; labelKey: keyof (typeof ui)["en"]; hasDropd
   { href: "/#contact", labelKey: "nav.contact" },
 ];
 
-// Sub-items for the "Tools" dropdown
-const toolsSubItems = [
+const toolsSubItems: Array<{ href: string; labelKey: I18nKey; descKey: I18nKey; icon: React.ReactNode }> = [
   {
     href: "/tools/image-compressor",
-    label: { en: "Image Compressor", vi: "Nén Ảnh Thông Minh" },
+    labelKey: "tools.imageCompressor.title",
+    descKey: "tools.imageCompressor.desc",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -24,21 +25,20 @@ const toolsSubItems = [
         <polyline points="21 15 16 10 5 21" />
       </svg>
     ),
-    description: { en: "Compress images client-side", vi: "Nén ảnh trực tiếp trên trình duyệt" },
   },
   {
     href: "/tools/css-mesh-gradient",
-    label: { en: "CSS Mesh Gradient", vi: "Tạo Mesh Gradient" },
+    labelKey: "tools.meshGradient.title",
+    descKey: "tools.meshGradient.desc",
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
       </svg>
     ),
-    description: { en: "Beautiful mesh gradients in pure CSS", vi: "Tạo mesh gradient tuyệt đẹp bằng CSS" },
   },
 ];
 
-export default function Header({ currentPath }: { currentPath: string }) {
+export default function Header({ currentPath, lang }: { currentPath: string; lang: Lang }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
   const [currentHash, setCurrentHash] = useState("");
@@ -47,13 +47,8 @@ export default function Header({ currentPath }: { currentPath: string }) {
   const toolsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { scrollY } = useScroll();
 
-  const lang = currentPath.startsWith("/vi") ? "vi" : "en";
-  const t = (key: keyof (typeof ui)["en"]) => ui[lang][key] || ui["en"][key];
-  const translatePath = (path: string, l: string = lang) => {
-    if (l === "en") return path;
-    if (path.startsWith("/#")) return `/${l}${path.substring(1)}`;
-    return `/${l}${path}`;
-  };
+  const t = useTranslations(lang);
+  const translatePath = useTranslatedPath(lang);
 
   const toggleLangPath =
     lang === "en"
@@ -359,7 +354,7 @@ export default function Header({ currentPath }: { currentPath: string }) {
                             <rect x="14" y="14" width="7" height="7" />
                             <rect x="3" y="14" width="7" height="7" />
                           </svg>
-                          {lang === "vi" ? "Tất cả công cụ" : "All Tools"}
+                          {t("header.tools.allTools")}
                         </a>
 
                         <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "0 8px 4px" }} />
@@ -408,10 +403,10 @@ export default function Header({ currentPath }: { currentPath: string }) {
                             </div>
                             <div>
                               <div style={{ fontSize: "14px", fontWeight: 600, lineHeight: 1.3 }}>
-                                {sub.label[lang]}
+                                {t(sub.labelKey)}
                               </div>
                               <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: 1.4, marginTop: "2px" }}>
-                                {sub.description[lang]}
+                                {t(sub.descKey)}
                               </div>
                             </div>
                           </a>
@@ -623,7 +618,7 @@ export default function Header({ currentPath }: { currentPath: string }) {
                                   <rect x="14" y="14" width="7" height="7" />
                                   <rect x="3" y="14" width="7" height="7" />
                                 </svg>
-                                {lang === "vi" ? "Tất cả công cụ" : "All Tools"}
+                                {t("header.tools.allTools")}
                               </a>
 
                               {toolsSubItems.map((sub) => (
@@ -659,10 +654,10 @@ export default function Header({ currentPath }: { currentPath: string }) {
                                   </div>
                                   <div>
                                     <div style={{ fontSize: "15px", fontWeight: 600, lineHeight: 1.3 }}>
-                                      {sub.label[lang]}
+                                      {t(sub.labelKey)}
                                     </div>
                                     <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", lineHeight: 1.4, marginTop: "2px" }}>
-                                      {sub.description[lang]}
+                                      {t(sub.descKey)}
                                     </div>
                                   </div>
                                 </a>
