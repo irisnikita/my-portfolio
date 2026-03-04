@@ -35,6 +35,8 @@ Run:
 (Optionally) `npm run format:check`
 
 ## Files to read first
+- `.antigravity/README.md`
+- `docs/rules/code-quality.md`
 - `src/i18n/messages.ts`
 - `src/i18n/utils.ts`
 - `src/i18n/routing.ts`
