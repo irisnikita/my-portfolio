@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from "react";
 import EditorPkg from "react-simple-code-editor";
 // SSR workaround for react-simple-code-editor ESM import
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Editor = (EditorPkg as any).default || EditorPkg;
 import Prism from "prismjs";
 import "prismjs/components/prism-javascript";
@@ -50,6 +51,7 @@ console.log(\`Velocity is \${v} m/s\`);`);
   const [showBackground, setShowBackground] = useState(true);
   const [showLineNumbers, setShowLineNumbers] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
+  const [widthMode, setWidthMode] = useState<"auto" | "custom">("auto");
 
   const [isExporting, setIsExporting] = useState(false);
   const [copiedIndicator, setCopiedIndicator] = useState(false);
@@ -140,7 +142,7 @@ console.log(\`Velocity is \${v} m/s\`);`);
         >
           {/* Code Editor Window */}
           <div
-            className={`relative w-full max-w-[800px] rounded-xl overflow-hidden shadow-2xl transition-colors duration-300 ${darkMode ? "bg-[#0E1117]/95 border border-white/10" : "bg-white/95 border border-black/10"}`}
+            className={`relative min-w-[320px] sm:min-w-[400px] max-w-full rounded-xl shadow-2xl transition-colors duration-300 ${darkMode ? "bg-[#0E1117]/95 border border-white/10" : "bg-white/95 border border-black/10"} ${widthMode === "auto" ? "w-fit overflow-hidden" : "w-[600px] resize-x overflow-auto"}`}
             style={{
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
@@ -336,6 +338,27 @@ console.log(\`Velocity is \${v} m/s\`);`);
                     {p.replace("px", "")}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Width Controls */}
+            <div>
+              <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
+                {dict.widthMode}
+              </label>
+              <div className="flex bg-black/50 rounded-lg p-1 border border-white/10">
+                <button
+                  onClick={() => setWidthMode("auto")}
+                  className={`flex-1 py-1.5 text-xs rounded-md transition-colors ${widthMode === "auto" ? "bg-white/20 text-white" : "text-white/50 hover:text-white"}`}
+                >
+                  {dict.autoWidth}
+                </button>
+                <button
+                  onClick={() => setWidthMode("custom")}
+                  className={`flex-1 py-1.5 text-xs rounded-md transition-colors ${widthMode === "custom" ? "bg-white/20 text-white" : "text-white/50 hover:text-white"}`}
+                >
+                  {dict.customWidth}
+                </button>
               </div>
             </div>
 

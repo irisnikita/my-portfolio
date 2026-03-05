@@ -22,6 +22,9 @@ export const codeToImageDict = {
     aboutDesc: "A tool to create beautiful, shareable screenshots of your code snippets. Perfect for social media, blogs, or documentation.",
     aboutFeatures: "Features include syntax highlighting for 10+ languages, customizable padding, beautiful background gradients, and macOS window controls.",
     madeBy: "Made with ❤️ by Iris Nikita.",
+    widthMode: "Width",
+    autoWidth: "Auto",
+    customWidth: "Custom",
   },
   vi: {
     language: "Ngôn ngữ",
@@ -46,5 +49,8 @@ export const codeToImageDict = {
     aboutDesc: "Công cụ tạo ảnh chụp màn hình code tuyệt đẹp để chia sẻ lên mạng xã hội, blog hoặc tài liệu.",
     aboutFeatures: "Hỗ trợ tô màu cú pháp cho hơn 10 ngôn ngữ, tùy chỉnh padding, phông nền gradient đẹp mắt và nút cửa sổ macOS.",
     madeBy: "Làm bằng ❤️ bởi Iris Nikita.",
+    widthMode: "Độ rộng",
+    autoWidth: "Tự động",
+    customWidth: "Tùy chỉnh",
   },
 } as const;
