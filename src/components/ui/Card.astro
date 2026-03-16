@@ -34,7 +34,7 @@ const { class: className, reveal = true, ...rest } = Astro.props;
       if (card.hasAttribute("data-tilt-init")) return;
       card.setAttribute("data-tilt-init", "true");
 
-      card.addEventListener("mousemove", (e) => {
+      const updatePosition = (e: MouseEvent) => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
@@ -56,16 +56,20 @@ const { class: className, reveal = true, ...rest } = Astro.props;
         // Keep standard glow synced too
         card.style.setProperty("--glow-x", `${x}px`);
         card.style.setProperty("--glow-y", `${y}px`);
-      });
+        
+        card.setAttribute("data-hovered", "true");
+      };
+
+      card.addEventListener("mouseenter", updatePosition);
+      card.addEventListener("mousemove", updatePosition);
 
       card.addEventListener("mouseleave", () => {
+        card.removeAttribute("data-hovered");
         card.style.setProperty("--rot-x", "0deg");
         card.style.setProperty("--rot-y", "0deg");
-        card.style.setProperty("--mouse-x", "50%");
-        card.style.setProperty("--mouse-y", "50%");
-        // Reset glow slightly offset
-        card.style.setProperty("--glow-x", "50%");
-        card.style.setProperty("--glow-y", "50%");
+        // We INTENTIONALLY don't reset --mouse-x, --mouse-y, --glow-x, --glow-y here 
+        // to `50%` so the light effect smoothly fades out exactly where the cursor exited 
+        // instead of abruptly jumping back to the center.
       });
     });
   }
@@ -175,22 +179,22 @@ const { class: className, reveal = true, ...rest } = Astro.props;
     transform: translateZ(1px);
   }
 
-  .card:hover {
+  .card[data-hovered="true"] {
     border-color: rgba(0, 229, 255, 0.22);
     box-shadow:
       var(--shadow-glow-cyan),
       0 30px 60px -15px rgba(0, 0, 0, 0.6);
   }
 
-  .card:hover::before {
+  .card[data-hovered="true"]::before {
     opacity: 1;
   }
 
-  .card:hover .card-glow {
+  .card[data-hovered="true"] .card-glow {
     opacity: 1;
   }
 
-  .card:hover .card-glare {
+  .card[data-hovered="true"] .card-glare {
     opacity: 0.6;
   }
 

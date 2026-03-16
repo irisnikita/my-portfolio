@@ -22,6 +22,34 @@ import "prismjs/components/prism-go";
 import "prismjs/components/prism-sql";
 import "prismjs/components/prism-yaml";
 import "prismjs/components/prism-markdown";
+import "prismjs/components/prism-markup-templating";
+import "prismjs/components/prism-php";
+import "prismjs/components/prism-swift";
+import "prismjs/components/prism-kotlin";
+import "prismjs/components/prism-dart";
+import "prismjs/components/prism-scala";
+import "prismjs/components/prism-elixir";
+import "prismjs/components/prism-graphql";
+import "prismjs/components/prism-docker";
+import "prismjs/components/prism-lua";
+import "prismjs/components/prism-r";
+import "prismjs/components/prism-solidity";
+import "prismjs/components/prism-objectivec";
+import "prismjs/components/prism-powershell";
+import "prismjs/components/prism-scss";
+import "prismjs/components/prism-sass";
+import "prismjs/components/prism-less";
+import "prismjs/components/prism-haskell";
+import "prismjs/components/prism-perl";
+import "prismjs/components/prism-clojure";
+import "prismjs/components/prism-fsharp";
+import "prismjs/components/prism-groovy";
+import "prismjs/components/prism-lisp";
+import "prismjs/components/prism-pascal";
+import "prismjs/components/prism-protobuf";
+import "prismjs/components/prism-csv";
+import "prismjs/components/prism-regex";
+import "prismjs/components/prism-makefile";
 import "prismjs/themes/prism-tomorrow.css"; // base theme
 import { toPng } from "html-to-image";
 import { Settings, Download, Copy, Check, Info, X } from "lucide-react";
@@ -30,8 +58,8 @@ import type { codeToImageDict } from "../../i18n/dicts/codeToImage";
 interface CodeToImageProps {
   dict: (typeof codeToImageDict)["en"] | (typeof codeToImageDict)["vi"];
 }
-type Language = "javascript" | "typescript" | "css" | "json" | "html" | "bash" | "python" | "java" | "c" | "cpp" | "csharp" | "ruby" | "rust" | "go" | "sql" | "yaml" | "markdown";
-type BgGradient = "ocean" | "candy" | "aurora" | "nebula" | "sunset" | "emerald" | "velvet" | "noir" | "none";
+type Language = "javascript" | "typescript" | "css" | "json" | "html" | "bash" | "python" | "java" | "c" | "cpp" | "csharp" | "ruby" | "rust" | "go" | "sql" | "yaml" | "markdown" | "php" | "swift" | "kotlin" | "dart" | "scala" | "elixir" | "graphql" | "docker" | "lua" | "r" | "solidity" | "objectivec" | "powershell" | "scss" | "sass" | "less" | "haskell" | "perl" | "clojure" | "fsharp" | "groovy" | "lisp" | "pascal" | "protobuf" | "csv" | "regex" | "makefile";
+type BgGradient = "ocean" | "candy" | "aurora" | "nebula" | "sunset" | "emerald" | "velvet" | "noir" | "cyberpunk" | "matrix" | "synthwave" | "dracula" | "monokai" | "nord" | "lava" | "forest" | "frost" | "royal" | "crimson" | "midnight" | "peach" | "mango" | "violet" | "abyss" | "cosmic" | "silver" | "gold" | "rose" | "teal" | "amber" | "indigo" | "pink" | "lime" | "coral" | "jade" | "sapphire" | "amethyst" | "ruby" | "citrine" | "obsidian" | "pearl" | "onyx" | "quartz" | "opal" | "topaz" | "malachite" | "turquoise" | "spinel" | "garnet" | "none";
 
 export default function CodeToImageGenerator({ dict }: CodeToImageProps) {
   const [code, setCode] = useState(`function calculateVelocity(distance, time) {
@@ -52,6 +80,7 @@ console.log(\`Velocity is \${v} m/s\`);`);
   const [showLineNumbers, setShowLineNumbers] = useState(false);
   const [isAboutOpen, setIsAboutOpen] = useState(false);
   const [widthMode, setWidthMode] = useState<"auto" | "custom">("auto");
+  const [customWidth, setCustomWidth] = useState(600);
 
   const [isExporting, setIsExporting] = useState(false);
   const [copiedIndicator, setCopiedIndicator] = useState(false);
@@ -59,6 +88,53 @@ console.log(\`Velocity is \${v} m/s\`);`);
   const exportRef = useRef<HTMLDivElement>(null);
 
   const paddingOptions = ["32px", "64px", "96px", "128px"];
+  
+  const LANGUAGES_LIST = [
+    { value: "javascript", label: "JavaScript" },
+    { value: "typescript", label: "TypeScript" },
+    { value: "css", label: "CSS" },
+    { value: "json", label: "JSON" },
+    { value: "html", label: "HTML" },
+    { value: "bash", label: "Bash / Shell" },
+    { value: "python", label: "Python" },
+    { value: "java", label: "Java" },
+    { value: "c", label: "C" },
+    { value: "cpp", label: "C++" },
+    { value: "csharp", label: "C#" },
+    { value: "ruby", label: "Ruby" },
+    { value: "rust", label: "Rust" },
+    { value: "go", label: "Go" },
+    { value: "sql", label: "SQL" },
+    { value: "yaml", label: "YAML" },
+    { value: "markdown", label: "Markdown" },
+    { value: "php", label: "PHP" },
+    { value: "swift", label: "Swift" },
+    { value: "kotlin", label: "Kotlin" },
+    { value: "dart", label: "Dart" },
+    { value: "scala", label: "Scala" },
+    { value: "elixir", label: "Elixir" },
+    { value: "graphql", label: "GraphQL" },
+    { value: "docker", label: "Docker" },
+    { value: "lua", label: "Lua" },
+    { value: "r", label: "R" },
+    { value: "solidity", label: "Solidity" },
+    { value: "objectivec", label: "Objective-C" },
+    { value: "powershell", label: "PowerShell" },
+    { value: "scss", label: "SCSS" },
+    { value: "sass", label: "SASS" },
+    { value: "less", label: "LESS" },
+    { value: "haskell", label: "Haskell" },
+    { value: "perl", label: "Perl" },
+    { value: "clojure", label: "Clojure" },
+    { value: "fsharp", label: "F#" },
+    { value: "groovy", label: "Groovy" },
+    { value: "lisp", label: "Lisp" },
+    { value: "pascal", label: "Pascal" },
+    { value: "protobuf", label: "Protocol Buffers" },
+    { value: "csv", label: "CSV" },
+    { value: "regex", label: "Regex" },
+    { value: "makefile", label: "Makefile" }
+  ];
 
   const bgGradients: Record<BgGradient, string> = {
     ocean: "linear-gradient(135deg, #0ea5e9, #6366f1)",
@@ -69,6 +145,47 @@ console.log(\`Velocity is \${v} m/s\`);`);
     emerald: "linear-gradient(135deg, #059669, #10b981)",
     velvet: "linear-gradient(135deg, #4c1d95, #c026d3)",
     noir: "linear-gradient(135deg, #1e293b, #0f172a)",
+    cyberpunk: "linear-gradient(135deg, #fce043, #fb7ba2)",
+    matrix: "linear-gradient(135deg, #0f9b0f, #000000)",
+    synthwave: "linear-gradient(135deg, #ff00cc, #333399)",
+    dracula: "linear-gradient(135deg, #282a36, #bd93f9)",
+    monokai: "linear-gradient(135deg, #272822, #f92672)",
+    nord: "linear-gradient(135deg, #434c5e, #81a1c1)",
+    lava: "linear-gradient(135deg, #ff416c, #ff4b2b)",
+    forest: "linear-gradient(135deg, #134e5e, #71b280)",
+    frost: "linear-gradient(135deg, #000428, #004e92)",
+    royal: "linear-gradient(135deg, #141e30, #243b55)",
+    crimson: "linear-gradient(135deg, #870000, #190a05)",
+    midnight: "linear-gradient(135deg, #232526, #414345)",
+    peach: "linear-gradient(135deg, #ed4264, #ffedbc)",
+    mango: "linear-gradient(135deg, #ffe259, #ffa751)",
+    violet: "linear-gradient(135deg, #4b1248, #f0c27b)",
+    abyss: "linear-gradient(135deg, #000000, #434343)",
+    cosmic: "linear-gradient(135deg, #ff0099, #493240)",
+    silver: "linear-gradient(135deg, #8e9eab, #eef2f3)",
+    gold: "linear-gradient(135deg, #f37335, #fdc830)",
+    rose: "linear-gradient(135deg, #ff9a9e, #fecfef)",
+    teal: "linear-gradient(135deg, #11998e, #38ef7d)",
+    amber: "linear-gradient(135deg, #f12711, #f5af19)",
+    indigo: "linear-gradient(135deg, #654ea3, #eaafc8)",
+    pink: "linear-gradient(135deg, #ff758c, #ff7eb3)",
+    lime: "linear-gradient(135deg, #a8ff78, #78ffd6)",
+    coral: "linear-gradient(135deg, #ff9966, #ff5e62)",
+    jade: "linear-gradient(135deg, #4ca1af, #c4e0e5)",
+    sapphire: "linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d)",
+    amethyst: "linear-gradient(135deg, #9d50bb, #6e48aa)",
+    ruby: "linear-gradient(135deg, #e52d27, #b31217)",
+    citrine: "linear-gradient(135deg, #f9d423, #ff4e50)",
+    obsidian: "linear-gradient(135deg, #4ca1af, #2c3e50)",
+    pearl: "linear-gradient(135deg, #bdc3c7, #2c3e50)",
+    onyx: "linear-gradient(135deg, #000000, #53346d)",
+    quartz: "linear-gradient(135deg, #ffafbd, #ffc3a0)",
+    opal: "linear-gradient(135deg, #e0c3fc, #8ec5fc)",
+    topaz: "linear-gradient(135deg, #1cd8d2, #93edc7)",
+    malachite: "linear-gradient(135deg, #11998e, #38ef7d)",
+    turquoise: "linear-gradient(135deg, #134e5e, #71b280)",
+    spinel: "linear-gradient(135deg, #ff416c, #ff4b2b)",
+    garnet: "linear-gradient(135deg, #870000, #190a05)",
     none: "transparent",
   };
 
@@ -142,13 +259,41 @@ console.log(\`Velocity is \${v} m/s\`);`);
         >
           {/* Code Editor Window */}
           <div
-            className={`relative min-w-[320px] sm:min-w-[400px] max-w-full rounded-xl shadow-2xl transition-colors duration-300 ${darkMode ? "bg-[#0E1117]/95 border border-white/10" : "bg-white/95 border border-black/10"} ${widthMode === "auto" ? "w-fit overflow-hidden" : "w-[600px] resize-x overflow-auto"}`}
+            className={`relative min-w-[320px] sm:min-w-[400px] max-w-full rounded-xl shadow-2xl transition-colors duration-300 ${darkMode ? "bg-[#0E1117]/95 border border-white/10" : "bg-white/95 border border-black/10"} ${widthMode === "auto" ? "w-fit" : ""} overflow-hidden`}
             style={{
               backdropFilter: "blur(20px)",
               WebkitBackdropFilter: "blur(20px)",
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+              width: widthMode === "custom" ? `${customWidth}px` : "auto",
             }}
           >
+            {/* Custom Resize Handle */}
+            {widthMode === "custom" && (
+              <div
+                className="absolute right-0 top-0 bottom-0 w-4 cursor-ew-resize z-20 hover:bg-white/10 transition-colors flex items-center justify-center group"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  const startX = e.clientX;
+                  const startWidth = customWidth;
+
+                  const handleMouseMove = (moveEvent: MouseEvent) => {
+                    const deltaX = moveEvent.clientX - startX;
+                    setCustomWidth(Math.max(320, startWidth + deltaX * 2));
+                  };
+
+                  const handleMouseUp = () => {
+                    document.removeEventListener("mousemove", handleMouseMove);
+                    document.removeEventListener("mouseup", handleMouseUp);
+                  };
+
+                  document.addEventListener("mousemove", handleMouseMove);
+                  document.addEventListener("mouseup", handleMouseUp);
+                }}
+              >
+                <div className="w-1 h-8 rounded-full bg-white/20 group-hover:bg-white/50 transition-colors" />
+              </div>
+            )}
+
             {/* Mac OS Window Controls */}
             {showWindowControls && (
               <div
@@ -285,23 +430,11 @@ console.log(\`Velocity is \${v} m/s\`);`);
                 onChange={(e) => setLanguage(e.target.value as Language)}
                 className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[var(--c-neon-cyan)]"
               >
-                <option value="javascript">JavaScript</option>
-                <option value="typescript">TypeScript</option>
-                <option value="css">CSS</option>
-                <option value="json">JSON</option>
-                <option value="html">HTML</option>
-                <option value="bash">Bash / Shell</option>
-                <option value="python">Python</option>
-                <option value="java">Java</option>
-                <option value="c">C</option>
-                <option value="cpp">C++</option>
-                <option value="csharp">C#</option>
-                <option value="ruby">Ruby</option>
-                <option value="rust">Rust</option>
-                <option value="go">Go</option>
-                <option value="sql">SQL</option>
-                <option value="yaml">YAML</option>
-                <option value="markdown">Markdown</option>
+                {LANGUAGES_LIST.map((langItem) => (
+                  <option key={langItem.value} value={langItem.value}>
+                    {langItem.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -310,7 +443,7 @@ console.log(\`Velocity is \${v} m/s\`);`);
               <label className="block text-xs uppercase tracking-wider text-white/50 mb-2">
                 {dict.bgPattern}
               </label>
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-6 xl:grid-cols-8 gap-2">
                 {Object.entries(bgGradients).map(([key, gradient]) => (
                   <button
                     key={key}
