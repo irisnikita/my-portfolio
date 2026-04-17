@@ -1,10 +1,7 @@
 ---
-// CSS/SVG neon grid parallax (2 layers) + subtle cinematic layers
-// Performance rules:
-// - transform/opacity only
-// - requestAnimationFrame throttle
-// - prefers-reduced-motion disables motion loops
-// - pointer-follow only on fine pointer + hover-capable devices
+// Static neon grid backdrop for the hero.
+// The previous scroll/pointer-driven parallax created too much main-thread work,
+// so this version keeps the depth cues without runtime listeners or RAF loops.
 
 const { class: className } = Astro.props;
 ---
@@ -50,112 +47,6 @@ const { class: className } = Astro.props;
   <div class="pulse"></div>
 </div>
 
-<script>
-  const root = document.currentScript?.previousElementSibling;
-  const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-
-  // Reduced motion: do not attach listeners/loops.
-  if (prefersReduced || !root) {
-    // no-op
-  } else {
-    const back = root.querySelector(".layerBack");
-    const front = root.querySelector(".layerFront");
-
-    let active = !document.hidden;
-
-    // Scroll parallax (rAF throttle)
-    let sRaf = 0;
-    let lastY = -1;
-
-    const tickScroll = () => {
-      sRaf = 0;
-      if (!active) return;
-
-      const y = window.scrollY || 0;
-      if (y === lastY) return;
-      lastY = y;
-
-      const s = Math.min(1.0, window.innerWidth / 900);
-      const backY = y * 0.05 * s;
-      const frontY = y * 0.09 * s;
-
-      back?.style.setProperty("transform", `translate3d(0, ${backY}px, 0)`);
-      front?.style.setProperty("transform", `translate3d(0, ${frontY}px, 0)`);
-    };
-
-    const onScroll = () => {
-      if (!active) return;
-      if (sRaf) return;
-      sRaf = requestAnimationFrame(tickScroll);
-    };
-
-    // Pointer-follow hotspot (fine pointer only)
-    const canHover = window.matchMedia?.("(hover: hover)")?.matches;
-    const finePointer = window.matchMedia?.("(pointer: fine)")?.matches;
-
-    let pRaf = 0;
-    let targetX = 0.5;
-    let targetY = 0.25;
-    let curX = targetX;
-    let curY = targetY;
-
-    const clamp01 = (v) => Math.min(1, Math.max(0, v));
-
-    const stepPointer = () => {
-      pRaf = 0;
-      if (!active) return;
-
-      curX += (targetX - curX) * 0.12;
-      curY += (targetY - curY) * 0.12;
-      root.style.setProperty("--hx", String(curX));
-      root.style.setProperty("--hy", String(curY));
-
-      if (Math.abs(targetX - curX) + Math.abs(targetY - curY) > 0.002) {
-        pRaf = requestAnimationFrame(stepPointer);
-      }
-    };
-
-    const onPointerMove = (ev) => {
-      if (!active) return;
-      const rect = root.getBoundingClientRect();
-      const x = (ev.clientX - rect.left) / rect.width;
-      const y = (ev.clientY - rect.top) / rect.height;
-      targetX = clamp01(x);
-      targetY = clamp01(y);
-      if (!pRaf) pRaf = requestAnimationFrame(stepPointer);
-    };
-
-    const attach = () => {
-      window.addEventListener("scroll", onScroll, { passive: true });
-      if (canHover && finePointer)
-        root.addEventListener("pointermove", onPointerMove, { passive: true });
-    };
-
-    const detach = () => {
-      window.removeEventListener("scroll", onScroll);
-      root.removeEventListener("pointermove", onPointerMove);
-      if (sRaf) cancelAnimationFrame(sRaf);
-      if (pRaf) cancelAnimationFrame(pRaf);
-      sRaf = 0;
-      pRaf = 0;
-    };
-
-    const onVis = () => {
-      active = !document.hidden;
-      if (!active) {
-        detach();
-        return;
-      }
-      attach();
-      tickScroll();
-    };
-
-    attach();
-    tickScroll();
-    document.addEventListener("visibilitychange", onVis);
-  }
-</script>
-
 <style>
   .gridWrap {
     --hx: 0.5;
@@ -183,7 +74,6 @@ const { class: className } = Astro.props;
     inset: 0;
     width: 100%;
     height: 100%;
-    will-change: transform;
     transform: translate3d(0, 0, 0);
   }
 
@@ -204,20 +94,9 @@ const { class: className } = Astro.props;
     background:
       radial-gradient(700px 420px at 50% 20%, rgba(50, 245, 255, 0.07), transparent 60%),
       radial-gradient(900px 520px at 60% 25%, rgba(255, 53, 213, 0.05), transparent 62%);
-    animation: pulse 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    opacity: 0.72;
   }
 
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 0.55;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
-
-  /* Light sweep: low-alpha diagonal pass */
   .sweep {
     position: absolute;
     inset: -40%;
@@ -228,25 +107,14 @@ const { class: className } = Astro.props;
       rgba(255, 43, 214, 0.06) 52%,
       rgba(255, 255, 255, 0) 70%
     );
-    transform: translate3d(-12%, -10%, 0);
-    animation: sweep 14s linear infinite;
-    opacity: 0.4;
+    transform: translate3d(-8%, -6%, 0);
+    opacity: 0.22;
   }
 
-  @keyframes sweep {
-    0% {
-      transform: translate3d(-18%, -12%, 0);
-    }
-    100% {
-      transform: translate3d(18%, 12%, 0);
-    }
-  }
-
-  /* Cursor hotspot: transform-only via CSS vars, no runtime filters */
   .hotspot {
     position: absolute;
     inset: 0;
-    opacity: 0.65;
+    opacity: 0.45;
     background: radial-gradient(
       520px 360px at calc(var(--hx) * 100%) calc(var(--hy) * 100%),
       rgba(0, 229, 255, 0.12),
@@ -255,7 +123,6 @@ const { class: className } = Astro.props;
     );
   }
 
-  /* Scanlines + gentle drift */
   .scan {
     position: absolute;
     inset: 0;
@@ -267,32 +134,15 @@ const { class: className } = Astro.props;
       transparent 2px,
       transparent 6px
     );
-    transform: translate3d(0, 0, 0);
-    animation: scanDrift 12s linear infinite;
+    opacity: 0.035;
   }
 
-  @keyframes scanDrift {
-    0% {
-      transform: translate3d(0, 0, 0);
-    }
-    100% {
-      transform: translate3d(0, 18px, 0);
-    }
-  }
-
-  /* Reduced motion: freeze loops + hide pointer-follow feel */
   @media (prefers-reduced-motion: reduce) {
-    .pulse,
-    .sweep,
-    .scan {
-      animation: none;
-    }
     .hotspot {
       opacity: 0;
     }
   }
 
-  /* Touch/coarse pointer: disable hotspot emphasis */
   @media (hover: none), (pointer: coarse) {
     .hotspot {
       opacity: 0;

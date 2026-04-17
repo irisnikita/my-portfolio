@@ -3,12 +3,9 @@ import "../styles/global.css";
 import { ViewTransitions } from "astro:transitions";
 import RevealInit from "../components/motion/RevealInit.astro";
 import CustomCursor from "../components/motion/CustomCursor.astro";
-import FluidBackground from "../components/hero/FluidBackground.astro";
 import CommandPalette from "../components/ui/CommandPalette.astro";
 import ScrambleText from "../components/motion/ScrambleText.astro";
-import ScrollDistortion from "../components/motion/ScrollDistortion.astro";
 import SoundManager from "../components/ui/SoundManager.astro";
-import LenisScroll from "../components/motion/LenisScroll.astro";
 import AIChatbot from "../components/widgets/AIChatbot";
 import Header from "../components/ui/Header";
 import { site } from "../data/site";
@@ -120,21 +117,15 @@ const jsonLd = [
     </script>
   </head>
   <body>
-    <!-- Smooth Scroll Init -->
-    <LenisScroll />
-
-    <!-- 3D WebGL Fluid Canvas -->
-    <FluidBackground />
-    <CustomCursor />
     <div class="scroll-progress-bar" aria-hidden="true"></div>
     <RevealInit />
+    <CustomCursor />
     <CommandPalette />
-    <ScrollDistortion />
     <ScrambleText />
     <SoundManager />
     <a href="#main" class="skip-link">{t("a11y.skipToContent")}</a>
 
-    <Header client:load currentPath={pathname} lang={lang} />
+    <Header client:idle currentPath={pathname} lang={lang} />
 
     <main id="main">
       <slot />
@@ -158,7 +149,7 @@ const jsonLd = [
         </div>
       </div>
     </footer>
-    <AIChatbot client:only="react" lang={lang} />
+    <AIChatbot client:idle lang={lang} />
   </body>
 </html>
 
@@ -177,10 +168,11 @@ const jsonLd = [
     );
     transform-origin: left center;
     transform: scaleX(0);
-    z-index: 50;
-    will-change: transform;
+    opacity: 0;
+    z-index: 60;
     pointer-events: none;
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.4);
+    will-change: transform, opacity;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.35);
   }
 
   .skip-link {

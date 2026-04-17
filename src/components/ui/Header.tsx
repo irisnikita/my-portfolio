@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { site } from "../../data/site";
 
 import { useTranslations, useTranslatedPath } from "../../i18n/utils";
@@ -83,12 +83,10 @@ const toolsSubItems: Array<{
 
 export default function Header({ currentPath, lang }: { currentPath: string; lang: Lang }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
   const [currentHash, setCurrentHash] = useState("");
   const [toolsExpanded, setToolsExpanded] = useState(false);
   const [toolsHover, setToolsHover] = useState(false);
   const toolsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { scrollY } = useScroll();
 
   const t = useTranslations(lang);
   const translatePath = useTranslatedPath(lang);
@@ -104,16 +102,6 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
     window.addEventListener("hashchange", handleHashChange);
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
-
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() || 0;
-    if (latest > previous && latest > 100) {
-      setIsHidden(true);
-      setIsOpen(false);
-    } else {
-      setIsHidden(false);
-    }
-  });
 
   const getIsActive = (href: string) => {
     const translatedHref = translatePath(href);
@@ -136,10 +124,7 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
   };
 
   return (
-    <motion.header
-      initial={{ y: 0 }}
-      animate={{ y: isHidden ? "-100%" : 0 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
+    <header
       className="site-header"
       style={{
         position: "fixed",
@@ -832,6 +817,6 @@ export default function Header({ currentPath, lang }: { currentPath: string; lan
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }

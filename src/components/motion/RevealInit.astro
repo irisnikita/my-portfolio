@@ -4,34 +4,28 @@
 ---
 
 <script>
-  import {
-    observeReveal,
-    observeParallax,
-    observeScrollProgress,
-    initCardTilt,
-    initHeroScrollFade,
-  } from "../../lib/motion";
+  import { observeReveal, observeScrollProgress } from "../../lib/motion";
+
+  type RevealInitWindow = Window & typeof globalThis & { _cleanupRevealInit?: () => void };
 
   function initMotion() {
-    // Reveal on scroll
-    observeReveal({});
+    const cleanups = [];
+    const revealInitWindow = window as RevealInitWindow;
 
-    // Scroll parallax elements
-    observeParallax();
+    cleanups.push(observeReveal({}));
 
-    // Scroll progress bar
     const progressBar = document.querySelector<HTMLElement>(".scroll-progress-bar");
-    observeScrollProgress(progressBar);
+    cleanups.push(observeScrollProgress(progressBar));
 
-    // Card 3D tilt
-    initCardTilt();
-
-    // Hero scroll fade-out
-    initHeroScrollFade();
+    revealInitWindow._cleanupRevealInit = () => {
+      cleanups.forEach((cleanup) => cleanup?.disconnect?.());
+    };
   }
 
   // astro:page-load fires on initial page load AND after every ViewTransition
   document.addEventListener("astro:page-load", () => {
+    const revealInitWindow = window as RevealInitWindow;
+    if (revealInitWindow._cleanupRevealInit) revealInitWindow._cleanupRevealInit();
     initMotion();
   });
 </script>

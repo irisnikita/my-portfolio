@@ -7,10 +7,9 @@ import { testimonials } from "../../data/testimonials";
 <Section title="What People Say" eyebrow="Testimonials">
   <div class="grid" data-reveal-container="testimonials" data-reveal-stagger="120">
     {
-      testimonials.map((t, i) => (
+      testimonials.map((t) => (
         <div
           class="cardWrap"
-          style={`--float-delay: ${i * 1.2}s`}
           data-reveal
           data-reveal-class="reveal-scale"
           data-reveal-group="tCard"
@@ -48,23 +47,7 @@ import { testimonials } from "../../data/testimonials";
   }
 
   .cardWrap {
-    animation: cardFloat 6s ease-in-out infinite;
-    animation-delay: var(--float-delay, 0s);
-    animation-play-state: paused;
-  }
-
-  .cardWrap.is-revealed {
-    animation-play-state: running;
-  }
-
-  @keyframes cardFloat {
-    0%,
-    100% {
-      transform: translate3d(0, 0, 0);
-    }
-    50% {
-      transform: translate3d(0, -6px, 0);
-    }
+    transform: translate3d(0, 0, 0);
   }
 
   .testimonial {
@@ -149,9 +132,6 @@ import { testimonials } from "../../data/testimonials";
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cardWrap {
-      animation: none;
-    }
     .quote-mark {
       opacity: 1;
       transform: none;

@@ -6,12 +6,10 @@ type Props = HTMLAttributes<"div"> & {
 };
 
 const { class: className, text, ...rest } = Astro.props;
-// Use a unique ID for the SVG filter so multiple instances don't collide
-const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
+const filterId = `liquid-filter-${Math.random().toString(36).slice(2, 9)}`;
 ---
 
 <div class={["liquid-text-container", className].filter(Boolean).join(" ")} {...rest}>
-  <!-- SVG Filter definition (hidden) -->
   <svg
     class="liquid-svg"
     aria-hidden="true"
@@ -26,7 +24,6 @@ const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
         numOctaves="1"
         result="noise"
         class="turbulence"></feTurbulence>
-      <!-- Higher scale = stronger melting effect -->
       <feDisplacementMap
         in="SourceGraphic"
         in2="noise"
@@ -43,93 +40,99 @@ const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
 </div>
 
 <script>
+  type LiquidTextWindow = Window & typeof globalThis & { _cleanupLiquidText?: () => void };
+
   function initLiquidText() {
-    const pmr = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (pmr) return;
+    const liquidTextWindow = window as LiquidTextWindow;
+    if (liquidTextWindow._cleanupLiquidText) liquidTextWindow._cleanupLiquidText();
 
-    const containers = document.querySelectorAll(".liquid-text-container");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-    containers.forEach((containerFn) => {
-      const container = containerFn as HTMLElement;
-      if (container.hasAttribute("data-liquid-init")) return;
-      container.setAttribute("data-liquid-init", "true");
+    const cleanups: Array<() => void> = [];
+    const containers = document.querySelectorAll<HTMLElement>(".liquid-text-container");
 
-      const filter = container.querySelector(".displacement") as SVGFEDisplacementMapElement;
-      const turbulence = container.querySelector(".turbulence") as SVGFETurbulenceElement;
+    containers.forEach((container) => {
+      const filter = container.querySelector<SVGFEDisplacementMapElement>(".displacement");
+      const turbulence = container.querySelector<SVGFETurbulenceElement>(".turbulence");
       if (!filter || !turbulence) return;
 
       let targetScale = 0;
       let currentScale = 0;
-      let rafId: number;
-
-      // Base frequencies mapped to mouse hover
       let baseFreqX = 0.01;
       let baseFreqY = 0.01;
+      let rafId = 0;
 
-      container.addEventListener("mousemove", (e) => {
-        const rect = container.getBoundingClientRect();
-        // Calculate distance from center of bounding box to cursor
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = e.clientX - cx;
-        const dy = e.clientY - cy;
+      const queueAnimation = () => {
+        if (!rafId) rafId = requestAnimationFrame(animate);
+      };
 
-        // Intensity based on proximity
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const maxDist = Math.max(rect.width, rect.height);
+      const animate = () => {
+        rafId = 0;
+        currentScale += (targetScale - currentScale) * 0.16;
 
-        // Closer = higher scale (more distortion) up to max 120
-        const intensity = Math.max(0, 1 - dist / (maxDist * 0.8));
-        targetScale = intensity * 120;
-
-        // Slightly tweak frequency based on x/y for dynamic rippling
-        baseFreqX = 0.01 + (dx / rect.width) * 0.02;
-        baseFreqY = 0.01 + (dy / rect.height) * 0.02;
-      });
-
-      container.addEventListener("mouseleave", () => {
-        targetScale = 0;
-      });
-
-      function animate() {
-        // Lerp the scale for smooth transition
-        currentScale += (targetScale - currentScale) * 0.1;
-
-        // Only update DOM if there's a meaningful change
-        if (Math.abs(currentScale - targetScale) > 0.1 || currentScale > 0.5) {
-          filter.setAttribute("scale", currentScale.toString());
-          turbulence.setAttribute("baseFrequency", `${Math.abs(baseFreqX)} ${Math.abs(baseFreqY)}`);
-        } else if (currentScale <= 0.5 && targetScale === 0) {
-          // Snap to 0 to stop rendering filter
+        if (Math.abs(currentScale - targetScale) < 0.2 && targetScale === 0) {
+          currentScale = 0;
           filter.setAttribute("scale", "0");
+          turbulence.setAttribute("baseFrequency", "0.01 0.01");
+          return;
         }
 
+        filter.setAttribute("scale", currentScale.toFixed(2));
+        turbulence.setAttribute(
+          "baseFrequency",
+          `${Math.abs(baseFreqX).toFixed(4)} ${Math.abs(baseFreqY).toFixed(4)}`,
+        );
+
         rafId = requestAnimationFrame(animate);
-      }
-
-      animate();
-
-      (window as any)[`_cleanupLiquid_${container.id}`] = () => {
-        cancelAnimationFrame(rafId);
       };
+
+      const onPointerMove = (event: PointerEvent) => {
+        const rect = container.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = event.clientX - cx;
+        const dy = event.clientY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = Math.max(rect.width, rect.height);
+        const intensity = Math.max(0, 1 - dist / (maxDist * 0.8));
+
+        targetScale = intensity * 90;
+        baseFreqX = 0.01 + (dx / rect.width) * 0.012;
+        baseFreqY = 0.01 + (dy / rect.height) * 0.012;
+        queueAnimation();
+      };
+
+      const onPointerLeave = () => {
+        targetScale = 0;
+        baseFreqX = 0.01;
+        baseFreqY = 0.01;
+        queueAnimation();
+      };
+
+      container.addEventListener("pointermove", onPointerMove, { passive: true });
+      container.addEventListener("pointerleave", onPointerLeave);
+
+      cleanups.push(() => {
+        container.removeEventListener("pointermove", onPointerMove);
+        container.removeEventListener("pointerleave", onPointerLeave);
+        if (rafId) cancelAnimationFrame(rafId);
+        filter.setAttribute("scale", "0");
+        turbulence.setAttribute("baseFrequency", "0.01 0.01");
+      });
     });
+
+    liquidTextWindow._cleanupLiquidText = () => {
+      cleanups.forEach((cleanup) => cleanup());
+    };
   }
 
   document.addEventListener("astro:page-load", initLiquidText);
-  if (typeof window !== "undefined") {
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initLiquidText);
-    } else {
-      initLiquidText();
-    }
-  }
 </script>
 
 <style>
   .liquid-text-container {
     position: relative;
     width: 100%;
-    /* Create a large hit area for tracking */
     padding: 60px 0;
     cursor: crosshair;
     overflow: hidden;
@@ -150,15 +153,11 @@ const filterId = `liquid-filter-${Math.random().toString(36).substr(2, 9)}`;
     text-align: center;
     color: transparent;
     -webkit-text-stroke: 2px var(--c-text);
-    text-stroke: 2px var(--c-text);
-    will-change: filter;
-    /* Optional: subtle ambient glow */
     text-shadow: 0 0 20px rgba(var(--c-neon-cyan-rgb, 0, 229, 255), 0.2);
-    transition: color 400ms ease;
+    transition: color 320ms ease;
   }
 
   .liquid-text-container:hover .liquid-heading {
-    /* Fill with solid color when hovered + melting */
     color: var(--c-text);
     -webkit-text-stroke: 0;
     text-shadow: var(--shadow-glow-cyan);

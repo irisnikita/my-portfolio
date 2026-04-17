@@ -3,22 +3,41 @@ export function prefersReducedMotion(): boolean {
   return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 }
 
-export function rafThrottle<T extends (...args: any[]) => void>(fn: T): T {
+export function observeScrollProgress(el: HTMLElement | null) {
+  if (!el || typeof window === "undefined") return { disconnect() {} };
+
+  if (prefersReducedMotion()) {
+    el.style.display = "none";
+    return { disconnect() {} };
+  }
+
   let raf = 0;
-  let lastArgs: any[] | null = null;
 
-  const wrapped = ((...args: any[]) => {
-    lastArgs = args;
+  const update = () => {
+    raf = 0;
+    const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+    const pct = maxScroll > 0 ? Math.min(window.scrollY / maxScroll, 1) : 0;
+
+    el.style.transform = `scaleX(${pct})`;
+    el.style.opacity = maxScroll > 0 ? "1" : "0";
+  };
+
+  const queueUpdate = () => {
     if (raf) return;
-    raf = requestAnimationFrame(() => {
-      raf = 0;
-      if (!lastArgs) return;
-      fn(...(lastArgs as Parameters<T>));
-      lastArgs = null;
-    });
-  }) as T;
+    raf = requestAnimationFrame(update);
+  };
 
-  return wrapped;
+  window.addEventListener("scroll", queueUpdate, { passive: true });
+  window.addEventListener("resize", queueUpdate, { passive: true });
+  queueUpdate();
+
+  return {
+    disconnect() {
+      window.removeEventListener("scroll", queueUpdate);
+      window.removeEventListener("resize", queueUpdate);
+      if (raf) cancelAnimationFrame(raf);
+    },
+  };
 }
 
 type ObserveRevealOpts = {
@@ -150,204 +169,4 @@ export function observeReveal(opts: ObserveRevealOpts = {}) {
       io.disconnect();
     },
   };
-}
-
-// --- Scroll Parallax ---
-
-type ParallaxItem = {
-  el: HTMLElement;
-  speed: number;
-  direction: "up" | "down" | "left" | "right";
-  scale: number;
-};
-
-export function observeParallax(selector = "[data-parallax]") {
-  if (typeof window === "undefined") return { disconnect() {} };
-  if (prefersReducedMotion()) return { disconnect() {} };
-
-  const items: ParallaxItem[] = [];
-  const els = document.querySelectorAll<HTMLElement>(selector);
-
-  for (const el of els) {
-    items.push({
-      el,
-      speed: parseFloat(el.getAttribute("data-parallax-speed") ?? "0.08"),
-      direction: (el.getAttribute("data-parallax-dir") ?? "up") as ParallaxItem["direction"],
-      scale: parseFloat(el.getAttribute("data-parallax-scale") ?? "1"),
-    });
-  }
-
-  if (items.length === 0) return { disconnect() {} };
-
-  let active = !document.hidden;
-  let raf = 0;
-
-  const tick = () => {
-    raf = 0;
-    if (!active) return;
-
-    const scrollY = window.scrollY;
-    const vh = window.innerHeight;
-
-    for (const item of items) {
-      const rect = item.el.getBoundingClientRect();
-      const center = rect.top + rect.height / 2;
-      const progress = (center - vh / 2) / vh; // -0.5 to 0.5 when in view
-
-      let tx = 0,
-        ty = 0;
-      const offset = progress * item.speed * 100;
-
-      switch (item.direction) {
-        case "up":
-          ty = -offset;
-          break;
-        case "down":
-          ty = offset;
-          break;
-        case "left":
-          tx = -offset;
-          break;
-        case "right":
-          tx = offset;
-          break;
-      }
-
-      const s = 1 + (1 - item.scale) * progress;
-
-      item.el.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${s})`;
-    }
-  };
-
-  const onScroll = () => {
-    if (!active || raf) return;
-    raf = requestAnimationFrame(tick);
-  };
-
-  const onVis = () => {
-    active = !document.hidden;
-    if (active) onScroll();
-  };
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  document.addEventListener("visibilitychange", onVis);
-  tick();
-
-  return {
-    disconnect() {
-      window.removeEventListener("scroll", onScroll);
-      document.removeEventListener("visibilitychange", onVis);
-      if (raf) cancelAnimationFrame(raf);
-    },
-  };
-}
-
-// --- Scroll Progress Bar ---
-
-export function observeScrollProgress(el: HTMLElement | null) {
-  if (!el || typeof window === "undefined") return { disconnect() {} };
-  if (prefersReducedMotion()) {
-    el.style.display = "none";
-    return { disconnect() {} };
-  }
-
-  let raf = 0;
-
-  const tick = () => {
-    raf = 0;
-    const scrollY = window.scrollY;
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    const pct = maxScroll > 0 ? Math.min(1, scrollY / maxScroll) : 0;
-    el.style.transform = `scaleX(${pct})`;
-  };
-
-  const onScroll = () => {
-    if (raf) return;
-    raf = requestAnimationFrame(tick);
-  };
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  tick();
-
-  return {
-    disconnect() {
-      window.removeEventListener("scroll", onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    },
-  };
-}
-
-// --- Card 3D Tilt ---
-
-export function initCardTilt(selector = ".card-tilt") {
-  if (typeof window === "undefined") return;
-  if (prefersReducedMotion()) return;
-
-  const canHover = window.matchMedia?.("(hover: hover)")?.matches;
-  const finePointer = window.matchMedia?.("(pointer: fine)")?.matches;
-  if (!canHover || !finePointer) return;
-
-  for (const el of document.querySelectorAll<HTMLElement>(selector)) {
-    let raf = 0;
-
-    const onMove = (ev: PointerEvent) => {
-      const rect = el.getBoundingClientRect();
-      const x = (ev.clientX - rect.left) / rect.width;
-      const y = (ev.clientY - rect.top) / rect.height;
-
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        const rotateY = (x - 0.5) * 12; // ±6deg
-        const rotateX = (0.5 - y) * 8; // ±4deg
-        el.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translate3d(0, -2px, 0)`;
-        el.style.setProperty("--glow-x", `${x * 100}%`);
-        el.style.setProperty("--glow-y", `${y * 100}%`);
-      });
-    };
-
-    const onLeave = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        el.style.transform = "perspective(600px) rotateX(0) rotateY(0) translate3d(0, 0, 0)";
-        el.style.setProperty("--glow-x", `50%`);
-        el.style.setProperty("--glow-y", `50%`);
-      });
-    };
-
-    el.addEventListener("pointermove", onMove);
-    el.addEventListener("pointerleave", onLeave);
-  }
-}
-
-// --- Hero Scroll Fade ---
-
-export function initHeroScrollFade(selector = ".hero") {
-  if (typeof window === "undefined") return;
-  if (prefersReducedMotion()) return;
-
-  const hero = document.querySelector<HTMLElement>(selector);
-  if (!hero) return;
-
-  const inner = hero.querySelector<HTMLElement>(".heroInner");
-  if (!inner) return;
-
-  let raf = 0;
-
-  const tick = () => {
-    raf = 0;
-    const scrollY = window.scrollY;
-    const heroH = hero.offsetHeight;
-    const progress = Math.min(1, scrollY / (heroH * 0.6));
-
-    inner.style.opacity = String(1 - progress * 0.8);
-    inner.style.transform = `translate3d(0, ${scrollY * 0.15}px, 0) scale(${1 - progress * 0.05})`;
-  };
-
-  const onScroll = () => {
-    if (raf) return;
-    raf = requestAnimationFrame(tick);
-  };
-
-  window.addEventListener("scroll", onScroll, { passive: true });
-  tick();
 }

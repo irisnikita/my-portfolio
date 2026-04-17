@@ -1,5 +1,5 @@
 ---
-// GlowDivider — animated neon gradient separator between sections
+// GlowDivider — static neon separator between sections
 ---
 
 <div class="glowDivider" aria-hidden="true">
@@ -28,8 +28,6 @@
       rgba(124, 59, 255, 0.4) 75%,
       transparent 100%
     );
-    background-size: 200% 100%;
-    animation: glowSlide 6s linear infinite;
   }
 
   .glowPulse {
@@ -40,36 +38,11 @@
     width: 120px;
     height: 16px;
     background: radial-gradient(ellipse at center, rgba(0, 229, 255, 0.2), transparent 70%);
-    animation: glowPulseAnim 3s ease-in-out infinite;
-  }
-
-  @keyframes glowSlide {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
-  }
-
-  @keyframes glowPulseAnim {
-    0%,
-    100% {
-      opacity: 0.3;
-      transform: translateX(-50%) scaleX(1);
-    }
-    50% {
-      opacity: 0.8;
-      transform: translateX(-50%) scaleX(1.5);
-    }
+    opacity: 0.4;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .glowLine {
-      animation: none;
-    }
     .glowPulse {
-      animation: none;
       opacity: 0.4;
     }
   }

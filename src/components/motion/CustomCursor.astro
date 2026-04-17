@@ -1,90 +1,122 @@
 ---
-// CustomCursor — branded dot + ring cursor for desktop only
+// CustomCursor — branded cursor for desktop with a lightweight RAF loop.
 ---
 
 <div class="cursor-dot" aria-hidden="true"></div>
 <div class="cursor-ring" aria-hidden="true"></div>
 
 <script>
+  type CustomCursorWindow = Window & typeof globalThis & { _cleanupCustomCursor?: () => void };
+
+  const hoverTargets = 'a, button, [role="button"], .btn, .card-tilt, .projectCardLink';
+
   function initCustomCursor() {
+    const customCursorWindow = window as CustomCursorWindow;
+    if (customCursorWindow._cleanupCustomCursor) customCursorWindow._cleanupCustomCursor();
+
     const reducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     const canHover = window.matchMedia?.("(hover: hover)")?.matches;
     const finePointer = window.matchMedia?.("(pointer: fine)")?.matches;
+    const dot = document.querySelector<HTMLElement>(".cursor-dot");
+    const ring = document.querySelector<HTMLElement>(".cursor-ring");
 
-    if (!reducedMotion && canHover && finePointer) {
-      const dot = document.querySelector<HTMLElement>(".cursor-dot");
-      const ring = document.querySelector<HTMLElement>(".cursor-ring");
-
-      if (dot && ring) {
-        let mouseX = -100,
-          mouseY = -100;
-        let ringX = -100,
-          ringY = -100;
-        let raf = 0;
-        let isHover = false;
-
-        const onMouseMove = (e: MouseEvent) => {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
-          dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
-          if (!raf) raf = requestAnimationFrame(lerp);
-        };
-
-        const lerp = () => {
-          raf = 0;
-          ringX += (mouseX - ringX) * 0.15;
-          ringY += (mouseY - ringY) * 0.15;
-          ring.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0) scale(${isHover ? 1.5 : 1})`;
-          if (Math.abs(mouseX - ringX) + Math.abs(mouseY - ringY) > 0.5) {
-            raf = requestAnimationFrame(lerp);
-          }
-        };
-
-        const hoverTargets = 'a, button, [role="button"], .btn, .card-tilt, .projectCardLink';
-
-        const onMouseOver = (e: MouseEvent) => {
-          const target = e.target as HTMLElement;
-          if (target.closest(hoverTargets)) {
-            isHover = true;
-            dot.classList.add("is-hover");
-            ring.classList.add("is-hover");
-          }
-        };
-
-        const onMouseOut = (e: MouseEvent) => {
-          const target = e.target as HTMLElement;
-          if (target.closest(hoverTargets)) {
-            isHover = false;
-            dot.classList.remove("is-hover");
-            ring.classList.remove("is-hover");
-          }
-        };
-
-        document.addEventListener("mousemove", onMouseMove, { passive: true });
-        document.addEventListener("mouseover", onMouseOver);
-        document.addEventListener("mouseout", onMouseOut);
-
-        dot.style.opacity = "1";
-        ring.style.opacity = "1";
-        document.documentElement.style.cursor = "none";
-
-        // Restore cursors for inputs
-        if (!document.getElementById("cursor-input-style")) {
-          const style = document.createElement("style");
-          style.id = "cursor-input-style";
-          style.textContent =
-            "input, textarea, select, [contenteditable] { cursor: text !important; }";
-          document.head.appendChild(style);
-        }
-      }
+    if (!dot || !ring || reducedMotion || !canHover || !finePointer) {
+      document.documentElement.classList.remove("has-custom-cursor");
+      return;
     }
+
+    let mouseX = -100;
+    let mouseY = -100;
+    let ringX = -100;
+    let ringY = -100;
+    let raf = 0;
+    let visible = false;
+    let isHover = false;
+
+    const queueRender = () => {
+      if (!raf) raf = requestAnimationFrame(render);
+    };
+
+    const syncHover = (target: EventTarget | null) => {
+      const nextHover = target instanceof HTMLElement ? !!target.closest(hoverTargets) : false;
+      if (nextHover === isHover) return;
+      isHover = nextHover;
+      dot.classList.toggle("is-hover", isHover);
+      ring.classList.toggle("is-hover", isHover);
+      queueRender();
+    };
+
+    const render = () => {
+      raf = 0;
+
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+
+      dot.style.transform = `translate3d(${mouseX - 4}px, ${mouseY - 4}px, 0)`;
+      ring.style.transform = `translate3d(${ringX - 16}px, ${ringY - 16}px, 0) scale(${isHover ? 1.35 : 1})`;
+
+      const distance = Math.abs(mouseX - ringX) + Math.abs(mouseY - ringY);
+      if (visible && distance > 0.2) {
+        raf = requestAnimationFrame(render);
+      }
+    };
+
+    const onPointerMove = (event: PointerEvent) => {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+      syncHover(event.target);
+
+      if (!visible) {
+        visible = true;
+        dot.classList.add("is-visible");
+        ring.classList.add("is-visible");
+        document.documentElement.classList.add("has-custom-cursor");
+      }
+
+      queueRender();
+    };
+
+    const onPointerLeaveWindow = (event: MouseEvent) => {
+      if (event.relatedTarget) return;
+      visible = false;
+      isHover = false;
+      dot.classList.remove("is-visible", "is-hover");
+      ring.classList.remove("is-visible", "is-hover");
+      document.documentElement.classList.remove("has-custom-cursor");
+    };
+
+    document.addEventListener("pointermove", onPointerMove, { passive: true });
+    document.addEventListener("mouseout", onPointerLeaveWindow);
+
+    customCursorWindow._cleanupCustomCursor = () => {
+      document.removeEventListener("pointermove", onPointerMove);
+      document.removeEventListener("mouseout", onPointerLeaveWindow);
+      document.documentElement.classList.remove("has-custom-cursor");
+      dot.classList.remove("is-visible", "is-hover");
+      ring.classList.remove("is-visible", "is-hover");
+      if (raf) cancelAnimationFrame(raf);
+    };
   }
 
-  // astro:page-load fires on initial load AND after every ViewTransition
-  document.addEventListener("astro:page-load", () => {
-    initCustomCursor();
-  });
+  document.addEventListener("astro:page-load", initCustomCursor);
 </script>
+
+<style is:global>
+  html.has-custom-cursor,
+  html.has-custom-cursor body,
+  html.has-custom-cursor a,
+  html.has-custom-cursor button,
+  html.has-custom-cursor [role="button"] {
+    cursor: none !important;
+  }
+
+  html.has-custom-cursor input,
+  html.has-custom-cursor textarea,
+  html.has-custom-cursor select,
+  html.has-custom-cursor [contenteditable] {
+    cursor: text !important;
+  }
+</style>
 
 <style>
   .cursor-dot,
@@ -95,42 +127,60 @@
     pointer-events: none;
     z-index: 999999;
     opacity: 0;
-    will-change: transform;
+    transform: translate3d(-100px, -100px, 0);
+    will-change: transform, opacity;
+  }
+
+  .cursor-dot.is-visible,
+  .cursor-ring.is-visible {
+    opacity: 1;
   }
 
   .cursor-dot {
     width: 8px;
     height: 8px;
     border-radius: 999px;
-    background: rgba(0, 229, 255, 0.9);
-    box-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
-    mix-blend-mode: screen;
+    background: rgba(0, 229, 255, 0.92);
+    box-shadow:
+      0 0 8px rgba(0, 229, 255, 0.45),
+      0 0 22px rgba(255, 43, 214, 0.2);
     transition:
-      background 200ms,
-      width 200ms,
-      height 200ms;
+      opacity 140ms ease,
+      background-color 180ms ease,
+      box-shadow 180ms ease;
   }
 
   .cursor-ring {
     width: 32px;
     height: 32px;
     border-radius: 999px;
-    border: 1.5px solid rgba(0, 229, 255, 0.35);
+    border: 1.5px solid rgba(0, 229, 255, 0.38);
+    box-shadow: 0 0 18px rgba(0, 229, 255, 0.14);
     transition:
-      border-color 200ms,
-      transform 200ms var(--ease-out);
+      opacity 140ms ease,
+      border-color 180ms ease,
+      box-shadow 180ms ease;
   }
 
   .cursor-dot.is-hover {
-    background: rgba(255, 43, 214, 0.9);
-    box-shadow: 0 0 8px rgba(255, 43, 214, 0.5);
+    background: rgba(255, 43, 214, 0.95);
+    box-shadow:
+      0 0 10px rgba(255, 43, 214, 0.5),
+      0 0 26px rgba(255, 43, 214, 0.24);
   }
 
   .cursor-ring.is-hover {
-    border-color: rgba(255, 43, 214, 0.4);
+    border-color: rgba(255, 43, 214, 0.45);
+    box-shadow: 0 0 22px rgba(255, 43, 214, 0.18);
   }
 
-  /* Hide on touch/mobile */
+  @media (prefers-reduced-motion: reduce) {
+    .cursor-dot,
+    .cursor-ring {
+      display: none !important;
+    }
+  }
+
   @media (hover: none), (pointer: coarse) {
     .cursor-dot,
     .cursor-ring {
